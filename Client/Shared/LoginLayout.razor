@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+
+
+<MudThemeProvider />
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center" Style="height: 100vh;">
+    <div class="d-flex flex-column mud-width-full">
+        <MudPaper Elevation="3" Class="pa-8" Width="100%" MaxWidth="500px">
+            <center>
+                @*<MudIcon icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large" Style="width:100px; height:100px; margin:auto" />*@
+                <img src="img/logo.jpg" style="width:100px; height:100px; margin:auto; border-radius:50px"/>
+            </center>
+            @Body
+        </MudPaper>
+    </div>
+</MudContainer>
+
+
+
+@code {
+
+}

@@ -23,12 +23,7 @@ public partial class Usuario
     /// <summary>
     /// Id Trabajador
     /// </summary>
-    public int? IdTrabajador { get; set; }
-
-    /// <summary>
-    /// Id Area
-    /// </summary>
-    public int? IdArea { get; set; }
+    public int? IdTraba { get; set; }
 
     /// <summary>
     /// Id Tipo Usuario
@@ -43,4 +38,6 @@ public partial class Usuario
     public virtual Creacion? IdCreateNavigation { get; set; }
 
     public virtual TpoUsuario? IdTpoUsuaNavigation { get; set; }
+
+    public virtual Trabajador? IdTrabaNavigation { get; set; }
 }

@@ -1,0 +1,284 @@
+﻿@page "/"
+@page "/pedidos/{codigo}/1"
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+@inject IUsuarioService _usuarioServicio
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SweetAlertService Swal
+@layout LoginLayout
+@inject IJSRuntime _jsServicio
+
+@if (_recuperarClave)
+{
+    <EditForm Model="@usuarioLogin" OnValidSubmit="OnValidSubmit">
+
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+
+        <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">Recuperar Contraseña</MudText>
+
+        <MudTextField T="string"
+                  Label="Ingresar Usuario"
+                  Variant="Variant.Outlined"
+                  Class="my-6"
+                  @bind-Value="@_usuarioRecuperarClave">
+        </MudTextField>
+
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+
+        <MudButton Class="mt-5" Variant="Variant.Filled" Color="Color.Primary" OnClick="@RecuperarClave" Size="Size.Large"
+               FullWidth="true"
+               Disabled="@disableButton">Recuperar Clave</MudButton>
+        <br /><br />
+        @if (_recuperacion)
+        {
+            <center><MudInputLabel style="cursor:pointer" onclick="@CancelarClave">Cancelar Recuperacion de clave</MudInputLabel></center>
+        }
+
+    </EditForm>
+}
+else
+{
+
+    <EditForm Model="@usuarioLogin" OnValidSubmit="OnValidSubmit">
+
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+
+        <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">Bienvenido</MudText>
+
+
+        <MudTextField T="string"
+                  @bind-Value="@usuarioLogin.Usuario1"
+                  Label="Usuario"
+                  Variant="Variant.Outlined"
+                  Class="my-6"
+                  For="@(() => usuarioLogin.Usuario1)">
+        </MudTextField>
+
+        <MudTextField @bind-Value="@usuarioLogin.Clave"
+                  Label="Contraseña"
+                  Variant="Variant.Outlined"
+                  InputType="@PasswordInput"
+                  Adornment="Adornment.End"
+                  AdornmentIcon="@PasswordInputIcon"
+                  OnAdornmentClick="TogglePasswordVisibility"
+                  For="@(() => usuarioLogin.Clave)" />
+
+        <MudButton Class="mt-5" Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Size="Size.Large"
+               FullWidth="true"
+               Disabled="@disableButton">Iniciar Sesión</MudButton>
+
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </EditForm>
+
+    <MudAlert Severity="Severity.Error" Class="@(myAlert + " mt-8 mud-width-full")" Style="max-width:500px;" Elevation="25">No se encontraron coincidencias</MudAlert>
+
+    <br />
+    @if (disableButton == false)
+    {
+        <center><MudInputLabel style="cursor:pointer" onclick="@RecuperarClave">¿Desea recuperar su contraseña?</MudInputLabel></center>
+    }
+
+}
+
+
+@code {
+    [Parameter]
+    public string codigo { get; set; }
+
+    UsuarioLogin usuarioLogin = new UsuarioLogin();
+    UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+    string myImageClass { get; set; } = "d-none";
+    string myAlert { get; set; } = "d-none";
+    bool disableButton { get; set; } = false;
+
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    bool _recuperarClave = false, _recuperacion = false;
+    string _usuarioRecuperarClave;
+
+
+    private config[] _config;
+
+    private async Task leerJson()
+    {
+
+        _config = await _http.GetFromJsonAsync<config[]>("config.json");
+
+    }
+
+
+    public class config
+    {
+        public string rutaReporte { get; set; }
+    }
+
+
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        // var mobile = await _jsServicio.InvokeAsync<bool>("isDevice");
+
+        //string isDevice = mobile ? "Mobile" : "Desktop";
+        // //var result = appData.esComputadora();
+        // await Swal.FireAsync("Pedido Registrado", $"Numero de pedido: NO pc: {isDevice}", "success");
+    }
+
+
+
+    private async Task CancelarClave()
+    {
+        _recuperarClave = false;
+        myImageClass = "d-none";
+        disableButton = false;
+    }
+
+    private async Task RecuperarClave()
+    {
+        if (_recuperarClave)
+        {
+            myImageClass = "d-block";
+            disableButton = true;
+            _recuperacion = false;
+            UsuarioDTO usuarioRecuperaDTO = new UsuarioDTO();
+
+            usuarioRecuperaDTO.NomUsua = _usuarioRecuperarClave;//usuarioLogin.Usuario1;
+
+            var result = await _usuarioServicio.Recuperar(usuarioRecuperaDTO);
+
+            if (result.status)
+            {
+                await Swal.FireAsync("Recuperacion Correcta", "Se envio la clave a su correo...", "success");
+            }
+            else
+            {
+                await Swal.FireAsync("Oops...", "Datos invalidados, usuario no existe!", "error");
+            }
+            myImageClass = "d-none";
+            disableButton = false;
+            _recuperarClave = false;
+            _recuperacion = false;
+
+        }
+        else
+        {
+            _recuperarClave = true;
+            myImageClass = "d-none";
+            disableButton = false;
+            _recuperacion = true;
+            _usuarioRecuperarClave = "";
+            StateHasChanged();
+        }
+    }
+
+
+
+    private async Task OnValidSubmit()
+    {
+        List<UsuarioDTO> listaUsuarios = new List<UsuarioDTO>();
+        List<TrabajadorDTO> listaTrabjadores = new List<TrabajadorDTO>();
+        myImageClass = "d-block";
+        disableButton = true;
+
+        usuarioDTO.NomUsua = usuarioLogin.Usuario1;
+        usuarioDTO.ClaveUsua = usuarioLogin.Clave;
+
+        var result = await _usuarioServicio.Login(usuarioDTO);
+
+        if (result.status)
+        {
+
+            appData.idPedido = 0;
+
+            string currentUrl = _navigationManager.Uri;
+            string codigoPedido = currentUrl.Substring(currentUrl.Length - 9, 9);
+            codigoPedido = codigoPedido.Substring(0, 7);
+
+            int n;
+            bool isNumeric = int.TryParse(codigoPedido, out n);
+
+            if (isNumeric)
+            {
+                if (Convert.ToInt16(codigoPedido) > 0)
+                {
+                    appData.idPedido = Convert.ToInt16(currentUrl.Substring(currentUrl.Length - 9, 7));
+                }
+            }
+
+
+
+            listaUsuarios = (List<UsuarioDTO>)result.value!;
+            usuarioDTO = listaUsuarios.FirstOrDefault();
+
+            appData.usuarioToken = result.token;
+            appData.usuarioLogin = usuarioDTO.NomUsua;
+            appData.idUsuario = usuarioDTO.IdUsua;
+            appData.usuarioRol = usuarioDTO.TipoUsuario;
+            appData.idTraba = usuarioDTO.IdTraba;
+            //appData.idVendedor = usuarioDTO.IdVendedor;
+            //appData.empresa = usuarioDTO.Em;
+
+            var mobile = await _jsServicio.InvokeAsync<bool>("isDevice");
+            string isDevice = mobile ? "Mobile" : "Desktop";
+            appData.xs6 = 6;
+            appData.xs5 = 5;
+            appData.xs4 = 4;
+            appData.xs3 = 3;
+            appData.xs2 = 2;
+            appData.xs1 = 1;
+            appData.xs46 = 4;
+
+
+            // enviammos la ruta del reporte //
+            _config = await _http.GetFromJsonAsync<config[]>("config.json");
+            appData.urlReporte = _config.First().rutaReporte;
+
+
+            if (mobile)
+            {
+                appData.isMobile = true;
+                appData.xs1 = 12; appData.xs2 = 12;
+                appData.xs3 = 12; appData.xs4 = 12;
+                appData.xs5 = 12; appData.xs6 = 12;
+
+                appData.xs46 = 6;
+
+            }
+
+
+            //var result = appData.esComputadora();
+            //await Swal.FireAsync("Pedido Registrado", $"Numero de pedido: NO pc: {isDevice}", "success");
+
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
+            .AuthenticateUser(usuarioDTO.NomUsua, usuarioDTO.TipoUsuario);
+
+            _navigationManager.NavigateTo("/page/dashboard");
+
+        }
+
+        else
+        {
+            myImageClass = "d-none";
+            disableButton = false;
+            myAlert = "d-block";
+        }
+    }
+}
+

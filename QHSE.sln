@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33403.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QHSE.Server", "Server\QHSE.Server.csproj", "{59625A42-8160-46A9-98F7-498F944FFD47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QHSE.Server", "Server\QHSE.Server.csproj", "{59625A42-8160-46A9-98F7-498F944FFD47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QHSE.Client", "Client\QHSE.Client.csproj", "{868B92A7-89F2-441B-8724-3AF0C267EF4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QHSE.Client", "Client\QHSE.Client.csproj", "{868B92A7-89F2-441B-8724-3AF0C267EF4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QHSE.Shared", "Shared\QHSE.Shared.csproj", "{27237524-244C-4560-BC70-3A373E631AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QHSE.Shared", "Shared\QHSE.Shared.csproj", "{27237524-244C-4560-BC70-3A373E631AC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

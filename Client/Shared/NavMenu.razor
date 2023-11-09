@@ -1,39 +1,44 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">QHSE</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿<MudNavMenu>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">DashBoard</MudNavLink>
+    <MudNavLink Href="/page/cliente" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LockPerson">Distribuidor</MudNavLink>
 
-@code {
-    private bool collapseNavMenu = true;
+    <AuthorizeView Roles="Administrador,Supervisor,Logistica">
+        <Authorized>
+            <MudNavLink Href="/page/articulo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AllInbox">Articulos</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    <MudNavLink Href="/page/pedido" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceCheck">Pedidos</MudNavLink>
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+    <AuthorizeView Roles="Administrador,Supervisor,Logistica">
+        <Authorized>
+            <MudNavLink Href="/page/proveedor" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Store">Proveedores</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
+
+    <MudNavGroup Title="Vendedores" Expanded="false" Icon="@Icons.Material.Filled.Article">
+        <AuthorizeView Roles="Administrador,Supervisor">
+            <Authorized>
+                <MudNavLink Href="/page/vendedor" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person2">Datos Personales</MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+        <MudNavLink Href="/page/vendedorArticulo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PointOfSale">Cuota de Articulos</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Report">
+        <MudNavLink Href="/page/reportepedido" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Estado de Pedido</MudNavLink>
+        <MudNavLink Href="/page/reportepedidodetalle" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Articulos Despachados</MudNavLink>
+    </MudNavGroup>
+
+    <AuthorizeView Roles="Administrador,Supervisor">
+        <Authorized>
+
+            <MudNavLink Href="/page/usuario" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceCheck">Usuarios</MudNavLink>
+            <MudNavLink Href="/page/empresa" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Receipt">Empresa</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
+
+</MudNavMenu>

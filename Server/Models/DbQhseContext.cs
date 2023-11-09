@@ -42,8 +42,9 @@ public partial class DbQhseContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQHSE;user id=sa; pwd=ACEace11");
+    { }
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQHSE;user id=sa; pwd=ACEace11");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -161,7 +162,7 @@ public partial class DbQhseContext : DbContext
                 .HasColumnType("date");
             entity.Property(e => e.IdArea).HasComment("Id Area");
             entity.Property(e => e.IdCreate).HasComment("Id Creación");
-            entity.Property(e => e.IdEmpresa).HasComment("Id Empresa");
+            entity.Property(e => e.IdEmp).HasComment("Id Empresa");
             entity.Property(e => e.IdSuper1).HasComment("Id Trabajador 1");
             entity.Property(e => e.IdSuper2).HasComment("Id Trabajador 2");
             entity.Property(e => e.IdTpoInsp).HasComment("Id Tipo Inspección");
@@ -177,8 +178,8 @@ public partial class DbQhseContext : DbContext
                 .HasForeignKey(d => d.IdCreate)
                 .HasConstraintName("FK_Inspeccion_Creacion");
 
-            entity.HasOne(d => d.IdEmpresaNavigation).WithMany(p => p.Inspeccions)
-                .HasForeignKey(d => d.IdEmpresa)
+            entity.HasOne(d => d.IdEmpNavigation).WithMany(p => p.Inspeccions)
+                .HasForeignKey(d => d.IdEmp)
                 .HasConstraintName("FK_Inspeccion_Empresa");
 
             entity.HasOne(d => d.IdSuper1Navigation).WithMany(p => p.Inspeccions)
@@ -364,10 +365,9 @@ public partial class DbQhseContext : DbContext
             entity.Property(e => e.ClaveUsua)
                 .HasMaxLength(15)
                 .HasComment("Clave Usuario");
-            entity.Property(e => e.IdArea).HasComment("Id Area");
             entity.Property(e => e.IdCreate).HasComment("Id Creación");
             entity.Property(e => e.IdTpoUsua).HasComment("Id Tipo Usuario");
-            entity.Property(e => e.IdTrabajador).HasComment("Id Trabajador");
+            entity.Property(e => e.IdTraba).HasComment("Id Trabajador");
             entity.Property(e => e.NomUsua)
                 .HasMaxLength(30)
                 .HasComment("Nombre Usuario");
@@ -379,6 +379,10 @@ public partial class DbQhseContext : DbContext
             entity.HasOne(d => d.IdTpoUsuaNavigation).WithMany(p => p.Usuarios)
                 .HasForeignKey(d => d.IdTpoUsua)
                 .HasConstraintName("FK_Usuario_TpoUsuario");
+
+            entity.HasOne(d => d.IdTrabaNavigation).WithMany(p => p.Usuarios)
+                .HasForeignKey(d => d.IdTraba)
+                .HasConstraintName("FK_Usuario_Trabajador");
         });
 
         OnModelCreatingPartial(modelBuilder);

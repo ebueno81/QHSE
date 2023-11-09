@@ -43,7 +43,7 @@ public partial class Inspeccion
     /// <summary>
     /// Id Empresa
     /// </summary>
-    public int? IdEmpresa { get; set; }
+    public int? IdEmp { get; set; }
 
     /// <summary>
     /// Id Creación
@@ -54,7 +54,7 @@ public partial class Inspeccion
 
     public virtual Creacion? IdCreateNavigation { get; set; }
 
-    public virtual Empresa? IdEmpresaNavigation { get; set; }
+    public virtual Empresa? IdEmpNavigation { get; set; }
 
     public virtual Trabajador? IdSuper1Navigation { get; set; }
 
