@@ -4,7 +4,7 @@
     {
         public int IdVendedor { get; set; }
 
-        public int? IdPersona { get; set; }
+        public int? IdTraba { get; set; }
 
         public int? IdCargo { get; set; }
 
