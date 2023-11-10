@@ -1,35 +1,22 @@
 ﻿<MudNavMenu>
 
     <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">DashBoard</MudNavLink>
-    <MudNavLink Href="/page/cliente" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LockPerson">Distribuidor</MudNavLink>
 
-    <AuthorizeView Roles="Administrador,Supervisor,Logistica">
-        <Authorized>
-            <MudNavLink Href="/page/articulo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AllInbox">Articulos</MudNavLink>
-        </Authorized>
-    </AuthorizeView>
+    <MudNavGroup Title="Mantenimiento" Expanded="false" Icon="@Icons.Material.Filled.Report">
+        <MudNavLink Href="/page/trabajador" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Trabajadores</MudNavLink>
+        <MudNavLink Href="/page/area" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Areas</MudNavLink>
+        <MudNavLink Href="/page/categoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Categorias</MudNavLink>
+        <MudNavLink Href="/page/subcategoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Sub Categorias</MudNavLink>
+    </MudNavGroup>
 
-    <MudNavLink Href="/page/pedido" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceCheck">Pedidos</MudNavLink>
-
-    <AuthorizeView Roles="Administrador,Supervisor,Logistica">
-        <Authorized>
-            <MudNavLink Href="/page/proveedor" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Store">Proveedores</MudNavLink>
-        </Authorized>
-    </AuthorizeView>
-
-
-    <MudNavGroup Title="Vendedores" Expanded="false" Icon="@Icons.Material.Filled.Article">
-        <AuthorizeView Roles="Administrador,Supervisor">
-            <Authorized>
-                <MudNavLink Href="/page/vendedor" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person2">Datos Personales</MudNavLink>
-            </Authorized>
-        </AuthorizeView>
-        <MudNavLink Href="/page/vendedorArticulo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PointOfSale">Cuota de Articulos</MudNavLink>
+    <MudNavGroup Title="Procesos" Expanded="false" Icon="@Icons.Material.Filled.Report">
+        <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Plantillas</MudNavLink>
+        <MudNavLink Href="/page/RegistroInspeccion" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Registro Inspección</MudNavLink>
     </MudNavGroup>
 
     <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Report">
-        <MudNavLink Href="/page/reportepedido" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Estado de Pedido</MudNavLink>
-        <MudNavLink Href="/page/reportepedidodetalle" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Articulos Despachados</MudNavLink>
+        <MudNavLink Href="/page/ReporteGeneral" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Reporte General </MudNavLink>
+        <MudNavLink Href="/page/ReporteDetallado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Reporte Detallado</MudNavLink>
     </MudNavGroup>
 
     <AuthorizeView Roles="Administrador,Supervisor">
@@ -39,6 +26,8 @@
             <MudNavLink Href="/page/empresa" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Receipt">Empresa</MudNavLink>
         </Authorized>
     </AuthorizeView>
+
+    <MudNavLink Href="/page/ayuda" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Ayuda</MudNavLink>
 
 
 </MudNavMenu>
