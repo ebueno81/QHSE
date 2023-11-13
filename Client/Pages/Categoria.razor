@@ -1,7 +1,197 @@
 ﻿@page "/page/categoria"
+@inject ICategoriaService _categoriaServicio
+@inject ICreacionService _creacionServicio
+@inject IDialogService _dialogServicio
+@inject ISnackbar _snackBar
+@inject SweetAlertService Swal;
 
-<h3>Categoria</h3>
+<AuthorizeView Roles="Administrador,Supervisor">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+    <MudText Typo="Typo.h5" GutterBottom="true">Categorias</MudText>
+
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+        <MudGrid>
+            <AuthorizeView Roles="Administrador,Supervisor">
+                <Authorized>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary"
+                                   OnClick="AbrirNuevo">
+                            Nuevo Area
+                        </MudButton>
+                    </MudItem>
+                </Authorized>
+            </AuthorizeView>
+
+            <MudItem xs="12">
+
+                <MudTable Items="@listaCategorias"
+                          Striped="true" Bordered="true" Dense="true"
+                          Filter="new Func<CategoriaDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                          Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Codigo</MudTh>
+                        <MudTh>Area</MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="registroRow">
+                        <MudTd DataLabel="Codigo">@registroRow.IdCtg</MudTd>
+                        <MudTd DataLabel="Categoria">@registroRow.DescCtg</MudTd>
+
+                        <MudTd DataLabel="">
+                            <AuthorizeView Roles="Administrador,Supervisor">
+                                <Authorized>
+                                    <MudFab Color="Color.Primary"
+                                            StartIcon="@Icons.Material.Filled.Edit"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => AbrirEditar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView Roles="Administrador">
+                                <Authorized>
+                                    <MudFab Color="Color.Error"
+                                            StartIcon="@Icons.Material.Filled.Delete"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => Eliminar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+
+
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+</MudContainer>
 
 @code {
+
+    List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
+
+
+    private string searchString1 = "";
+    private CategoriaDTO selectedItem1 = null;
+    private bool _loading = true;
+
+    private async Task ObtenerCategorias()
+    {
+        var result = await _categoriaServicio.Lista();
+
+        if (result.status)
+        {
+            listaCategorias = (List<CategoriaDTO>)result.value!;
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerCategorias();
+        _loading = false;
+
+        //try
+        //{
+        //    await ObtenerAreas();
+        //    _loading = false;
+        //}
+        //catch (Exception)
+        //{
+
+        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
+        //}
+    }
+
+    private bool FilterFunc1(CategoriaDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(CategoriaDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.DescCtg.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+
+        return false;
+    }
+
+    private async Task AbrirNuevo()
+    {
+        var dialogo = _dialogServicio.Show<MdCategoria>("Nueva Categoria");
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+            await ObtenerCategorias();
+        }
+    }
+
+    private async Task AbrirEditar(CategoriaDTO model)
+    {
+        var parametros = new DialogParameters { ["_categoria"] = model };
+
+        var dialogo = _dialogServicio.Show<MdCategoria>("Editar Categoria", parametros);
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+            await ObtenerCategorias();
+        }
+    }
+
+    private async Task Eliminar(CategoriaDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Esta seguro?",
+                Text = $"Eliminar Area: {model.DescCtg}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
+
+        if (result.IsConfirmed)
+        {
+            CreacionDTO _creacion = new CreacionDTO();
+            _creacion.IdCreate = model.IdCreate ?? default(int);
+            _creacion.UsuaAnula = appData.usuarioLogin;
+            _creacion.PcAnula = Environment.MachineName;
+
+
+            var resultado = await _creacionServicio.Anular(_creacion);
+
+            if (resultado)
+            {
+                _snackBar.Add("El area fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                await ObtenerCategorias();
+            }
+            else
+                _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
+    }
 
 }

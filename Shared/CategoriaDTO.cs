@@ -5,5 +5,8 @@
         public int IdCtg { get; set; }
 
         public string? DescCtg { get; set; }
+
+        public int? IdCreate { get; set; }
+
     }
 }
