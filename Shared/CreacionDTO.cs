@@ -29,7 +29,7 @@ namespace QHSE.Shared
 
         public virtual List<AreaDTO>? Areas { get; set; }
 
-        //public virtual List<VendedorDTO>? Vendedores { get; set; }
+        public virtual List<TrabajadorDTO>? Trabajadors { get; set; }
 
         public virtual List<UsuarioDTO>? Usuarios { get; set; }
 

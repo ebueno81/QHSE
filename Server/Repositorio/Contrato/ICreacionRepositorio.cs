@@ -3,13 +3,13 @@ using System.Linq.Expressions;
 
 namespace QHSE.Server.Repositorio.Contrato
 {
-    public interface ICategoriaRepositorio
+    public interface ICreacionRepositorio
     {
-        Task<List<Categorium>> Lista();
+        Task<List<Creacion>> Lista();
         Task<Creacion> Obtener(Expression<Func<Creacion, bool>> filtro = null);
         Task<Creacion> Crear(Creacion entidad);
         Task<bool> Editar(Creacion entidad);
-        Task<IQueryable<Categorium>> Consultar(Expression<Func<Categorium, bool>> filtro = null);
-        
+        Task<bool> Eliminar(Creacion entidad);
+        Task<IQueryable<Creacion>> Consultar(Expression<Func<Creacion, bool>> filtro = null);
     }
 }

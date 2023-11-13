@@ -15,12 +15,12 @@ namespace QHSE.Server.Controllers
     public class CategoriaController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IAreaRepositorio _areaRepositorio;
+        private readonly ICategoriaRepositorio _categoriaRepositorio;
 
-        public CategoriaController(IAreaRepositorio articuloRepositorio, IMapper mapper)
+        public CategoriaController(ICategoriaRepositorio articuloRepositorio, IMapper mapper)
         {
             _mapper = mapper;
-            _areaRepositorio = articuloRepositorio;
+            _categoriaRepositorio = articuloRepositorio;
         }
 
         [HttpGet]
@@ -31,16 +31,16 @@ namespace QHSE.Server.Controllers
 
             try
             {
-                List<CategoriaDTO> _listaAreas = new List<CategoriaDTO>();
+                List<CategoriaDTO> _listaCategorias = new List<CategoriaDTO>();
 
-                IQueryable<Area> query = await _areaRepositorio.Consultar();
+                IQueryable<Categorium> query = await _categoriaRepositorio.Consultar();
                 query = query.Include(c => c.IdCreateNavigation)
                         .Where(c => c.IdCreateNavigation.Activo == 1);
 
-                _listaAreas = _mapper.Map<List<CategoriaDTO>>(query.ToList());
+                _listaCategorias = _mapper.Map<List<CategoriaDTO>>(query.ToList());
 
-                if (_listaAreas.Count > 0)
-                    _response = new ResponseDTO<List<CategoriaDTO>>() { status = true, msg = "ok", value = _listaAreas };
+                if (_listaCategorias.Count > 0)
+                    _response = new ResponseDTO<List<CategoriaDTO>>() { status = true, msg = "ok", value = _listaCategorias };
                 else
                     _response = new ResponseDTO<List<CategoriaDTO>>() { status = false, msg = "sin resultados", value = null };
 
@@ -64,13 +64,13 @@ namespace QHSE.Server.Controllers
 
             try
             {
-                Creacion _Area = _mapper.Map<Creacion>(request);
+                Creacion Categorium = _mapper.Map<Creacion>(request);
 
-                Creacion _AreaCreado = await _areaRepositorio.Crear(_Area);
+                Creacion CategoriumCreado = await _categoriaRepositorio.Crear(Categorium);
 
 
-                if (_AreaCreado.IdCreate != 0)
-                    _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = true, msg = "ok", value = _mapper.Map<CreacionDTO>(_AreaCreado) };
+                if (CategoriumCreado.IdCreate != 0)
+                    _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = true, msg = "ok", value = _mapper.Map<CreacionDTO>(CategoriumCreado) };
                 else
                     _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = false, msg = "No se pudo crear el registro" };
 
@@ -96,18 +96,18 @@ namespace QHSE.Server.Controllers
 
             try
             {
-                Creacion _Area = _mapper.Map<Creacion>(request);
-                Creacion _AreaEditar = await _areaRepositorio.Obtener(u => u.IdCreate == _Area.IdCreate);
+                Creacion Categorium = _mapper.Map<Creacion>(request);
+                Creacion CategoriumEditar = await _categoriaRepositorio.Obtener(u => u.IdCreate == Categorium.IdCreate);
 
-                if (_AreaEditar.IdCreate != null)
+                if (CategoriumEditar.IdCreate != null)
                 {
 
-                    _AreaEditar.FechaModi = DateTime.Now;
-                    _AreaEditar.UsuaModi = _Area.UsuaModi;
-                    _AreaEditar.PcModi = _Area.PcModi;
-                    _AreaEditar.Areas = _Area.Areas;
+                    CategoriumEditar.FechaModi = DateTime.Now;
+                    CategoriumEditar.UsuaModi = Categorium.UsuaModi;
+                    CategoriumEditar.PcModi = Categorium.PcModi;
+                    CategoriumEditar.Categoria = Categorium.Categoria;
 
-                    bool respuesta = await _areaRepositorio.Editar(_AreaEditar);
+                    bool respuesta = await _categoriaRepositorio.Editar(CategoriumEditar);
 
                     if (respuesta)
                         _ResponseDTO = new ResponseDTO<bool>() { status = true, msg = "ok", value = true };
