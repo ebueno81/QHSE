@@ -1,0 +1,207 @@
+﻿@inject ITrabajadorService _trabajadorServicio
+@inject IDialogService DialogService
+
+@inject ISnackbar _snackBar
+
+<MudDialog Style="width:500px">
+
+    <DialogContent>
+        <MudContainer Style="max-height: 400px;" Class="m-0 p-0">
+            <EditForm Model="@_trabajador">
+
+                <MudPaper Elevation="3" Class="pa-4" Width="100%">
+                            <MudTextField @bind-Value="@_trabajador.NomTraba" Class="mb-3"
+                                          Label="Nombres" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                            <MudTextField @bind-Value="@_trabajador.ApeTraba" Class="mb-3"
+                                          Label="Apellidos" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                            <MudTextField @bind-Value="@_trabajador.NroDoc" Class="mb-3"
+                                          Label="Nro Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                            <MudTextField @bind-Value="@_trabajador.NroTelefono" Class="mb-3"
+                                          Label="Nro Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                            <MudTextField @bind-Value="@_trabajador.CorreoTraba" Class="mb-3"
+                                          Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    
+                </MudPaper>
+            </EditForm>
+        </MudContainer>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [Parameter]
+    public TrabajadorDTO _trabajador { get; set; } = new TrabajadorDTO();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Trabajadors = new List<TrabajadorDTO>()
+        };
+
+
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false;
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            //if (validarDuplicidad())
+            //{
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
+            // _usuario.IdTraba = _personaSeleccionado.IdTraba;
+
+            _creacion.Trabajadors!.Add(_trabajador);
+
+
+            if (_trabajador.IdTraba != 0)
+            {
+                _creacion.IdCreate = _trabajador.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _trabajadorServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _trabajadorServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer el trabajador esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+
+            //}
+        }
+
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+    //validar que no se repite el area //
+    private bool validarDuplicidad()
+    {
+        // if (_area.IdArea > 0)
+        // {
+        //     return true;
+        // }
+        // else
+        // {
+        //     AreaDTO areaValidateDTO = new AreaDTO();
+        //     ResponseDTO<List<AreaDTO>> result = new ResponseDTO<List<AreaDTO>>();
+        //     areaValidateDTO.DescArea = _area.DescArea;
+        //       var result = _areaServicio.ValidarDuplicidad(areaValidateDTO);
+        //     if (_areaServicio.ValidarDuplicidad(areaValidateDTO) != null)
+        //     {
+
+        //         if (_areaServicio.ValidarDuplicidad(userValidateDTO).Result.status == true)
+        //         {
+        //             _snackBar.Add("Usuario ya existe, se esta duplicando", Severity.Error, a => a.VisibleStateDuration = 500);
+        //             return false;
+        //         }
+        //         else
+        //         {
+        //             return true;
+        //         }
+
+        //     }
+        //     else
+        //     {
+        //         return true;
+        //     }
+        // }
+        return true;
+
+    }
+
+    private bool validarDatos()
+    {
+
+        if (!string.IsNullOrEmpty(_trabajador.NomTraba))
+        {
+
+            if (!string.IsNullOrEmpty(_trabajador.ApeTraba))
+            {
+
+                if (!string.IsNullOrEmpty(_trabajador.NroDoc))
+                {
+
+                    return true;
+                }
+                else
+                {
+                    Mensaje("1. Ingrese el número de documento...");
+                    return false;
+                }
+            }
+            else
+            {
+                Mensaje("2. Ingrese apellido del trabajador...");
+                return false;
+            }
+        }
+        else
+        {
+            Mensaje("3. Ingrese nombre del trabaajdor...");
+            return false;
+        }
+
+
+    }
+
+}

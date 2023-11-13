@@ -1,7 +1,210 @@
 ﻿@page "/page/trabajador"
+@inject ITrabajadorService _trabajadorServicio
+@inject ICreacionService _creacionServicio
+@inject IDialogService _dialogServicio
+@inject ISnackbar _snackBar
+@inject SweetAlertService Swal;
 
-<h3>Trabajador</h3>
+<AuthorizeView Roles="Administrador,Supervisor">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+    <MudText Typo="Typo.h5" GutterBottom="true">Trabajadores</MudText>
+
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+        <MudGrid>
+            <AuthorizeView Roles="Administrador,Supervisor">
+                <Authorized>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary"
+                                   OnClick="AbrirNuevo">
+                            Nuevo Trabajador
+                        </MudButton>
+                    </MudItem>
+                </Authorized>
+            </AuthorizeView>
+
+            <MudItem xs="12">
+
+                <MudTable Items="@listaTrabajadores"
+                          Striped="true" Bordered="true" Dense="true"
+                          Filter="new Func<TrabajadorDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                          Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Codigo</MudTh>
+                        <MudTh>Nombre</MudTh>
+                        <MudTh>Apellido</MudTh>
+                        <MudTh>N°Documento</MudTh>
+                        <MudTh>N°Telefono</MudTh>
+                        <MudTh>Correo</MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="registroRow">
+                        <MudTd DataLabel="Codigo">@registroRow.IdTraba</MudTd>
+                        <MudTd DataLabel="Nombre">@registroRow.NomTraba</MudTd>
+                        <MudTd DataLabel="Apellido">@registroRow.ApeTraba</MudTd>
+                        <MudTd DataLabel="N°Documento">@registroRow.NroDoc</MudTd>
+                        <MudTd DataLabel="N°Telefono">@registroRow.NroTelefono</MudTd>
+                        <MudTd DataLabel="Correo">@registroRow.CorreoTraba</MudTd>
+
+                        <MudTd DataLabel="">
+                            <AuthorizeView Roles="Administrador,Supervisor">
+                                <Authorized>
+                                    <MudFab Color="Color.Primary"
+                                            StartIcon="@Icons.Material.Filled.Edit"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => AbrirEditar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView Roles="Administrador">
+                                <Authorized>
+                                    <MudFab Color="Color.Error"
+                                            StartIcon="@Icons.Material.Filled.Delete"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => Eliminar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+
+
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+</MudContainer>
 
 @code {
+
+    List<TrabajadorDTO> listaTrabajadores = new List<TrabajadorDTO>();
+
+
+    private string searchString1 = "";
+    private TrabajadorDTO selectedItem1 = null;
+    private bool _loading = true;
+
+    private async Task ObtenerTrabajadores()
+    {
+        var result = await _trabajadorServicio.Lista();
+
+        if (result.status)
+        {
+            listaTrabajadores = (List<TrabajadorDTO>)result.value!;
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerTrabajadores();
+        _loading = false;
+
+        //try
+        //{
+        //    await ObtenerAreas();
+        //    _loading = false;
+        //}
+        //catch (Exception)
+        //{
+
+        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
+        //}
+    }
+
+    private bool FilterFunc1(TrabajadorDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TrabajadorDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.NomTraba.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.ApeTraba.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.NroDoc.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
+    }
+
+    private async Task AbrirNuevo()
+    {
+        var dialogo = _dialogServicio.Show<MdTrabajador>("Nuevo Trabajador");
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+            await ObtenerTrabajadores();
+        }
+    }
+
+    private async Task AbrirEditar(TrabajadorDTO model)
+    {
+        var parametros = new DialogParameters { ["_trabajador"] = model };
+
+        var dialogo = _dialogServicio.Show<MdTrabajador>("Editar Trabajador", parametros);
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+            await ObtenerTrabajadores();
+        }
+    }
+
+    private async Task Eliminar(TrabajadorDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Esta seguro?",
+                Text = $"Eliminar Trabajador: {model.NomTraba} {model.ApeTraba}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
+
+        if (result.IsConfirmed)
+        {
+            CreacionDTO _creacion = new CreacionDTO();
+            _creacion.IdCreate = model.IdCreate ?? default(int);
+            _creacion.UsuaAnula = appData.usuarioLogin;
+            _creacion.PcAnula = Environment.MachineName;
+
+
+            var resultado = await _creacionServicio.Anular(_creacion);
+
+            if (resultado)
+            {
+                _snackBar.Add("El trabajador fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                await ObtenerTrabajadores();
+            }
+            else
+                _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
+    }
 
 }

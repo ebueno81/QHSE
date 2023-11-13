@@ -18,7 +18,7 @@
                                          ResetValueOnEmptyText="true"
                                          AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
                                          Variant="Variant.Outlined" Margin="Margin.Dense"
-                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombres}")" />
+                                         ToStringFunc="@(e => e == null ? null : $"{e.NomTraba}")" />
                     </MudItem>
                 </MudGrid>
                 <MudGrid>
@@ -135,8 +135,8 @@
                 return new List<TrabajadorDTO>();
 
             List<TrabajadorDTO> lista = (List<TrabajadorDTO>)response.value!;
-            _usuario.Correo = lista.Where(p => p.Nombres.Contains(valor, StringComparison.InvariantCultureIgnoreCase)).First().Correo;
-            return lista.FindAll(p => p.Nombres.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
+            _usuario.Correo = lista.Where(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase)).First().CorreoTraba;
+            return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
 
 
 
@@ -175,7 +175,7 @@
 
                 if (_personaSeleccionado != null)
                 {
-                    _usuario.Correo = _personaSeleccionado.Correo;
+                    _usuario.Correo = _personaSeleccionado.CorreoTraba;
                     desabilitaUser = true;
                 }
                 else
