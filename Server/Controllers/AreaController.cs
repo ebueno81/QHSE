@@ -33,6 +33,7 @@ namespace QHSE.Server.Controllers
                 List<AreaDTO> _listaAreas = new List<AreaDTO>();
 
                 IQueryable<Area> query = await _areaRepositorio.Consultar();
+
                 query = query.Include(c => c.IdCreateNavigation)
                         .Where(c => c.IdCreateNavigation.Activo == 1);
 

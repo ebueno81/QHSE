@@ -17,7 +17,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
-    <MudText Typo="Typo.h5" GutterBottom="true">Areas</MudText>
+    <MudText Typo="Typo.h5" GutterBottom="true">Areas  </MudText>
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
         <MudGrid>
@@ -108,19 +108,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ObtenerAreas();
-        _loading = false;
+        //await ObtenerAreas();
+        //_loading = false;
 
-        //try
-        //{
-        //    await ObtenerAreas();
-        //    _loading = false;
-        //}
-        //catch (Exception)
-        //{
+        try
+        {
+            await ObtenerAreas();
+            _loading = false;
+        }
+        catch (Exception)
+        {
 
-        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
-        //}
+            _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
     }
 
     private bool FilterFunc1(AreaDTO element) => FilterFunc(element, searchString1);

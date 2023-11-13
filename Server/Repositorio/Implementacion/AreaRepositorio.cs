@@ -49,9 +49,17 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public Task<List<Area>> Lista()
+        public async Task<List<Area>> Lista()
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _dbContext.Areas.ToListAsync();
+            }
+            catch
+            {
+
+                throw;
+            }
         }
 
         public async Task<Creacion> Obtener(Expression<Func<Creacion, bool>> filtro = null)
