@@ -13,7 +13,5 @@ namespace QHSE.Client.Servicios.Contrato
         Task<bool> Editar(CreacionDTO entidad);
         Task<bool> Eliminar(int id);
 
-
-
     }
 }
