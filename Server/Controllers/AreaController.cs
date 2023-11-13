@@ -71,7 +71,7 @@ namespace QHSE.Server.Controllers
                 if (_AreaCreado.IdCreate != 0)
                     _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = true, msg = "ok", value = _mapper.Map<CreacionDTO>(_AreaCreado) };
                 else
-                    _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = false, msg = "No se pudo crear el vendedor" };
+                    _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = false, msg = "No se pudo crear el registro" };
 
                 return StatusCode(StatusCodes.Status200OK, _ResponseDTO);
 
@@ -111,11 +111,11 @@ namespace QHSE.Server.Controllers
                     if (respuesta)
                         _ResponseDTO = new ResponseDTO<bool>() { status = true, msg = "ok", value = true };
                     else
-                        _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se pudo crear el vendedor" };
+                        _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se pudo crear el registro" };
                 }
                 else
                 {
-                    _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se encontró el vendedor" };
+                    _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se encontró el registro" };
                 }
 
                 return StatusCode(StatusCodes.Status200OK, _ResponseDTO);
