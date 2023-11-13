@@ -16,7 +16,6 @@ namespace QHSE.Server.Utilidades
                   .ForMember(destino =>
                 destino.Usuarios,
                 opt => opt.Ignore());
-
             CreateMap<CreacionDTO, Creacion>();
 
             #endregion Creacion
@@ -28,10 +27,12 @@ namespace QHSE.Server.Utilidades
 
             #region Area
             CreateMap<Area, AreaDTO>();
+            CreateMap<AreaDTO, Area>();
             #endregion Area
 
             #region Categoria
             CreateMap<Categorium, CategoriaDTO>();
+            CreateMap<CategoriaDTO, Categorium>();
             #endregion Categoria
 
             //#region Persona
