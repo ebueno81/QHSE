@@ -17,7 +17,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+<<<<<<< HEAD
 builder.Services.AddScoped<IAreaService, AreaService>();
+=======
+builder.Services.AddScoped<ICreacionService, CreacionService>();
+builder.Services.AddScoped<ITipoUsuarioService,TipoUsuarioService>();
+
+builder.Services.AddScoped<ITrabajadorService, TrabajadorService>();
+>>>>>>> 2e36e4e72a9ceccf3d9d1b2d4fac05d43955b108
 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
