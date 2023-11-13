@@ -1,0 +1,381 @@
+﻿@inject IUsuarioService _usuarioServicio
+@inject ITipoUsuarioService _tipoUsuarioServicio
+@inject ITrabajadorService _trabajadorServicio
+@inject IDialogService DialogService
+
+@inject ISnackbar _snackBar
+
+<MudDialog Style="width:900px">
+
+    <DialogContent>
+        <MudContainer Style="max-height: 400px; overflow-x:hidden;overflow-y: scroll" Class="m-0 p-0">
+
+            <EditForm Model="@_usuario">
+
+                <MudGrid>
+                    <MudItem xs="12" sm="12">
+                        <MudAutocomplete T="TrabajadorDTO" Label="Buscar persona" @bind-Value="_personaSeleccionado" SearchFunc="@BuscarPersona"
+                                         ResetValueOnEmptyText="true"
+                                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                         Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombres}")" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField @bind-Value="@_usuario.NomUsua" Class="mb-3" Disabled="@desabilitaUser"
+                              Label="Usuario" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+
+                    </MudItem>
+                    <MudItem xs="12" sm="8">
+                        <MudTextField Disabled @bind-Value="@_usuario.Correo" Class="mb-3"
+                                      Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="@_usuario.ClaveUsua"
+                                      Label="Clave"
+                                      Variant="Variant.Outlined"
+                                      InputType="@PasswordInput"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="TogglePasswordVisibility"
+                                      For="@(() => _usuario.ClaveUsua)" />
+
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="@_usuario.ClaveConfirmacion"
+                                      Label="Confirmacion"
+                                      Variant="Variant.Outlined"
+                                      InputType="@PasswordInput"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="TogglePasswordVisibility"
+                                      For="@(() => _usuario.ClaveConfirmacion)" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect Label="Tipo Empleado" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-3"
+                           @bind-Value="tipoUsuarioSeleccionado">
+                    @if (listaTipoUsuario.Any())
+                    {
+                        foreach (var tipoUsuario in listaTipoUsuario)
+                        {
+                            <MudSelectItem Value="@tipoUsuario">@tipoUsuario.DescTpo</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudContainer>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+   [Parameter]
+    public UsuarioDTO _usuario { get; set; } = new UsuarioDTO();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Usuarios = new List<UsuarioDTO>()
+        };
+
+    List<TpoUsuarioDTO> listaTipoUsuario = new List<TpoUsuarioDTO>();
+    public TpoUsuarioDTO tipoUsuarioSeleccionado;
+
+
+    List<TrabajadorDTO> listaPersona = new List<TrabajadorDTO>();
+    private TrabajadorDTO _personaSeleccionado;
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false;
+
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private async Task<IEnumerable<TrabajadorDTO>> BuscarPersona(string valor)
+    {
+
+        var response = await _trabajadorServicio.Lista();
+
+        if (response.status)
+        {
+            if (string.IsNullOrEmpty(valor))
+                return new List<TrabajadorDTO>();
+
+            List<TrabajadorDTO> lista = (List<TrabajadorDTO>)response.value!;
+            _usuario.Correo = lista.Where(p => p.Nombres.Contains(valor, StringComparison.InvariantCultureIgnoreCase)).First().Correo;
+            return lista.FindAll(p => p.Nombres.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
+
+
+
+        }
+        else
+        {
+            return new List<TrabajadorDTO>();
+        }
+
+
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resultado = await _tipoUsuarioServicio.Lista();
+
+        if (resultado.status)
+        {
+            listaTipoUsuario = resultado.value!;
+            if (_usuario.IdTpoUsua != 0)
+                tipoUsuarioSeleccionado = listaTipoUsuario.FirstOrDefault(p => p.IdTpoUsua == _usuario.IdTpoUsua)!;
+            else
+                tipoUsuarioSeleccionado = listaTipoUsuario.First();
+        }
+
+        var response = await _trabajadorServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaPersona = response.value!;
+            if (_usuario.IdTraba != 0)
+            {
+                _personaSeleccionado = listaPersona.FirstOrDefault(p => p.IdTraba == _usuario.IdTraba)!;
+
+                if (_personaSeleccionado != null)
+                {
+                    _usuario.Correo = _personaSeleccionado.Correo;
+                    desabilitaUser = true;
+                }
+                else
+                {
+                    _usuario.NomUsua = "";
+                    _usuario.ClaveUsua = "";
+                }
+
+            }
+            else
+            {
+                _usuario.NomUsua = "";
+                _usuario.ClaveUsua = "";
+
+            }
+            // StateHasChanged();
+
+        }
+
+        StateHasChanged();
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            //if (validarDuplicidadUsuario())
+            //{
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
+            _usuario.IdTraba = _personaSeleccionado.IdTraba;
+
+            _creacion.Usuarios!.Add(_usuario);
+
+
+            if (_usuario.IdUsua != 0)
+            {
+                _creacion.IdCreate = _usuario.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _usuarioServicio.Editar(_creacion);
+                _mensaje = "Usuario fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _usuarioServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Usuario fue creado";
+            }
+
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer el usuario esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+
+            //}
+        }
+
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+    //validar que no se repite el nombre de usuario //
+    private bool validarDuplicidadUsuario()
+    {
+        if (_usuario.IdUsua > 0)
+        {
+            return true;
+        }
+        else
+        {
+            UsuarioDTO userValidateDTO = new UsuarioDTO();
+            // ResponseDTO<List<UsuarioDTO>> result = new ResponseDTO<List<UsuarioDTO>>();
+            userValidateDTO.NomUsua = _usuario.NomUsua;
+            //  var result = _usuarioServicio.ValidarDuplicidad(userValidateDTO);
+            if (_usuarioServicio.ValidarDuplicidad(userValidateDTO) != null)
+            {
+
+                if (_usuarioServicio.ValidarDuplicidad(userValidateDTO).Result.status == true)
+                {
+                    _snackBar.Add("Usuario ya existe, se esta duplicando", Severity.Error, a => a.VisibleStateDuration = 500);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+
+
+    }
+
+    private bool validarDatos()
+    {
+        if (_personaSeleccionado != null)
+        {
+            if (tipoUsuarioSeleccionado != null)
+            {
+                if (!string.IsNullOrEmpty(_usuario.NomUsua))
+                {
+                    if (_personaSeleccionado.IdTraba > 0)
+                    {
+                        if (tipoUsuarioSeleccionado.IdTpoUsua > -1)
+                        {
+                            if (!string.IsNullOrEmpty(_usuario.ClaveUsua))
+                            {
+                                if (_usuario.ClaveUsua.Length > 0)
+                                {
+                                    if (_usuario.ClaveUsua == _usuario.ClaveConfirmacion)
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        Mensaje("1. La confirmacion de clave no coincide...");
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    Mensaje("2. Debe ingresar una clave valida...");
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                Mensaje("3. la clave esta vacia...");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Mensaje("4. Debe seleccionar el tipo de cargo...");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        Mensaje("5. Debe seleccionar la persona...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Mensaje("6. Debe ingresar el usuario...");
+                    return false;
+                }
+            }
+            else
+            {
+                Mensaje("7. Debe seleccionar el tipo de usuario...");
+                return false;
+            }
+        }
+        else
+        {
+            Mensaje("8. Debe seleccionar la persona...");
+            return false;
+        }
+    }
+
+}
