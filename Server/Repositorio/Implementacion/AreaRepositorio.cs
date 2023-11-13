@@ -5,18 +5,19 @@ using System.Linq.Expressions;
 
 namespace QHSE.Server.Repositorio.Implementacion
 {
-    public class TrabajadorRepositorio : ITrabajadorRepositorio
+    public class AreaRepositorio : IAreaRepositorio
+
     {
         private readonly DbQhseContext _dbContext;
 
-        public TrabajadorRepositorio(DbQhseContext dbContext)
+        public AreaRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<IQueryable<Trabajador>> Consultar(Expression<Func<Trabajador, bool>> filtro = null)
+        public async Task<IQueryable<Area>> Consultar(Expression<Func<Area, bool>> filtro = null)
         {
-            IQueryable<Trabajador> queryEntidad = filtro == null ? _dbContext.Trabajadors : _dbContext.Trabajadors.Where(filtro);
+            IQueryable<Area> queryEntidad = filtro == null ? _dbContext.Areas : _dbContext.Areas.Where(filtro);
             return queryEntidad;
         }
 
@@ -48,18 +49,9 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-
-        public async Task<List<Trabajador>> Lista()
+        public Task<List<Area>> Lista()
         {
-            try
-            {
-                return await _dbContext.Trabajadors.ToListAsync();
-            }
-            catch
-            {
-
-                throw;
-            }
+            throw new NotImplementedException();
         }
 
         public async Task<Creacion> Obtener(Expression<Func<Creacion, bool>> filtro = null)

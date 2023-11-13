@@ -56,7 +56,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<ITrabajadorRepositorio, TrabajadorRepositorio>();
-
+builder.Services.AddScoped<IAreaRepositorio, AreaRepositorio>();
 
 var app = builder.Build();
 
