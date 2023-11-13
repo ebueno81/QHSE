@@ -25,7 +25,7 @@ namespace QHSE.Shared
 
         public string? PcAnula { get; set; }
 
-        public virtual List<CategoriaDTO>? Categorias { get; set; }
+        public virtual List<CategoriaDTO>? Categoria { get; set; }
 
         public virtual List<AreaDTO>? Areas { get; set; }
 
