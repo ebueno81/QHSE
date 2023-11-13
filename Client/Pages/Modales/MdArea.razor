@@ -1,5 +1,187 @@
-﻿<h3>MdArea</h3>
+﻿@inject IAreaService _areaServicio
+@inject IDialogService DialogService
+
+@inject ISnackbar _snackBar
+
+<MudDialog Style="width:900px">
+
+    <DialogContent>
+        <MudContainer Style="max-height: 400px; overflow-x:hidden;" Class="m-0 p-0">
+
+            <EditForm Model="@_area">
+
+          
+                <MudGrid>
+                  
+                    <MudItem xs="12" sm="12">
+                        <MudTextField  @bind-Value="@_area.DescArea" Class="mb-3"
+                                       Label="Area" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                     </MudItem>
+                 </MudGrid>
+              
+            </EditForm>
+        </MudContainer>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar </MudButton>
+    </DialogActions>
+</MudDialog>
+
 
 @code {
+
+    [Parameter]
+    public AreaDTO _area { get; set; } = new AreaDTO();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Areas = new List<AreaDTO>()
+        };
+
+  
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false;
+
+
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            //if (validarDuplicidad())
+            //{
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
+            // _usuario.IdTraba = _personaSeleccionado.IdTraba;
+
+            _creacion.Areas!.Add(_area);
+
+
+            if (_area.IdArea != 0)
+            {
+                _creacion.IdCreate = _area.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _areaServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _areaServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer el usuario esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+
+            //}
+        }
+
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+    //validar que no se repite el area //
+    private bool validarDuplicidad()
+    {
+        // if (_area.IdArea > 0)
+        // {
+        //     return true;
+        // }
+        // else
+        // {
+        //     AreaDTO areaValidateDTO = new AreaDTO();
+        //     ResponseDTO<List<AreaDTO>> result = new ResponseDTO<List<AreaDTO>>();
+        //     areaValidateDTO.DescArea = _area.DescArea;
+        //       var result = _areaServicio.ValidarDuplicidad(areaValidateDTO);
+        //     if (_areaServicio.ValidarDuplicidad(areaValidateDTO) != null)
+        //     {
+
+        //         if (_areaServicio.ValidarDuplicidad(userValidateDTO).Result.status == true)
+        //         {
+        //             _snackBar.Add("Usuario ya existe, se esta duplicando", Severity.Error, a => a.VisibleStateDuration = 500);
+        //             return false;
+        //         }
+        //         else
+        //         {
+        //             return true;
+        //         }
+
+        //     }
+        //     else
+        //     {
+        //         return true;
+        //     }
+        // }
+        return true;
+
+    }
+
+    private bool validarDatos()
+    {
+      
+        if (!string.IsNullOrEmpty(_area.DescArea))
+        {
+                   
+            return true;
+        }
+        else
+        {
+            Mensaje("1. Ingrese descripción de area...");
+            return false;
+        }
+                              
+          
+    }
 
 }

@@ -1,3 +1,4 @@
+
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -130,7 +131,6 @@ namespace QHSE.Server.Controllers
 
 
         }
-
 
 
     }

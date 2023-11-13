@@ -5,7 +5,9 @@ using System.Net.Http.Json;
 
 namespace QHSE.Client.Servicios.Implementacion
 {
+
     public class TrabajadorService : ITrabajadorService
+
     {
         private readonly HttpClient _http;
         private readonly AppData _appData;
@@ -14,6 +16,7 @@ namespace QHSE.Client.Servicios.Implementacion
         {
             _http = http;
             _appData = appData;
+
         }
 
         public async Task<ResponseDTO<CreacionDTO>> Crear(CreacionDTO entidad)
@@ -36,13 +39,16 @@ namespace QHSE.Client.Servicios.Implementacion
             var result = await _http.DeleteAsync($"api/trabajador/Eliminar/{id}");
             var response = await result.Content.ReadFromJsonAsync<ResponseDTO<string>>();
             return response!.status;
+
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _appData.usuarioToken);
         }
 
         public async Task<ResponseDTO<List<TrabajadorDTO>>> Lista()
         {
+
             var result = await _http.GetFromJsonAsync<ResponseDTO<List<TrabajadorDTO>>>("api/trabajador/Lista");
             return result!;
+
 
         }
     }
