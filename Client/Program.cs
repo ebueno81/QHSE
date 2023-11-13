@@ -22,6 +22,8 @@ builder.Services.AddScoped<ICreacionService, CreacionService>();
 builder.Services.AddScoped<ITipoUsuarioService,TipoUsuarioService>();
 
 builder.Services.AddScoped<ITrabajadorService, TrabajadorService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+
 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();

@@ -30,9 +30,9 @@ namespace QHSE.Server.Utilidades
             CreateMap<Area, AreaDTO>();
             #endregion Area
 
-            //#region TipoCargo
-            //CreateMap<TipoCargo, TipoCargoDTO>();
-            //#endregion TipoCargo
+            #region Categoria
+            CreateMap<Categorium, CategoriaDTO>();
+            #endregion Categoria
 
             //#region Persona
             //CreateMap<Persona, PersonaDTO>();
