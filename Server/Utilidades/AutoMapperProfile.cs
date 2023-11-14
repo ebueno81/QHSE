@@ -35,9 +35,12 @@ namespace QHSE.Server.Utilidades
             CreateMap<CategoriaDTO, Categorium>();
             #endregion Categoria
 
-            //#region Persona
-            //CreateMap<Persona, PersonaDTO>();
-            //#endregion Persona
+            #region SubCategoria
+            CreateMap<SubCategorium, SubCategoriaDTO>()
+            .ForMember(destino =>
+                    destino.Categoria,
+                    opt => opt.MapFrom(origen => origen.IdCtgNavigation.DescCtg));
+            #endregion SubCategoria
 
             #region TipoUsuario
             CreateMap<TpoUsuario, TpoUsuarioDTO>();

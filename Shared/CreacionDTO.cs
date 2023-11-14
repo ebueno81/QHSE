@@ -33,7 +33,7 @@ namespace QHSE.Shared
 
         public virtual List<UsuarioDTO>? Usuarios { get; set; }
 
-        //public virtual List<PedidoDTO>? Pedidos { get; set; }
+        public virtual List<SubCategoriaDTO>? SubCategorium { get; set; }
 
         
     }

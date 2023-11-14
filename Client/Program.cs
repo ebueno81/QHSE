@@ -29,6 +29,7 @@ builder.Services.AddScoped<ITipoUsuarioService,TipoUsuarioService>();
 
 builder.Services.AddScoped<ITrabajadorService, TrabajadorService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<ISubCategoriaService, SubCategoriaService>();
 
 
 
