@@ -61,7 +61,6 @@
 
     private async Task<IEnumerable<CategoriaDTO>> BuscarCategoria(string valor)
     {
-
         var response = await _categoriaServicio.Lista();
 
         if (response.status)
