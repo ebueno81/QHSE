@@ -2,32 +2,32 @@
 
     <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">DashBoard</MudNavLink>
 
-    <MudNavGroup Title="Mantenimiento" Expanded="false" Icon="@Icons.Material.Filled.Report">
-        <MudNavLink Href="/page/trabajador" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Trabajadores</MudNavLink>
-        <MudNavLink Href="/page/area" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Areas</MudNavLink>
-        <MudNavLink Href="/page/categoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Categorias</MudNavLink>
-        <MudNavLink Href="/page/subcategoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Sub Categorias</MudNavLink>
+    <MudNavGroup Title="Mantenimiento" Expanded="false" Icon="@Icons.Material.Filled.ImagesearchRoller">
+        <MudNavLink Href="/page/trabajador" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Trabajadores</MudNavLink>
+        <MudNavLink Href="/page/area" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PieChart">Areas</MudNavLink>
+        <MudNavLink Href="/page/categoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.VerticalAlignCenter">Categorias</MudNavLink>
+        <MudNavLink Href="/page/subcategoria" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ReadMore">Sub Categorias</MudNavLink>
+    </MudNavGroup>
+  
+    <MudNavGroup Title="Procesos" Expanded="false" Icon="@Icons.Material.Filled.GridView">
+        <MudNavLink Href="/page/RegistroInspeccion" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Registro Inspección</MudNavLink>
+        <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DynamicFeed">Plantillas</MudNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="Procesos" Expanded="false" Icon="@Icons.Material.Filled.Report">
-        <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Plantillas</MudNavLink>
-        <MudNavLink Href="/page/RegistroInspeccion" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Registro Inspección</MudNavLink>
-    </MudNavGroup>
-
-    <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Report">
-        <MudNavLink Href="/page/ReporteGeneral" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddChart">Reporte General </MudNavLink>
-        <MudNavLink Href="/page/ReporteDetallado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddToQueue">Reporte Detallado</MudNavLink>
+    <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Plagiarism">
+        <MudNavLink Href="/page/ReporteGeneral" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MenuOpen">Reporte General </MudNavLink>
+        <MudNavLink Href="/page/ReporteDetallado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PostAdd">Reporte Detallado</MudNavLink>
     </MudNavGroup>
 
     <AuthorizeView Roles="Administrador,Supervisor">
         <Authorized>
 
-            <MudNavLink Href="/page/usuario" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceCheck">Usuarios</MudNavLink>
+            <MudNavLink Href="/page/usuario" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">Usuarios</MudNavLink>
             <MudNavLink Href="/page/empresa" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Receipt">Empresa</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
-    <MudNavLink Href="/page/ayuda" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Ayuda</MudNavLink>
+    <MudNavLink Href="/page/ayuda" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Report">Ayuda</MudNavLink>
 
 
 </MudNavMenu>
