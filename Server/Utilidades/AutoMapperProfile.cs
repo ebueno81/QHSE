@@ -67,7 +67,10 @@ namespace QHSE.Server.Utilidades
                 );
             #endregion Usuario
 
-
+            #region Empresa
+            CreateMap<Empresa, EmpresaDTO>();
+            CreateMap<EmpresaDTO, Empresa>();
+            #endregion Empresa
         }
     }
 }
