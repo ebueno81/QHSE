@@ -10,17 +10,18 @@
             <EditForm Model="@_trabajador">
 
                 <MudPaper Elevation="3" Class="pa-4" Width="100%">
+
                             <MudTextField @bind-Value="@_trabajador.NomTraba" Class="mb-3"
-                                          Label="Nombres" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                                  Label="Nombres" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.AdminPanelSettings" />
                             <MudTextField @bind-Value="@_trabajador.ApeTraba" Class="mb-3"
                                           Label="Apellidos" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
                             <MudTextField @bind-Value="@_trabajador.NroDoc" Class="mb-3"
-                                          Label="Nro Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                                  Label="Nro Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
                             <MudTextField @bind-Value="@_trabajador.NroTelefono" Class="mb-3"
-                                          Label="Nro Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                                  Label="Nro Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Phone" />
                             <MudTextField @bind-Value="@_trabajador.CorreoTraba" Class="mb-3"
-                                          Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-                    
+                                  Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Email" />
+                  
                 </MudPaper>
             </EditForm>
         </MudContainer>

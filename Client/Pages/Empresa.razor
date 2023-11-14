@@ -17,52 +17,46 @@
         <MudText Typo="Typo.h5" GutterBottom="true">Datos Empresa</MudText>
         <MudGrid>
             <MudItem xs="12" sm="12">
-                <MudTextField @bind-Value="@_empresa.Empresa1" Class="mb-3"
-                              Label="Empresa" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                <MudTextField @bind-Value="@_empresa.RazEmp" Class="mb-3"
+                              Label="Empresa" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Fax" />
             </MudItem>
         </MudGrid>
         <MudGrid>
             <MudItem xs="12" sm="4">
-                <MudTextField @bind-Value="@_empresa.NroDoc" Class="mb-3"
-                              Label="Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                <MudTextField @bind-Value="@_empresa.RucEmp" Class="mb-3"
+                              Label="Ruc" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudTextField @bind-Value="@_empresa.Telefono" Class="mb-3"
-                              Label="Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                <MudTextField @bind-Value="@_empresa.NroTelefono" Class="mb-3"
+                              Label="Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Call" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudTextField @bind-Value="@_empresa.Correo" Class="mb-3"
-                              Label="Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                <MudTextField @bind-Value="@_empresa.CorreoEmp" Class="mb-3"
+                              Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Mail" />
             </MudItem>
         </MudGrid>
         <MudGrid>
-            <MudItem xs="12" sm="6">
-                <MudTextField @bind-Value="@_empresa.Direccion" Class="mb-3"
-                              Label="Direccion" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            <MudItem xs="12" sm="8">
+                <MudTextField @bind-Value="@_empresa.DirecEmp" Class="mb-3"
+                              Label="Direccion" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Place" />
             </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudTextField @bind-Value="@_empresa.Distrito" Class="mb-3"
-                              Label="Distrito" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.DistEmp" Class="mb-3"
+                              Label="Distrito" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Festival" />
             </MudItem>
         </MudGrid>
 
         <MudGrid>
-            <MudItem xs="12" sm="3">
-                <MudTextField @bind-Value="@_empresa.Provincia" Class="mb-3"
-                              Label="Provincia" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.ProvEmp" Class="mb-3"
+                              Label="Provincia" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.LocationCity" />
             </MudItem>
-            <MudItem xs="12" sm="3">
-                <MudTextField @bind-Value="@_empresa.Dpto" Class="mb-3"
-                              Label="Departamento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.DptEmp" Class="mb-3"
+                              Label="Departamento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.AssistantPhoto" />
             </MudItem>
-            <MudItem xs="12" sm="3">
-                <MudTextField @bind-Value="@_empresa.Pais" Class="mb-3"
-                              Label="Pais" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-
-            </MudItem>
-
+          
         </MudGrid>
-
     </MudPaper>
     <br /><br />
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
@@ -127,11 +121,11 @@
             bool _resultado;
 
 
-            if (_empresa.IdEmpresa != 0)
+            if (_empresa.IdEmp != 0)
             {
 
                 _resultado = await _empresaServicio.Editar(_empresa);
-                _mensaje = "Persona fue modificado";
+                _mensaje = "Empresa fue modificado";
 
             }
             else
@@ -140,7 +134,7 @@
                 var response = await _empresaServicio.Crear(_empresa);
 
                 _resultado = response.status;
-                _mensaje = "Persona fue creado";
+                _mensaje = "Empresa fue creado";
             }
 
             if (_resultado)
@@ -158,12 +152,11 @@
     }
 
 
-
     private bool validarDatos()
     {
         if (_empresa != null)
         {
-            if (!string.IsNullOrEmpty(_empresa.Empresa1))
+            if (!string.IsNullOrEmpty(_empresa.RazEmp))
             {
                 return true;
             }
