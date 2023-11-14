@@ -189,6 +189,7 @@
             {
                 _snackBar.Add("La Sub Categoria  fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
                 await ObtenerSubCategorias();
+               
             }
             else
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);

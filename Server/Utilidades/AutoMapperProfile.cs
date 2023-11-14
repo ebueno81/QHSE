@@ -40,6 +40,7 @@ namespace QHSE.Server.Utilidades
             .ForMember(destino =>
                     destino.Categoria,
                     opt => opt.MapFrom(origen => origen.IdCtgNavigation.DescCtg));
+            CreateMap<SubCategoriaDTO, SubCategorium>();
             #endregion SubCategoria
 
             #region TipoUsuario
