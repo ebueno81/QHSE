@@ -52,7 +52,7 @@
                     </HeaderContent>
                     <RowTemplate Context="registroRow">
                         <MudTd DataLabel="Codigo">@registroRow.IdSubCtg</MudTd>
-                        <MudTd DataLabel="Categoria">@registroRow.DescSubCtg</MudTd>
+                        <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
                         <MudTd DataLabel="SubCategoria">@registroRow.DescSubCtg</MudTd>
 
                         <MudTd DataLabel="">
@@ -189,7 +189,7 @@
             {
                 _snackBar.Add("La Sub Categoria  fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
                 await ObtenerSubCategorias();
-               
+
             }
             else
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);

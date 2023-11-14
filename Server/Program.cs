@@ -59,6 +59,7 @@ builder.Services.AddScoped<ITrabajadorRepositorio, TrabajadorRepositorio>();
 builder.Services.AddScoped<IAreaRepositorio, AreaRepositorio>();
 builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 builder.Services.AddScoped<ISubCategoriaRepositorio, SubCategoriaRepositorio>();
+builder.Services.AddScoped<ITipoUsuarioRepositorio, TipoUsuarioRepositorio>();
 
 builder.Services.AddScoped<ICreacionRepositorio, CreacionRepositorio>();
 

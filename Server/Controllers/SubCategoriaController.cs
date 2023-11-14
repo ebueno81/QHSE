@@ -39,10 +39,10 @@ namespace QHSE.Server.Controllers
 
                 _listaSubCategorias = _mapper.Map<List<SubCategoriaDTO>>(query.ToList());
 
-                if (_listaSubCategorias.Count > 0)
+                //if (_listaSubCategorias.Count > 0)
                     _response = new ResponseDTO<List<SubCategoriaDTO>>() { status = true, msg = "ok", value = _listaSubCategorias };
-                else
-                    _response = new ResponseDTO<List<SubCategoriaDTO>>() { status = false, msg = "sin resultados", value = null };
+                //else
+                //    _response = new ResponseDTO<List<SubCategoriaDTO>>() { status = false, msg = "sin resultados", value = null };
 
                 return StatusCode(StatusCodes.Status200OK, _response);
             }
@@ -105,7 +105,7 @@ namespace QHSE.Server.Controllers
                     SubCategoriumEditar.FechaModi = DateTime.Now;
                     SubCategoriumEditar.UsuaModi = SubCategorium.UsuaModi;
                     SubCategoriumEditar.PcModi = SubCategorium.PcModi;
-                    SubCategoriumEditar.Categoria = SubCategorium.Categoria;
+                    SubCategoriumEditar.SubCategoria = SubCategorium.SubCategoria;
 
                     bool respuesta = await _subCategoriaRepositorio.Editar(SubCategoriumEditar);
 

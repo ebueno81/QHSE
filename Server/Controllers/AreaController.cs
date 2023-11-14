@@ -39,10 +39,12 @@ namespace QHSE.Server.Controllers
 
                 _listaAreas = _mapper.Map<List<AreaDTO>>(query.ToList());
 
-                if (_listaAreas.Count > 0)
-                    _response = new ResponseDTO<List<AreaDTO>>() { status = true, msg = "ok", value = _listaAreas };
-                else
-                    _response = new ResponseDTO<List<AreaDTO>>() { status = false, msg = "sin resultados", value = null };
+                //if (_listaAreas.Count > 0)
+                //    _response = new ResponseDTO<List<AreaDTO>>() { status = true, msg = "ok", value = _listaAreas };
+                //else
+                //    _response = new ResponseDTO<List<AreaDTO>>() { status = false, msg = "sin resultados", value = null };
+
+                _response = new ResponseDTO<List<AreaDTO>>() { status = true, msg = "ok", value = _listaAreas };
 
                 return StatusCode(StatusCodes.Status200OK, _response);
             }

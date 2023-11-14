@@ -39,10 +39,10 @@ namespace QHSE.Server.Controllers
 
                 _listaCategorias = _mapper.Map<List<CategoriaDTO>>(query.ToList());
 
-                if (_listaCategorias.Count > 0)
+                //if (_listaCategorias.Count > 0)
+                //    _response = new ResponseDTO<List<CategoriaDTO>>() { status = true, msg = "ok", value = _listaCategorias };
+                //else
                     _response = new ResponseDTO<List<CategoriaDTO>>() { status = true, msg = "ok", value = _listaCategorias };
-                else
-                    _response = new ResponseDTO<List<CategoriaDTO>>() { status = false, msg = "sin resultados", value = null };
 
                 return StatusCode(StatusCodes.Status200OK, _response);
             }

@@ -18,12 +18,10 @@ namespace QHSE.Client.Servicios.Implementacion
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _appData.usuarioToken);
         }
 
-        public async Task<ResponseDTO<List<TpoUsuarioDTO>>> Lista()
+        public async Task<ResponseDTO<List<TipoUsuarioDTO>>> Lista()
         {
-            var result = await _http.GetFromJsonAsync<ResponseDTO<List<TpoUsuarioDTO>>>("api/tipousuario/Lista");
-            return result;
-            
-
+            var result = await _http.GetFromJsonAsync<ResponseDTO<List<TipoUsuarioDTO>>>("api/tipousuario/lista");
+            return result!;
         }
     }
 }

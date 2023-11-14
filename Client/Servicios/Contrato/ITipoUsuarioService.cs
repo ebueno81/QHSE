@@ -5,6 +5,6 @@ namespace QHSE.Client.Servicios.Contrato
 {
     public interface ITipoUsuarioService
     {
-        Task<ResponseDTO<List<TpoUsuarioDTO>>> Lista();
+        Task<ResponseDTO<List<TipoUsuarioDTO>>> Lista();
     }
 }

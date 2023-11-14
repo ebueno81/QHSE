@@ -44,7 +44,8 @@ namespace QHSE.Server.Utilidades
             #endregion SubCategoria
 
             #region TipoUsuario
-            CreateMap<TpoUsuario, TpoUsuarioDTO>();
+            CreateMap<TpoUsuario, TipoUsuarioDTO>();
+            CreateMap<TipoUsuarioDTO, TpoUsuario>();
             #endregion TipoUsuario
 
             #region Usuario
