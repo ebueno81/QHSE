@@ -1,7 +1,186 @@
 ﻿@page "/page/empresa"
+@inject IEmpresaService _empresaServicio
+@inject ISnackbar _snackBar
+@inject NavigationManager _navigationManager
 
-<h3>Empresa</h3>
+<AuthorizeView Roles="Administrador,Supervisor,Logistica,Vendedor">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+
+        }
+    </NotAuthorized>
+</AuthorizeView>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+        <MudText Typo="Typo.h5" GutterBottom="true">Datos Empresa</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="12">
+                <MudTextField @bind-Value="@_empresa.Empresa1" Class="mb-3"
+                              Label="Empresa" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+        </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.NroDoc" Class="mb-3"
+                              Label="Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.Telefono" Class="mb-3"
+                              Label="Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.Correo" Class="mb-3"
+                              Label="Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+        </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="@_empresa.Direccion" Class="mb-3"
+                              Label="Direccion" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="@_empresa.Distrito" Class="mb-3"
+                              Label="Distrito" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+        </MudGrid>
+
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="@_empresa.Provincia" Class="mb-3"
+                              Label="Provincia" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="@_empresa.Dpto" Class="mb-3"
+                              Label="Departamento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="@_empresa.Pais" Class="mb-3"
+                              Label="Pais" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+
+            </MudItem>
+
+        </MudGrid>
+
+    </MudPaper>
+    <br /><br />
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Cerrar">Cerrar</MudButton>&nbsp;
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@disableButton" OnClick="GuardarEmpresa">Guardar</MudButton>
+
+</MudContainer>
 
 @code {
+
+
+    List<EmpresaDTO> listaEmpresa = new List<EmpresaDTO>();
+    public EmpresaDTO _empresa = new EmpresaDTO();
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var resultado = await _empresaServicio.Lista();
+
+            if (resultado.status)
+            {
+                listaEmpresa = resultado.value!;
+                if (listaEmpresa != null)
+                {
+                    if (listaEmpresa.Count() > 0)
+                    {
+                        _empresa = listaEmpresa.First();
+                    }
+                }
+
+
+            }
+        }
+        catch (Exception)
+        {
+            _snackBar.Add("Bienvenido al sistema...", Severity.Warning, a => a.VisibleStateDuration = 500);
+        }
+
+
+
+
+    }
+
+    private void Cerrar()
+    {
+
+        _navigationManager.NavigateTo("/page/dashboard");
+
+    }
+    private async Task GuardarEmpresa()
+    {
+        if (validarDatos())
+        {
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            if (_empresa.IdEmpresa != 0)
+            {
+
+                _resultado = await _empresaServicio.Editar(_empresa);
+                _mensaje = "Persona fue modificado";
+
+            }
+            else
+            {
+
+                var response = await _empresaServicio.Crear(_empresa);
+
+                _resultado = response.status;
+                _mensaje = "Persona fue creado";
+            }
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+            }
+            else
+                _snackBar.Add("Error al guardar cambios", Severity.Error, a => a.VisibleStateDuration = 500);
+
+            myImageClass = "d-none";
+            disableButton = false;
+        }
+
+
+    }
+
+
+
+    private bool validarDatos()
+    {
+        if (_empresa != null)
+        {
+            if (!string.IsNullOrEmpty(_empresa.Empresa1))
+            {
+                return true;
+            }
+            else
+            {
+                _snackBar.Add("1. Error al guardar cambios debe ingresar el nombre de la empresa", Severity.Error, a => a.VisibleStateDuration = 500);
+                return false;
+
+            }
+        }
+        else
+        {
+            _snackBar.Add("2. Error al guardar cambios", Severity.Error, a => a.VisibleStateDuration = 500);
+            return false;
+
+        }
+
+    }
 
 }
