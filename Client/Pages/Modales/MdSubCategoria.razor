@@ -1,4 +1,5 @@
-﻿@inject IAreaService _areaServicio
+﻿@inject ICategoriaService _categoriaServicio
+@inject ISubCategoriaService _subcategoriaServicio
 @inject IDialogService DialogService
 
 @inject ISnackbar _snackBar
@@ -6,19 +7,27 @@
 <MudDialog Style="width:900px">
 
     <DialogContent>
-        <MudContainer Style="max-height: 400px; overflow-x:hidden;" Class="m-0 p-0">
+        <MudContainer Style="max-height: 600px; overflow-x:hidden;" Class="m-0 p-0">
 
-            <EditForm Model="@_area">
+            <EditForm Model="@_subcategoria">
 
-          
                 <MudGrid>
-                  
+
                     <MudItem xs="12" sm="12">
-                        <MudTextField  @bind-Value="@_area.DescArea" Class="mb-3"
-                                       Label="Area" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-                     </MudItem>
-                 </MudGrid>
-              
+                        <MudAutocomplete T="CategoriaDTO" Label="Buscar categoria" @bind-Value="_categoriaSeleccionado" SearchFunc="@BuscarCategoria"
+                                         ResetValueOnEmptyText="true"
+                                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                         Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         ToStringFunc="@(e => e == null ? null : $"{e.DescCtg}")" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="12">
+                        <MudTextField @bind-Value="@_subcategoria.DescSubCtg" Class="mb-3"
+                                      Label="SubCategoria" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    </MudItem>
+
+                </MudGrid>
+
             </EditForm>
         </MudContainer>
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
@@ -29,32 +38,54 @@
     </DialogActions>
 </MudDialog>
 
-
 @code {
 
     [Parameter]
-    public AreaDTO _area { get; set; } = new AreaDTO();
+    public SubCategoriaDTO _subcategoria { get; set; } = new SubCategoriaDTO();
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
 
     CreacionDTO _creacion = new CreacionDTO()
         {
-            Areas = new List<AreaDTO>()
+            SubCategoria = new List<SubCategoriaDTO>()
         };
 
-  
 
     string myImageClass { get; set; } = "d-none";
     bool disableButton = false, desabilitaUser = false;
 
+    //Categoria
+    List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
+    private CategoriaDTO _categoriaSeleccionado;
 
-    
+    private async Task<IEnumerable<CategoriaDTO>> BuscarCategoria(string valor)
+    {
+
+        var response = await _categoriaServicio.Lista();
+
+        if (response.status)
+        {
+            if (string.IsNullOrEmpty(valor))
+                return new List<CategoriaDTO>();
+
+            List<CategoriaDTO> lista = (List<CategoriaDTO>)response.value!;
+          
+            return lista.FindAll(p => p.DescCtg.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
+
+        }
+        else
+        {
+            return new List<CategoriaDTO>();
+        }
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        
+
     }
+
 
     private void Cancel()
     {
@@ -77,16 +108,16 @@
             // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
             // _usuario.IdTraba = _personaSeleccionado.IdTraba;
 
-            _creacion.Areas!.Add(_area);
+            _creacion.SubCategoria!.Add(_subcategoria);
 
 
-            if (_area.IdArea != 0)
+            if (_subcategoria.IdSubCtg != 0)
             {
-                _creacion.IdCreate = _area.IdCreate ?? default(int);
+                _creacion.IdCreate = _subcategoria.IdCreate ?? default(int);
                 _creacion.PcModi = Environment.MachineName;
                 _creacion.UsuaModi = appData.usuarioLogin;
 
-                _resultado = await _areaServicio.Editar(_creacion);
+                _resultado = await _subcategoriaServicio.Editar(_creacion);
                 _mensaje = "Registro fue modificado";
             }
             else
@@ -95,7 +126,7 @@
                 _creacion.PcCrea = Environment.MachineName;
                 _creacion.UsuaCrea = appData.usuarioLogin;
 
-                var response = await _areaServicio.Crear(_creacion);
+                var response = await _subcategoriaServicio.Crear(_creacion);
                 _resultado = response.status;
                 _mensaje = "Registro fue creado";
             }
@@ -109,7 +140,7 @@
             }
             else
             {
-                _snackBar.Add("Error al guardar cambios, al parecer la area esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                _snackBar.Add("Error al guardar cambios, al parecer la sub categoria esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
                 disableButton = false;
                 myImageClass = "d-none";
             }
@@ -169,19 +200,19 @@
 
     private bool validarDatos()
     {
-      
-        if (!string.IsNullOrEmpty(_area.DescArea))
+
+        if (!string.IsNullOrEmpty(_subcategoria.DescSubCtg))
         {
-                   
+
             return true;
         }
         else
         {
-            Mensaje("1. Ingrese descripción de la Area...");
+            Mensaje("1. Ingrese descripción de la Sub Categoria...");
             return false;
         }
-                              
-          
+
+
     }
 
 }

@@ -138,15 +138,11 @@
             _usuario.Correo = lista.Where(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase)).First().CorreoTraba;
             return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
 
-
-
         }
         else
         {
             return new List<TrabajadorDTO>();
         }
-
-
 
     }
 

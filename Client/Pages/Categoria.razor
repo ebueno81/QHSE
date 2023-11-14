@@ -46,7 +46,7 @@
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Codigo</MudTh>
-                        <MudTh>Area</MudTh>
+                        <MudTh>Categoria</MudTh>
                         <MudTh></MudTh>
                     </HeaderContent>
                     <RowTemplate Context="registroRow">
@@ -186,7 +186,7 @@
 
             if (resultado)
             {
-                _snackBar.Add("El area fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                _snackBar.Add("La categoria fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
                 await ObtenerCategorias();
             }
             else
