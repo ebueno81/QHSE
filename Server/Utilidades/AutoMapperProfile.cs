@@ -48,6 +48,12 @@ namespace QHSE.Server.Utilidades
             CreateMap<TipoUsuarioDTO, TpoUsuario>();
             #endregion TipoUsuario
 
+            #region TipoInspeccion
+            CreateMap<TpoInspeccion, TipoInspeccionDTO>();
+            CreateMap<TipoInspeccionDTO, TpoInspeccion>();
+            #endregion TipoInspeccion
+
+
             #region Usuario
             CreateMap<UsuarioDTO, Usuario>();
 
