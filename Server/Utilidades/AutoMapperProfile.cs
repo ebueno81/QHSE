@@ -25,6 +25,11 @@ namespace QHSE.Server.Utilidades
             CreateMap<TrabajadorDTO, Trabajador>();
             #endregion Trabajador
 
+            #region Plantilla
+            CreateMap<Plantilla, PlantillaDTO>();
+            CreateMap<PlantillaDTO, Plantilla>();
+            #endregion Plantilla
+
             #region Area
             CreateMap<Area, AreaDTO>();
             CreateMap<AreaDTO, Area>();

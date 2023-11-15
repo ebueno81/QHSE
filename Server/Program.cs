@@ -61,6 +61,7 @@ builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 builder.Services.AddScoped<ISubCategoriaRepositorio, SubCategoriaRepositorio>();
 builder.Services.AddScoped<ITipoUsuarioRepositorio, TipoUsuarioRepositorio>();
 builder.Services.AddScoped<ITipoInspeccionRepositorio, TipoInspeccionRepositorio>();
+builder.Services.AddScoped<IPlantillaRepositorio, PlantillaRepositorio>();
 
 builder.Services.AddScoped<ICreacionRepositorio, CreacionRepositorio>();
 builder.Services.AddScoped<IEmpresaRepositorio, EmpresaRepositorio>();
