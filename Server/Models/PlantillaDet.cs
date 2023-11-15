@@ -20,6 +20,8 @@ public partial class PlantillaDet
     /// </summary>
     public int? IdSubCtg { get; set; }
 
+    public string? NroOrden { get; set; }
+
     /// <summary>
     /// 1=Activo, 0=Inactivo
     /// </summary>

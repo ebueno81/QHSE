@@ -42,7 +42,9 @@ public partial class DbQhseContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    { }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQhse;user id=sa; pwd=ACEace11");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Area>(entity =>
@@ -262,6 +264,7 @@ public partial class DbQhseContext : DbContext
             entity.Property(e => e.Activo).HasComment("1=Activo, 0=Inactivo");
             entity.Property(e => e.IdPlantilla).HasComment("Id Plantilla");
             entity.Property(e => e.IdSubCtg).HasComment("Id Sub Categoria");
+            entity.Property(e => e.NroOrden).HasMaxLength(5);
 
             entity.HasOne(d => d.IdPlantillaNavigation).WithMany(p => p.PlantillaDets)
                 .HasForeignKey(d => d.IdPlantilla)
