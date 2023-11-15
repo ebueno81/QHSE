@@ -14,8 +14,8 @@ namespace QHSE.Shared
 
         public int? IdArea { get; set; }
 
-        public int? IdTpoInsp { get; set; }
-
         public int? IdCreate { get; set; }
+
+        public string? Area { get; set; }
     }
 }

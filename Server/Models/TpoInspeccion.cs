@@ -21,6 +21,4 @@ public partial class TpoInspeccion
     public int? Activo { get; set; }
 
     public virtual ICollection<Inspeccion> Inspeccions { get; set; } = new List<Inspeccion>();
-
-    public virtual ICollection<Plantilla> Plantillas { get; set; } = new List<Plantilla>();
 }

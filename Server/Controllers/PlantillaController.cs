@@ -35,7 +35,8 @@ namespace QHSE.Server.Controllers
                 IQueryable<Plantilla> query = await _plantillaRepositorio.Consultar();
 
                 query = query.Include(c => c.IdCreateNavigation)
-                        .Where(c => c.IdCreateNavigation.Activo == 1);
+                        .Where(c => c.IdCreateNavigation.Activo == 1)
+                        .Include(a => a.IdAreaNavigation);
 
                 _listaPlantillas = _mapper.Map<List<PlantillaDTO>>(query.ToList());
 

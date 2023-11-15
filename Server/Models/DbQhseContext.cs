@@ -43,9 +43,6 @@ public partial class DbQhseContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQHSE;user id=sa; pwd=ACEace11");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Area>(entity =>
@@ -243,7 +240,6 @@ public partial class DbQhseContext : DbContext
                 .HasComment("Descripción");
             entity.Property(e => e.IdArea).HasComment("Id Area");
             entity.Property(e => e.IdCreate).HasComment("Id Creación");
-            entity.Property(e => e.IdTpoInsp).HasComment("Id Tipo Inspección");
 
             entity.HasOne(d => d.IdAreaNavigation).WithMany(p => p.Plantillas)
                 .HasForeignKey(d => d.IdArea)
@@ -252,10 +248,6 @@ public partial class DbQhseContext : DbContext
             entity.HasOne(d => d.IdCreateNavigation).WithMany(p => p.Plantillas)
                 .HasForeignKey(d => d.IdCreate)
                 .HasConstraintName("FK_Plantilla_Creacion");
-
-            entity.HasOne(d => d.IdTpoInspNavigation).WithMany(p => p.Plantillas)
-                .HasForeignKey(d => d.IdTpoInsp)
-                .HasConstraintName("FK_Plantilla_TpoInspeccion");
         });
 
         modelBuilder.Entity<PlantillaDet>(entity =>
@@ -286,7 +278,7 @@ public partial class DbQhseContext : DbContext
 
             entity.Property(e => e.IdSubCtg).HasComment("Id Sub Categoria");
             entity.Property(e => e.DescSubCtg)
-                .HasMaxLength(100)
+                .HasMaxLength(200)
                 .HasComment("Desc Sub Categoria");
             entity.Property(e => e.IdCreate).HasComment("Id Creción");
             entity.Property(e => e.IdCtg).HasComment("Id Categoria");

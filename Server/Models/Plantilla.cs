@@ -21,11 +21,6 @@ public partial class Plantilla
     public int? IdArea { get; set; }
 
     /// <summary>
-    /// Id Tipo Inspección
-    /// </summary>
-    public int? IdTpoInsp { get; set; }
-
-    /// <summary>
     /// Id Creación
     /// </summary>
     public int? IdCreate { get; set; }
@@ -33,8 +28,6 @@ public partial class Plantilla
     public virtual Area? IdAreaNavigation { get; set; }
 
     public virtual Creacion? IdCreateNavigation { get; set; }
-
-    public virtual TpoInspeccion? IdTpoInspNavigation { get; set; }
 
     public virtual ICollection<PlantillaDet> PlantillaDets { get; set; } = new List<PlantillaDet>();
 }

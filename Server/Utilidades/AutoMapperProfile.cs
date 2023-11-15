@@ -26,9 +26,20 @@ namespace QHSE.Server.Utilidades
             #endregion Trabajador
 
             #region Plantilla
-            CreateMap<Plantilla, PlantillaDTO>();
+            CreateMap<Plantilla, PlantillaDTO>()
+                 .ForMember(destino =>
+                    destino.Area,
+                    opt => opt.MapFrom(origen => origen.IdAreaNavigation.DescArea));
             CreateMap<PlantillaDTO, Plantilla>();
             #endregion Plantilla
+
+            #region PlantillaDetalle
+            CreateMap<PlantillaDet, PlantillaDetDTO>()
+                 .ForMember(destino =>
+                    destino.SubCategoria,
+                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg));
+            CreateMap<PlantillaDetDTO, PlantillaDet>();
+            #endregion PlantillaDetalle
 
             #region Area
             CreateMap<Area, AreaDTO>();
