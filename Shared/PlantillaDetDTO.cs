@@ -16,6 +16,7 @@ namespace QHSE.Shared
 
         public string? SubCategoria { get; set; }
 
+        public string? NroOrden { get; set; }
 
     }
 }

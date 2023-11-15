@@ -35,6 +35,7 @@ namespace QHSE.Shared
 
         public virtual List<SubCategoriaDTO>? SubCategoria { get; set; }
 
-        
+        public virtual ICollection<PlantillaDTO> Plantillas { get; set; } 
+
     }
 }

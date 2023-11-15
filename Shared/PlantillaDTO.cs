@@ -19,5 +19,7 @@ namespace QHSE.Shared
         public string? Area { get; set; }
 
         public DateTime? FechaCrea { get; set; }
+
+        public virtual ICollection<PlantillaDetDTO> PlantillaDets { get; set; } 
     }
 }

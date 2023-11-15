@@ -1,7 +1,333 @@
 ﻿@page "/page/plantillaDetalle"
+@inject IPlantillaService _plantillaServicio
+@inject IPlantillaDetService _plantillaDetServicio
+@inject ICategoriaService _categoriaServicio
+@inject ISubCategoriaService _subcategoriaServicio
+@inject IAreaService _areaServicio
+@inject IDialogService DialogService
 
-<h3>PlantillaDet</h3>
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackBar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+               <MudPaper Elevation="3" Class="pa-4" Width="100%">
+
+                   <MudGrid>
+                        <MudItem xs="12" sm="6">
+                             <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
+                                       Label="Descripción" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                        </MudItem>
+         
+                         <MudItem xs="12" sm="6">
+                               <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
+                            @bind-Value="_areaSeleccionado ">
+                                   @if (listaAreas.Any())
+                                   {
+                                       foreach (var area in listaAreas)
+                                       {
+                                           <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                                       }
+                                   } 
+                               </MudSelect>
+                        </MudItem>
+                 
+            <MudItem xs="12" sm="6">
+                @if(listaCategorias !=null)
+                {
+                    <MudSelect T="string" Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
+                    ValueChanged="Cambiar">
+                    @if (listaCategorias.Any())
+                    {
+                        foreach (var categoria in listaCategorias)
+                        {
+                            <MudSelectItem T="string" Value="@categoria.IdCtg.ToString()">@categoria.DescCtg</MudSelectItem>
+                        }
+                    }
+                    </MudSelect>
+                }
+                            
+            </MudItem>
+
+
+            <MudItem xs="12" sm="6">
+                <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
+                @bind-Value="_categoriaSeleccionado">
+                    @if (listaCategorias.Any())
+                    {
+                        foreach (var categoria in listaCategorias)
+                        {
+                            <MudSelectItem Value="@categoria">@categoria.DescCtg</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+                  </MudGrid>
+
+              </MudPaper>
+
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+
+        <br />
+    <br />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="LlamarCabecera">Cancelar</MudButton> 
+    &nbsp;
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
+   
+</MudContainer>
 
 @code {
+
+    [Parameter]
+    public PlantillaDTO plantilla { get; set; } = new PlantillaDTO();
+
+    public CategoriaDTO _categoria { get; set; } = new CategoriaDTO();
+
+    public SubCategoriaDTO _subcategoria { get; set; } = new SubCategoriaDTO();
+
+    public AreaDTO _area { get; set; } = new AreaDTO();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Plantillas = new List<PlantillaDTO>()
+        };
+
+    PlantillaDTO _plantilla = new PlantillaDTO()
+        {
+            PlantillaDets = new List<PlantillaDetDTO>()
+        };
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false;
+
+
+    //cargar listas
+    protected override async Task OnInitializedAsync()
+    {
+        ObtenerCategorias();
+
+        ObtenerAreas();
+    }
+
+    //Listar Categorias
+
+    List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
+    private CategoriaDTO _categoriaSeleccionado;
+
+    private async Task ObtenerCategorias()
+    {
+        var response = await _categoriaServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaCategorias = response.value!;
+            if (_categoria.IdCtg != 0)
+            {
+                _categoriaSeleccionado = listaCategorias.FirstOrDefault()!;
+
+            }
+
+        }
+    }
+
+    //Listar SubCategorias
+
+    List<SubCategoriaDTO> listaSubCategorias = new List<SubCategoriaDTO>();
+    private SubCategoriaDTO _subcategoriaSeleccionado;
+
+    private async Task ObtenerSubCategorias()
+    {
+        var response = await _subcategoriaServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaSubCategorias = response.value!;
+            if (_subcategoria.IdSubCtg != 0)
+            {
+                _subcategoriaSeleccionado = listaSubCategorias.Where(x=>x.IdCtg==_categoriaSeleccionado.IdCtg).FirstOrDefault()!;
+
+            }
+
+        }
+    }
+
+    //listar area
+
+    List<AreaDTO> listaAreas = new List<AreaDTO>();
+    private AreaDTO _areaSeleccionado;
+
+
+    private async Task ObtenerAreas()
+    {
+        var response = await _areaServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaAreas= response.value!;
+            if (_area.IdArea != 0)
+            {
+                _areaSeleccionado = listaAreas.FirstOrDefault()!;
+
+            }
+
+        }
+    }
+
+    private async void Cambiar(string _categoriaCodigo)
+    {
+        _categoriaSeleccionado = listaCategorias.Where(x => x.IdCtg == int.Parse(_categoriaCodigo)).FirstOrDefault();
+
+        Buscar();
+
+        StateHasChanged();
+    }
+
+    private async Task Buscar()
+    {
+        var resultado = await _subcategoriaServicio.Lista();
+        listaSubCategorias = (List<SubCategoriaDTO>) resultado.value!;
+
+    }
+    //Volver al listado de plantilla
+    private void LlamarCabecera()
+    {
+
+        _navigationManager.NavigateTo("/page/plantilla");
+
+    }
+
+    //Guardar
+
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            //if (validarDuplicidad())
+            //{
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
+            // _usuario.IdTraba = _personaSeleccionado.IdTraba;
+
+            plantilla.PlantillaDets = _plantilla.PlantillaDets;
+
+            _creacion.Plantillas!.Add(plantilla);
+
+
+            if (_creacion.IdCreate!= 0)
+            {
+                _creacion.IdCreate = _plantilla.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _plantillaServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _plantillaServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer la sub categoria esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+
+            //}
+        }
+
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+    //validar que no se repite el area //
+    private bool validarDuplicidad()
+    {
+        // if (_area.IdArea > 0)
+        // {
+        //     return true;
+        // }
+        // else
+        // {
+        //     AreaDTO areaValidateDTO = new AreaDTO();
+        //     ResponseDTO<List<AreaDTO>> result = new ResponseDTO<List<AreaDTO>>();
+        //     areaValidateDTO.DescArea = _area.DescArea;
+        //       var result = _areaServicio.ValidarDuplicidad(areaValidateDTO);
+        //     if (_areaServicio.ValidarDuplicidad(areaValidateDTO) != null)
+        //     {
+
+        //         if (_areaServicio.ValidarDuplicidad(userValidateDTO).Result.status == true)
+        //         {
+        //             _snackBar.Add("Usuario ya existe, se esta duplicando", Severity.Error, a => a.VisibleStateDuration = 500);
+        //             return false;
+        //         }
+        //         else
+        //         {
+        //             return true;
+        //         }
+
+        //     }
+        //     else
+        //     {
+        //         return true;
+        //     }
+        // }
+        return true;
+
+    }
+
+    private bool validarDatos()
+    {
+
+        // if (!string.IsNullOrEmpty(_subcategoria.DescSubCtg))
+        // {
+
+        //     return true;
+        // }
+        // else
+        // {
+        //     Mensaje("1. Ingrese descripción de la Sub Categoria...");
+        //     return false;
+        // }
+        return true;
+
+    }
 
 }

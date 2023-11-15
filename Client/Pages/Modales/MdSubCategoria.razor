@@ -93,7 +93,7 @@
                 _categoriaSeleccionado = listaCategorias.FirstOrDefault(p => p.IdCtg == _subcategoria.IdCtg)!;
 
             }
-            
+
         }
     }
 
@@ -135,6 +135,7 @@
             else
             {
                 _creacion.Activo = 1;
+                _creacion.IdCreate = 0;
                 _creacion.PcCrea = Environment.MachineName;
                 _creacion.UsuaCrea = appData.usuarioLogin;
 
