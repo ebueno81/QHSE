@@ -1,7 +1,191 @@
 ﻿@page "/page/plantilla"
+@inject IPlantillaService _plantillaServicio
+@inject ICreacionService _creacionServicio
+@inject IDialogService _dialogServicio
+@inject ISnackbar _snackBar
+@inject SweetAlertService Swal;
 
-<h3>Plantilla</h3>
+<AuthorizeView Roles="Administrador,Supervisor">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+    <MudText Typo="Typo.h5" GutterBottom="true">Plantillas</MudText>
+
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+        <MudGrid>
+            <AuthorizeView Roles="Administrador,Supervisor">
+                <Authorized>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary"
+                                   OnClick="LlamarDetalle">
+                            Nueva Plantilla
+                        </MudButton>
+                    </MudItem>
+                </Authorized>
+            </AuthorizeView>
+
+            <MudItem xs="12">
+
+                <MudTable Items="@listaPlantilla"
+                          Striped="true" Bordered="true" Dense="true"
+                          Filter="new Func<PlantillaDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                          Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Codigo</MudTh>
+                        <MudTh>Descripción</MudTh>
+                        <MudTh>Area</MudTh>
+                        <MudTh>Fecha</MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="registroRow">
+
+                        <MudTd DataLabel="Codigo">@registroRow.IdPlantilla</MudTd>
+                        <MudTd DataLabel="Descripcion">@registroRow.Descripcion</MudTd>
+                        <MudTd DataLabel="Area">@registroRow.Area</MudTd>
+                        <MudTd DataLabel="Fecha">@registroRow.FechaCrea</MudTd>
+
+                        <MudTd DataLabel="">
+                            <AuthorizeView Roles="Administrador,Supervisor">
+                                <Authorized>
+                                    <MudFab Color="Color.Primary"
+                                            StartIcon="@Icons.Material.Filled.Edit"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => AbrirEditar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView Roles="Administrador">
+                                <Authorized>
+                                    <MudFab Color="Color.Error"
+                                            StartIcon="@Icons.Material.Filled.Delete"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => Eliminar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
+
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+</MudContainer>
 
 @code {
 
+    List<PlantillaDTO> listaPlantilla = new List<PlantillaDTO>();
+
+    private string searchString1 = "";
+    private PlantillaDTO selectedItem1 = null;
+    private bool _loading = true;
+
+    private async Task ObtenerPlantilla()
+    {
+        var result = await _plantillaServicio.Lista();
+
+        if (result.status)
+        {
+            listaPlantilla = (List<PlantillaDTO>)result.value!;
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerPlantilla();
+        _loading = false;
+
+        //try
+        //{
+        //    await ObtenerAreas();
+        //    _loading = false;
+        //}
+        //catch (Exception)
+        //{
+
+        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
+        //}
+    }
+
+    private bool FilterFunc1(PlantillaDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(PlantillaDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Descripcion.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
+    }
+
+    private async Task AbrirEditar(PlantillaDTO model)
+    {
+        var parametros = new DialogParameters { ["_plantilla"] = model };
+
+        var dialogo = _dialogServicio.Show<MdPlantilla>("Editar Plantilla", parametros);
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+            await ObtenerPlantilla();
+        }
+    }
+
+    private async Task Eliminar(PlantillaDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Esta seguro?",
+                Text = $"Eliminar Plantilla: {model.Descripcion}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
+
+        if (result.IsConfirmed)
+        {
+            CreacionDTO _creacion = new CreacionDTO();
+            _creacion.IdCreate = model.IdCreate ?? default(int);
+            _creacion.UsuaAnula = appData.usuarioLogin;
+            _creacion.PcAnula = Environment.MachineName;
+
+            var resultado = await _creacionServicio.Anular(_creacion);
+
+            if (resultado)
+            {
+                _snackBar.Add("La plantilla fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                await ObtenerPlantilla();
+            }
+            else
+                _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
+    }
+
+    private void LlamarDetalle()
+    {
+
+        _navigationManager.NavigateTo("/page/plantillaDetalle");
+
+    }
 }

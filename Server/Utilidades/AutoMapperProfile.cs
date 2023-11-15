@@ -29,7 +29,10 @@ namespace QHSE.Server.Utilidades
             CreateMap<Plantilla, PlantillaDTO>()
                  .ForMember(destino =>
                     destino.Area,
-                    opt => opt.MapFrom(origen => origen.IdAreaNavigation.DescArea));
+                    opt => opt.MapFrom(origen => origen.IdAreaNavigation.DescArea))
+                 .ForMember(destino =>
+                    destino.FechaCrea,
+                    opt => opt.MapFrom(origen => origen.IdCreateNavigation.FechaCrea));
             CreateMap<PlantillaDTO, Plantilla>();
             #endregion Plantilla
 

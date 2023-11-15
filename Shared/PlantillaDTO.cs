@@ -17,5 +17,7 @@ namespace QHSE.Shared
         public int? IdCreate { get; set; }
 
         public string? Area { get; set; }
+
+        public DateTime? FechaCrea { get; set; }
     }
 }
