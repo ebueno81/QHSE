@@ -12,111 +12,129 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
-               <MudPaper Elevation="3" Class="pa-4" Width="100%">
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
-                   <MudGrid>
+        <MudText Typo="Typo.h5" GutterBottom="true">Plantillas</MudText>
+
+        <MudGrid>
                         
-         
-                         <MudItem xs="12" sm="2">
-                               <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
-                            @bind-Value="_areaSeleccionado ">
-                                   @if (listaAreas.Any())
-                                   {
-                                       foreach (var area in listaAreas)
-                                       {
-                                           <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
-                                       }
-                                   } 
-                               </MudSelect>
-                        </MudItem>
-                 
-            <MudItem xs="12" sm="10">
-                <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
-                              Label="Descripción" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-            </MudItem>
-            <MudItem xs="12" sm="2">
-                <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" 
-                @bind-Value="_categoriaSeleccionado">
-                    @if (listaCategorias.Any())
-                    {
-                        foreach (var categoria in listaCategorias)
+            <MudItem xs="12" sm="3">
+                <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @bind-Value="_areaSeleccionado ">
+                        @if (listaAreas.Any())
                         {
-                            <MudSelectItem Value="@categoria">@categoria.DescCtg</MudSelectItem>
+                            foreach (var area in listaAreas)
+                            {
+                                <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                            }
+                        } 
+                </MudSelect>
+            </MudItem>
+                 
+            <MudItem xs="12" sm="9">
+                <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
+                    Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense"
+                    @bind-Value="_categoriaSeleccionado">
+                        @if (listaCategorias.Any())
+                        {
+                            foreach (var categoria in listaCategorias)
+                            {
+                               <MudSelectItem Value="@categoria">@categoria.DescCtg</MudSelectItem>
+                            }
                         }
-                    }
                 </MudSelect>
             </MudItem>
 
-            <MudItem xs="12" sm="8">
-                <MudAutocomplete T="SubCategoriaDTO" Label="Buscar categorias" @bind-Value="_subcategoriaSeleccionado" SearchFunc="@BuscarSubCategoria"
-                                 ResetValueOnEmptyText="true"
-                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
-                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.DescSubCtg}")" />
+            <MudItem xs="12" sm="7">
+                       <MudAutocomplete T="SubCategoriaDTO" Label="Buscar categorias" @bind-Value="_subcategoriaSeleccionado" SearchFunc="@BuscarSubCategoria"
+                            ResetValueOnEmptyText="true"
+                            AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                            Variant="Variant.Outlined" Margin="Margin.Dense"
+                            ToStringFunc="@(e => e == null ? null : $"{e.DescSubCtg}")" />
                
+             </MudItem>
+
+             <MudItem xs="12" sm="2">
+                    <MudTextField @bind-Value="@_plantillaDets.NroOrden" Class="mb-3"
+                         Label="Nro." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+             </MudItem>
+
+              <MudItem xs="12" sm="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" OnClick="AgregarRegistro">Aceptar</MudButton>
             </MudItem>
+        </MudGrid>
 
-            <MudItem xs="12" sm="2">
-                <MudTextField @bind-Value="@_plantillaDets.NroOrden" Class="mb-3"
-                              Label="Nro." Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-            </MudItem>
+    </MudPaper>
 
-                  </MudGrid>
+    <br />
 
-              </MudPaper>
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
+         <MudItem xs="12">
 
-    <MudItem xs="12">
+             <MudTable Items="@listaDetalles"
+                    Striped="true" Bordered="true" Dense="true"
+                    Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                    Loading="@_loading" LoadingProgressColor="Color.Info">
 
-        <MudTable Items="@listaDetalles"
-                  Striped="true" Bordered="true" Dense="true"
-                  Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
-                  Loading="@_loading" LoadingProgressColor="Color.Info">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Orden</MudTh>
-                <MudTh>Categoria</MudTh>
-                <MudTh>SubCategoria</MudTh>
-            </HeaderContent>
-            <RowTemplate Context="registroRow">
+                   <ToolBarContent>
+                   <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                   </ToolBarContent>
 
-                <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
-                <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
-                <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
-                <MudTd>
+                   <HeaderContent>
+                        <MudTh>Orden</MudTh>
+                        <MudTh>Categoria</MudTh>
+                        <MudTh>SubCategoria</MudTh>
+                   </HeaderContent> 
 
-                    <MudFab Color="Color.Primary"
+                <RowTemplate Context="registroRow">
+
+                    <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
+                    <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
+                    <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
+                    <MudTd>
+
+                       <MudFab Color="Color.Primary"
                             StartIcon="@Icons.Material.Filled.Edit"
                             Size="Size.Small"
                             IconSize="Size.Small"
-                             />
-                    <MudFab Color="Color.Error"
+                         />
+                       <MudFab Color="Color.Error"
                             StartIcon="@Icons.Material.Filled.Delete"
                             Size="Size.Small"
                             IconSize="Size.Small"
-                            />
+                        />
                
-                </MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
+                   </MudTd>
+                </RowTemplate>
 
-    </MudItem>
+                <PagerContent>
+                <MudTablePager />
+                </PagerContent>
+
+             </MudTable>
+
+        </MudItem>
 
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
 
         <br />
-    <br />
+        <br />
 
-    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="LlamarCabecera">Cancelar</MudButton> 
-    &nbsp;
-        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
-   
+        <div style="float:right">
+            <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="LlamarCabecera">Cancelar</MudButton>
+            &nbsp;
+            <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
+        </div>
+
+        <br />
+        <br />
+    </MudPaper>
+
 </MudContainer>
 
 @code {
@@ -272,6 +290,16 @@
     //    listaSubCategorias = (List<SubCategoriaDTO>) resultado.value!;
 
     //}
+
+
+    //Agregar Registro
+    private void AgregarRegistro()
+    {
+
+        
+
+    }
+
     //Volver al listado de plantilla
     private void LlamarCabecera()
     {
@@ -328,7 +356,7 @@
             if (_resultado)
             {
                 _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
-                MudDialog.Close(DialogResult.Ok(true));
+               // MudDialog.Close(DialogResult.Ok(true));
             }
             else
             {
