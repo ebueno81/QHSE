@@ -4,7 +4,8 @@
 @inject ICategoriaService _categoriaServicio
 @inject ISubCategoriaService _subcategoriaServicio
 @inject IAreaService _areaServicio
-@inject IDialogService DialogService
+@inject IDialogService _dialogService
+@inject SweetAlertService Swal;
 
 @inject NavigationManager _navigationManager
 @inject ISnackbar _snackBar
@@ -14,12 +15,9 @@
                <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
                    <MudGrid>
-                        <MudItem xs="12" sm="6">
-                             <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
-                                       Label="Descripción" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
-                        </MudItem>
+                        
          
-                         <MudItem xs="12" sm="6">
+                         <MudItem xs="12" sm="2">
                                <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
                             @bind-Value="_areaSeleccionado ">
                                    @if (listaAreas.Any())
@@ -32,26 +30,12 @@
                                </MudSelect>
                         </MudItem>
                  
-            <MudItem xs="12" sm="6">
-                @if(listaCategorias !=null)
-                {
-                    <MudSelect T="string" Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
-                    ValueChanged="Cambiar">
-                    @if (listaCategorias.Any())
-                    {
-                        foreach (var categoria in listaCategorias)
-                        {
-                            <MudSelectItem T="string" Value="@categoria.IdCtg.ToString()">@categoria.DescCtg</MudSelectItem>
-                        }
-                    }
-                    </MudSelect>
-                }
-                            
+            <MudItem xs="12" sm="10">
+                <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
+                              Label="Descripción" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
             </MudItem>
-
-
-            <MudItem xs="12" sm="6">
-                <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Class="mb-1"
+            <MudItem xs="12" sm="2">
+                <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" 
                 @bind-Value="_categoriaSeleccionado">
                     @if (listaCategorias.Any())
                     {
@@ -62,9 +46,67 @@
                     }
                 </MudSelect>
             </MudItem>
+
+            <MudItem xs="12" sm="8">
+                <MudAutocomplete T="SubCategoriaDTO" Label="Buscar categoria" @bind-Value="_subcategoriaSeleccionado" SearchFunc="@BuscarSubCategoria"
+                                 ResetValueOnEmptyText="true"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                 Variant="Variant.Outlined" Margin="Margin.Dense"
+                                 ToStringFunc="@(e => e == null ? null : $"{e.DescSubCtg}")" />
+               
+            </MudItem>
+
+            <MudItem xs="12" sm="2">
+                <MudTextField @bind-Value="@_plantillaDets.NroOrden" Class="mb-3"
+                              Label="Nro." Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem>
+
                   </MudGrid>
 
               </MudPaper>
+
+
+    <MudItem xs="12">
+
+        <MudTable Items="@listaDetalles"
+                  Striped="true" Bordered="true" Dense="true"
+                  Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                  Loading="@_loading" LoadingProgressColor="Color.Info">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Orden</MudTh>
+                <MudTh>Categoria</MudTh>
+                <MudTh>SubCategoria</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="registroRow">
+
+                <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
+                <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
+                <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
+                <MudTd>
+
+                    <MudFab Color="Color.Primary"
+                            StartIcon="@Icons.Material.Filled.Edit"
+                            Size="Size.Small"
+                            IconSize="Size.Small"
+                             />
+                    <MudFab Color="Color.Error"
+                            StartIcon="@Icons.Material.Filled.Delete"
+                            Size="Size.Small"
+                            IconSize="Size.Small"
+                            />
+               
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+    </MudItem>
 
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
 
@@ -82,14 +124,22 @@
     [Parameter]
     public PlantillaDTO plantilla { get; set; } = new PlantillaDTO();
 
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    private string searchString1 = "";
+
+    private bool _loading = true;
+
     public CategoriaDTO _categoria { get; set; } = new CategoriaDTO();
+
+    PlantillaDetDTO _plantillaDets = new PlantillaDetDTO();
 
     public SubCategoriaDTO _subcategoria { get; set; } = new SubCategoriaDTO();
 
     public AreaDTO _area { get; set; } = new AreaDTO();
 
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; }
+    List<PlantillaDetDTO> listaDetalles = new List<PlantillaDetDTO>();
 
     CreacionDTO _creacion = new CreacionDTO()
         {
@@ -101,6 +151,8 @@
             PlantillaDets = new List<PlantillaDetDTO>()
         };
 
+       PlantillaDetDTO selectedItem1 = null;
+
     string myImageClass { get; set; } = "d-none";
     bool disableButton = false, desabilitaUser = false;
 
@@ -108,6 +160,8 @@
     //cargar listas
     protected override async Task OnInitializedAsync()
     {
+        _loading = false;
+
         ObtenerCategorias();
 
         ObtenerAreas();
@@ -135,26 +189,47 @@
         }
     }
 
+    private bool FilterFunc1(PlantillaDetDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(PlantillaDetDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Categoria.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.SubCategoria.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
+    }
+
     //Listar SubCategorias
 
     List<SubCategoriaDTO> listaSubCategorias = new List<SubCategoriaDTO>();
     private SubCategoriaDTO _subcategoriaSeleccionado;
 
-    private async Task ObtenerSubCategorias()
+    private async Task<IEnumerable<SubCategoriaDTO>> BuscarSubCategoria(string valor)
     {
+
         var response = await _subcategoriaServicio.Lista();
 
         if (response.status)
         {
+            if (string.IsNullOrEmpty(valor))
+                return new List<SubCategoriaDTO>();
 
-            listaSubCategorias = response.value!;
-            if (_subcategoria.IdSubCtg != 0)
-            {
-                _subcategoriaSeleccionado = listaSubCategorias.Where(x=>x.IdCtg==_categoriaSeleccionado.IdCtg).FirstOrDefault()!;
+            List<SubCategoriaDTO> lista = (List<SubCategoriaDTO>)response.value!;
 
-            }
+            var x = _categoriaSeleccionado.IdCtg;
+            return lista.FindAll(p => p.DescSubCtg.Contains(valor, StringComparison.InvariantCultureIgnoreCase) && p.IdCtg==_categoriaSeleccionado.IdCtg);
 
         }
+        else
+        {
+            return new List<SubCategoriaDTO>();
+        }
+
     }
 
     //listar area
@@ -182,19 +257,21 @@
 
     private async void Cambiar(string _categoriaCodigo)
     {
-        _categoriaSeleccionado = listaCategorias.Where(x => x.IdCtg == int.Parse(_categoriaCodigo)).FirstOrDefault();
-
-        Buscar();
+        //   _categoriaSeleccionado = listaCategorias.Where(x => x.IdCtg == int.Parse(_categoriaCodigo)).FirstOrDefault();
+        var resultado = await _subcategoriaServicio.Lista();
+        var resultadoLista = (List<SubCategoriaDTO>)resultado.value!;
+        //        Buscar();
+        listaSubCategorias = resultadoLista.Where(x => x.IdCtg == int.Parse(_categoriaCodigo)).ToList();
 
         StateHasChanged();
     }
 
-    private async Task Buscar()
-    {
-        var resultado = await _subcategoriaServicio.Lista();
-        listaSubCategorias = (List<SubCategoriaDTO>) resultado.value!;
+    //private async Task Buscar()
+    //{
+    //    var resultado = await _subcategoriaServicio.Lista();
+    //    listaSubCategorias = (List<SubCategoriaDTO>) resultado.value!;
 
-    }
+    //}
     //Volver al listado de plantilla
     private void LlamarCabecera()
     {
@@ -274,7 +351,7 @@
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-        DialogService.Show<MsMensaje>("Delete", parameters, options);
+        _dialogService.Show<MsMensaje>("Delete", parameters, options);
     }
 
     //validar que no se repite el area //
@@ -328,6 +405,34 @@
         // }
         return true;
 
+    }
+
+    private async Task AbrirEditar(PlantillaDTO model)
+    {
+        var parametros = new DialogParameters { ["_plantilla"] = model };
+
+        var dialogo = _dialogService.Show<MdPlantilla>("Editar Plantilla", parametros);
+        var resultado = await dialogo.Result;
+
+        if (!resultado.Canceled)
+        {
+         //   await ObtenerPlantilla();
+        }
+    }
+
+    private async Task Eliminar(PlantillaDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Esta seguro?",
+                Text = $"Eliminar Plantilla: {model.Descripcion}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
+
+        
     }
 
 }

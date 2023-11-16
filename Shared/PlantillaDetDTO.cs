@@ -18,5 +18,7 @@ namespace QHSE.Shared
 
         public string? NroOrden { get; set; }
 
+        public string? Categoria { get; set; }
+
     }
 }
