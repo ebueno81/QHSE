@@ -59,7 +59,7 @@
              </MudItem>
 
              <MudItem xs="12" sm="2">
-                    <MudTextField @bind-Value="@_plantillaDets.NroOrden" Class="mb-3"
+                    <MudTextField @bind-Value="@_nroOrden" Class="mb-3"
                          Label="Nro." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
              </MudItem>
 
@@ -76,7 +76,7 @@
 
          <MudItem xs="12">
 
-             <MudTable Items="@listaDetalles"
+            <MudTable Items="@_plantilla.PlantillaDets"
                     Striped="true" Bordered="true" Dense="true"
                     Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
                     Loading="@_loading" LoadingProgressColor="Color.Info">
@@ -169,11 +169,11 @@
             PlantillaDets = new List<PlantillaDetDTO>()
         };
 
-       PlantillaDetDTO selectedItem1 = null;
+    PlantillaDetDTO selectedItem1 = null;
 
     string myImageClass { get; set; } = "d-none";
     bool disableButton = false, desabilitaUser = false;
-
+    string _nroOrden;
 
     //cargar listas
     protected override async Task OnInitializedAsync()
@@ -295,7 +295,17 @@
     //Agregar Registro
     private void AgregarRegistro()
     {
-
+        if (_subcategoriaSeleccionado != null && _categoriaSeleccionado !=  null)
+        {
+            var plantillaDetalle = new PlantillaDetDTO()
+                {
+                    IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
+                    Categoria = _subcategoriaSeleccionado.Categoria,
+                    SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
+                    NroOrden = _nroOrden
+                };
+            _plantilla.PlantillaDets!.Add(plantillaDetalle);
+        }
         
 
     }
