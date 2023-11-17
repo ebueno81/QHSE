@@ -306,7 +306,7 @@
                 };
             _plantilla.PlantillaDets!.Add(plantillaDetalle);
         }
-        
+
 
     }
 
@@ -319,7 +319,6 @@
     }
 
     //Guardar
-
     private async Task Guardar()
     {
         if (validarDatos())
@@ -334,14 +333,14 @@
 
 
             // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
-            // _usuario.IdTraba = _personaSeleccionado.IdTraba;
-
+            // _usuario.IadTraba = _personaSeleccionado.IdTraba;
+            plantilla.IdArea = _areaSeleccionado.IdArea;
+            plantilla.Descripcion = _plantilla.Descripcion;
             plantilla.PlantillaDets = _plantilla.PlantillaDets;
 
             _creacion.Plantillas!.Add(plantilla);
 
-
-            if (_creacion.IdCreate!= 0)
+            if (_creacion.IdCreate != 0)
             {
                 _creacion.IdCreate = _plantilla.IdCreate ?? default(int);
                 _creacion.PcModi = Environment.MachineName;
