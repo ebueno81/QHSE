@@ -32,7 +32,7 @@
             </MudItem>
                  
             <MudItem xs="12" sm="9">
-                <MudTextField @bind-Value="@plantilla.Descripcion" Class="mb-1"
+                <MudTextField @bind-Value="@_plantilla.Descripcion" Class="mb-1"
                     Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
             </MudItem>
 
@@ -186,7 +186,6 @@
     }
 
     //Listar Categorias
-
     List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
     private CategoriaDTO _categoriaSeleccionado;
 
@@ -221,8 +220,6 @@
 
         return false;
     }
-
-    //Listar SubCategorias
 
     List<SubCategoriaDTO> listaSubCategorias = new List<SubCategoriaDTO>();
     private SubCategoriaDTO _subcategoriaSeleccionado;
@@ -284,13 +281,6 @@
         StateHasChanged();
     }
 
-    //private async Task Buscar()
-    //{
-    //    var resultado = await _subcategoriaServicio.Lista();
-    //    listaSubCategorias = (List<SubCategoriaDTO>) resultado.value!;
-
-    //}
-
 
     //Agregar Registro
     private void AgregarRegistro()
@@ -302,7 +292,9 @@
                     IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
                     Categoria = _subcategoriaSeleccionado.Categoria,
                     SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
-                    NroOrden = _nroOrden
+                    NroOrden = _nroOrden,
+                    Activo = 1
+                    
                 };
             _plantilla.PlantillaDets!.Add(plantillaDetalle);
         }
@@ -333,12 +325,14 @@
             bool _resultado;
 
 
-            // _usuario.IdTpoUsua = tipoUsuarioSeleccionado.IdTpoUsua;
-            // _usuario.IdTraba = _personaSeleccionado.IdTraba;
+            _plantilla.IdArea = _areaSeleccionado.IdArea;
+            _plantilla.IdCreate = 0;
+            
 
-            plantilla.PlantillaDets = _plantilla.PlantillaDets;
+          //  plantilla.PlantillaDets = _plantilla.PlantillaDets;
 
-            _creacion.Plantillas!.Add(plantilla);
+
+            _creacion.Plantillas!.Add(_plantilla);
 
 
             if (_creacion.IdCreate!= 0)
@@ -370,7 +364,7 @@
             }
             else
             {
-                _snackBar.Add("Error al guardar cambios, al parecer la sub categoria esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
                 disableButton = false;
                 myImageClass = "d-none";
             }

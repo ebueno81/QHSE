@@ -63,6 +63,9 @@ namespace QHSE.Server.Controllers
 
             try
             {
+                request.Activo = 1;
+                request.FechaCrea = DateTime.Now;
+
                 Creacion _Plantilla = _mapper.Map<Creacion>(request);
 
                 Creacion _PlantillaCreado = await _plantillaRepositorio.Crear(_Plantilla);

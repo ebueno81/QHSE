@@ -20,6 +20,6 @@ namespace QHSE.Shared
 
         public DateTime? FechaCrea { get; set; }
 
-        public virtual ICollection<PlantillaDetDTO> PlantillaDets { get; set; } 
+        public virtual List<PlantillaDetDTO>? PlantillaDets { get; set; } 
     }
 }
