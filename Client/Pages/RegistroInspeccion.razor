@@ -1,6 +1,87 @@
 ﻿@page "/page/RegistroInspeccion"
 
-<h3>Inspeccion</h3>
+@inject ICreacionService _creacionServicio
+@inject IDialogService _dialogServicio
+@inject ISnackbar _snackBar
+@inject SweetAlertService Swal;
+
+<AuthorizeView Roles="Administrador,Supervisor">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+    <MudText Typo="Typo.h5" GutterBottom="true">Registro de Inspección</MudText>
+
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+        <MudGrid>
+            <AuthorizeView Roles="Administrador,Supervisor">
+                <Authorized>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary"
+                                   >
+                            Nueva Inspeccion
+                        </MudButton>
+                    </MudItem>
+                </Authorized>
+            </AuthorizeView>
+
+            <MudItem xs="12">
+
+
+                <MudTablePager Striped="true" Bordered="true" Dense="true">
+                    </MudTablePager>
+            <HeaderContent>
+                <MudTh>Codigo</MudTh>
+                <MudTh>Descripción</MudTh>
+                <MudTh>Tipo Inspeccion</MudTh>
+                <MudTh>Area</MudTh>
+                <MudTh>Fecha</MudTh>
+            <MudTh>Supervisor</MudTh>
+            </HeaderContent>
+          
+                <MudTd DataLabel="Codigo"></MudTd>
+                <MudTd DataLabel="Descripcion"></MudTd>
+            <MudTd DataLabel="Tipo Inspeccion"></MudTd>
+                <MudTd DataLabel="Area"></MudTd>
+                <MudTd DataLabel="Fecha"></MudTd>
+            <MudTd DataLabel="Supervisor"></MudTd>
+
+                <MudTd DataLabel="">
+                    <AuthorizeView Roles="Administrador,Supervisor">
+                        <Authorized>
+                            <MudFab Color="Color.Primary"
+                                    StartIcon="@Icons.Material.Filled.Edit"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    />
+                        </Authorized>
+                    </AuthorizeView>
+                    <AuthorizeView Roles="Administrador">
+                        <Authorized>
+                            <MudFab Color="Color.Error"
+                                    StartIcon="@Icons.Material.Filled.Delete"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                   />
+                        </Authorized>
+                    </AuthorizeView>
+
+                </MudTd>
+
+                <MudTablePager />
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+</MudContainer>
 
 @code {
 

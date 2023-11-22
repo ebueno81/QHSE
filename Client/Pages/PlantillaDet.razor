@@ -340,6 +340,16 @@
     {
         if (ValidarDetalles())
         {
+            var plantillaDetalle = new PlantillaDetDTO()
+                {
+                    IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
+                    Categoria = _subcategoriaSeleccionado.Categoria,
+                    SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
+                    NroOrden = _nroOrden
+                };
+            _plantilla.PlantillaDets!.Add(plantillaDetalle);
+        }
+
             if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
             {
                 if (validarDuplicidadNroOrden(_nroOrden))
