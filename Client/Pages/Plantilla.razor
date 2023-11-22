@@ -44,10 +44,10 @@
                         <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
-                        <MudTh>Codigo</MudTh>
-                        <MudTh>Descripción</MudTh>
-                        <MudTh>Area</MudTh>
-                        <MudTh>Fecha</MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDTO, object>(x=>x.IdPlantilla)">Codigo</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDTO, object>(x=>x.Descripcion)">Descripcion</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDTO, object>(x=>x.Area)">Area</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDTO, object>(x=>x.FechaCrea)">Fecha Creacion</MudTableSortLabel></MudTh>
                     </HeaderContent>
                     <RowTemplate Context="registroRow">
 
@@ -57,13 +57,18 @@
                         <MudTd DataLabel="Fecha">@registroRow.FechaCrea</MudTd>
 
                         <MudTd DataLabel="">
+                            <MudFab Color="Color.Tertiary"
+                                    StartIcon="@Icons.Material.Filled.RemoveRedEye"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    OnClick="@(() => AbrirEditar(registroRow.IdPlantilla,0))" />
                             <AuthorizeView Roles="Administrador,Supervisor">
                                 <Authorized>
                                     <MudFab Color="Color.Primary"
                                             StartIcon="@Icons.Material.Filled.Edit"
                                             Size="Size.Small"
                                             IconSize="Size.Small"
-                                            OnClick="@(() => AbrirEditar(registroRow))" />
+                                            OnClick="@(() => AbrirEditar(registroRow.IdPlantilla,1))" />
                                 </Authorized>
                             </AuthorizeView>
                             <AuthorizeView Roles="Administrador">
@@ -99,7 +104,7 @@
 
     private async Task ObtenerPlantilla()
     {
-        var result = await _plantillaServicio.Lista();
+        var result = await _plantillaServicio.Lista(0);
 
         if (result.status)
         {
@@ -138,17 +143,9 @@
         return false;
     }
 
-    private async Task AbrirEditar(PlantillaDTO model)
+    private async Task AbrirEditar(int codigoPlantilla, int estadoRegistro)
     {
-        var parametros = new DialogParameters { ["_plantilla"] = model };
-
-        var dialogo = _dialogServicio.Show<MdPlantilla>("Editar Plantilla", parametros);
-        var resultado = await dialogo.Result;
-
-        if (!resultado.Canceled)
-        {
-            await ObtenerPlantilla();
-        }
+        _navigationManager.NavigateTo("/page/plantillaDetalle/" + codigoPlantilla + "/" + estadoRegistro);
     }
 
     private async Task Eliminar(PlantillaDTO model)
@@ -185,7 +182,7 @@
     private void LlamarDetalle()
     {
 
-        _navigationManager.NavigateTo("/page/plantillaDetalle");
+        _navigationManager.NavigateTo("/page/plantillaDetalle/0/1");
 
     }
 }

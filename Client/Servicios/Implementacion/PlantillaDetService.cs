@@ -31,10 +31,10 @@ namespace QHSE.Client.Servicios.Implementacion
             return response!.status;
         }
 
-        public async Task<bool> Eliminar(int id)
+        public async Task<bool> Anular(PlantillaDetDTO entidad)
         {
-            var result = await _http.DeleteAsync($"api/plantilladet/Eliminar/{id}");
-            var response = await result.Content.ReadFromJsonAsync<ResponseDTO<string>>();
+            var result = await _http.PutAsJsonAsync("api/plantilladet/Anular",entidad);
+            var response = await result.Content.ReadFromJsonAsync<ResponseDTO<bool>>();
             return response!.status;
         }
 

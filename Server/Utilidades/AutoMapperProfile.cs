@@ -25,6 +25,22 @@ namespace QHSE.Server.Utilidades
             CreateMap<TrabajadorDTO, Trabajador>();
             #endregion Trabajador
 
+            #region Inspeccion
+            CreateMap<Inspeccion, InspeccionDTO>()
+                .ForMember(destino =>
+                   destino.Area,
+                   opt => opt.MapFrom(origen => origen.IdAreaNavigation.DescArea))
+                .ForMember(destino =>
+                   destino.FechaCrea,
+                   opt => opt.MapFrom(origen => origen.IdCreateNavigation.FechaCrea));
+            CreateMap<InspeccionDTO, Inspeccion>();
+            #endregion Inspeccion
+
+            #region InspeccionDetalle
+            CreateMap<InspeccionDet, InspeccionDetDTO>();
+            CreateMap<InspeccionDetDTO, InspeccionDet>();
+            #endregion InspeccionDetalle
+
             #region Plantilla
             CreateMap<Plantilla, PlantillaDTO>()
                  .ForMember(destino =>
@@ -40,7 +56,10 @@ namespace QHSE.Server.Utilidades
             CreateMap<PlantillaDet, PlantillaDetDTO>()
                  .ForMember(destino =>
                     destino.SubCategoria,
-                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg));
+                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg))
+                 .ForMember(destino =>
+                    destino.Categoria,
+                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.DescCtg));
             CreateMap<PlantillaDetDTO, PlantillaDet>();
             #endregion PlantillaDetalle
 

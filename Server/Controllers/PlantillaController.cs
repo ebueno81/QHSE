@@ -24,7 +24,7 @@ namespace QHSE.Server.Controllers
 
         [HttpGet]
         [Route("Lista")]
-        public async Task<IActionResult> Lista()
+        public async Task<IActionResult> Lista(int? codigoPlantilla)
         {
             ResponseDTO<List<PlantillaDTO>> _response = new ResponseDTO<List<PlantillaDTO>>();
 
@@ -32,7 +32,9 @@ namespace QHSE.Server.Controllers
             {
                 List<PlantillaDTO> _listaPlantillas = new List<PlantillaDTO>();
 
-                IQueryable<Plantilla> query = await _plantillaRepositorio.Consultar();
+
+                IQueryable<Plantilla> query = await _plantillaRepositorio.Consultar(codigoPlantilla>0 ? x =>x.IdPlantilla==codigoPlantilla : null);
+
 
                 query = query.Include(c => c.IdCreateNavigation)
                         .Where(c => c.IdCreateNavigation.Activo == 1)
@@ -49,6 +51,43 @@ namespace QHSE.Server.Controllers
             {
 
                 _response = new ResponseDTO<List<PlantillaDTO>>() { status = false, msg = ex.Message, value = null };
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("ListaDetalles")]
+        public async Task<IActionResult> ListaDetalles(int codigoPlantilla)
+        {
+            ResponseDTO<List<PlantillaDetDTO>> _response = new ResponseDTO<List<PlantillaDetDTO>>();
+
+            try
+            {
+                List<PlantillaDetDTO> _listaPlantilla = new List<PlantillaDetDTO>();
+
+                IQueryable<PlantillaDet> query = await _plantillaRepositorio.ConsultarDetalle(codigoPlantilla);
+                query = query.Include(r => r.IdSubCtgNavigation)
+                    .Include(x => x.IdPlantillaNavigation)
+                    .Include(cr => cr.IdPlantillaNavigation.IdAreaNavigation)
+                    .Include(p => p.IdPlantillaNavigation.IdCreateNavigation)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                    .Where(p => p.Activo == 1);
+
+                _listaPlantilla = _mapper.Map<List<PlantillaDetDTO>>(query.ToList());
+
+                if (_listaPlantilla.Count > 0)
+                    _response = new ResponseDTO<List<PlantillaDetDTO>>() { status = true, msg = "ok", value = _listaPlantilla.ToList() };
+                else
+                    _response = new ResponseDTO<List<PlantillaDetDTO>>() { status = false, msg = "sin resultados", value = null };
+
+                return StatusCode(StatusCodes.Status200OK, _response);
+            }
+            catch (Exception ex)
+            {
+
+                _response = new ResponseDTO<List<PlantillaDetDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }
 

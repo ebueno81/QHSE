@@ -5,18 +5,18 @@ using System.Linq.Expressions;
 
 namespace QHSE.Server.Repositorio.Implementacion
 {
-    public class PlantillaRepositorio: IPlantillaRepositorio
+    public class InspeccionRepositorio:IInspeccionRepositorio
     {
         private readonly DbQhseContext _dbContext;
 
-        public PlantillaRepositorio(DbQhseContext dbContext)
+        public InspeccionRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<IQueryable<Plantilla>> Consultar(Expression<Func<Plantilla, bool>> filtro = null)
+        public async Task<IQueryable<Inspeccion>> Consultar(Expression<Func<Inspeccion, bool>> filtro = null)
         {
-            IQueryable<Plantilla> queryEntidad = filtro == null ? _dbContext.Plantillas : _dbContext.Plantillas.Where(filtro);
+            IQueryable<Inspeccion> queryEntidad = filtro == null ? _dbContext.Inspeccions : _dbContext.Inspeccions.Where(filtro);
             return queryEntidad;
         }
 
@@ -48,11 +48,11 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<List<Plantilla>> Lista()
+        public async Task<List<Inspeccion>> Lista()
         {
             try
             {
-                return await _dbContext.Plantillas.ToListAsync();
+                return await _dbContext.Inspeccions.ToListAsync();
             }
             catch
             {
@@ -73,9 +73,9 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<IQueryable<PlantillaDet>> ConsultarDetalle(int idPlantilla)
+        public async Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion)
         {
-            IQueryable<PlantillaDet> queryEntidad = _dbContext.PlantillaDets.Where(d => d.IdPlantilla == idPlantilla);
+            IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion);
             return queryEntidad;
         }
     }

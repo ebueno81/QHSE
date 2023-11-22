@@ -34,7 +34,7 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<bool> Editar(Creacion entidad)
+        public async Task<bool> Editar(PlantillaDet entidad)
         {
             try
             {
@@ -61,11 +61,11 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<Creacion> Obtener(Expression<Func<Creacion, bool>> filtro = null)
+        public async Task<PlantillaDet> Obtener(Expression<Func<PlantillaDet, bool>> filtro = null)
         {
             try
             {
-                return await _dbContext.Creacions.Where(filtro).FirstOrDefaultAsync();
+                return await _dbContext.PlantillaDets.Where(filtro).FirstOrDefaultAsync();
             }
             catch
             {

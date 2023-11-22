@@ -22,4 +22,6 @@ public partial class PlantillaDetDTO
 
     public int? Activo { get; set; }
 
+    public int? IdCtg { get; set; }
+
 }

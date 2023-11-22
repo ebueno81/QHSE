@@ -3,13 +3,13 @@ using System.Linq.Expressions;
 
 namespace QHSE.Server.Repositorio.Contrato
 {
-    public interface IPlantillaRepositorio
+    public interface IInspeccionRepositorio
     {
-        Task<List<Plantilla>> Lista();
+        Task<List<Inspeccion>> Lista();
         Task<Creacion> Obtener(Expression<Func<Creacion, bool>> filtro = null);
         Task<Creacion> Crear(Creacion entidad);
         Task<bool> Editar(Creacion entidad);
-        Task<IQueryable<Plantilla>> Consultar(Expression<Func<Plantilla, bool>> filtro = null);
-        Task<IQueryable<PlantillaDet>> ConsultarDetalle(int idPlantilla);
+        Task<IQueryable<Inspeccion>> Consultar(Expression<Func<Inspeccion, bool>> filtro = null);
+        Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion);
     }
 }

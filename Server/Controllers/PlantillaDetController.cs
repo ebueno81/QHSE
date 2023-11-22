@@ -87,24 +87,63 @@ namespace QHSE.Server.Controllers
 
         [HttpPut]
         [Route("Editar")]
-        public async Task<IActionResult> Editar([FromBody] CreacionDTO request)
+        public async Task<IActionResult> Editar([FromBody] PlantillaDetDTO request)
         {
 
             ResponseDTO<bool> _ResponseDTO = new ResponseDTO<bool>();
 
             try
             {
-                Creacion _PlantillaDet = _mapper.Map<Creacion>(request);
-                Creacion _PlantillaDetEditar = await _PlantillaDetDetRepositorio.Obtener(u => u.IdCreate == _PlantillaDet.IdCreate);
+                PlantillaDet _PlantillaDet = _mapper.Map<PlantillaDet>(request);
+                PlantillaDet _PlantillaDetEditar = await _PlantillaDetDetRepositorio.Obtener(u => u.IdPlantillaDet == _PlantillaDet.IdPlantillaDet);
 
-                if (_PlantillaDetEditar.IdCreate != null)
+                if (_PlantillaDetEditar.IdPlantillaDet != null)
                 {
 
-                    _PlantillaDetEditar.FechaModi = DateTime.Now;
-                    _PlantillaDetEditar.UsuaModi = _PlantillaDet.UsuaModi;
-                    _PlantillaDetEditar.PcModi = _PlantillaDet.PcModi;
-                    _PlantillaDetEditar.Plantillas = _PlantillaDet.Plantillas;
+                    _PlantillaDetEditar.NroOrden = _PlantillaDet.NroOrden;
+                    
+                    bool respuesta = await _PlantillaDetDetRepositorio.Editar(_PlantillaDetEditar);
 
+                    if (respuesta)
+                        _ResponseDTO = new ResponseDTO<bool>() { status = true, msg = "ok", value = true };
+                    else
+                        _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se pudo crear el registro" };
+                }
+                else
+                {
+                    _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = "No se encontró el registro" };
+                }
+
+                return StatusCode(StatusCodes.Status200OK, _ResponseDTO);
+
+            }
+            catch (Exception ex)
+            {
+
+                _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = ex.Message };
+                return StatusCode(StatusCodes.Status500InternalServerError, _ResponseDTO);
+            }
+
+
+        }
+
+        [HttpPut]
+        [Route("Anular")]
+        public async Task<IActionResult> Anular([FromBody] PlantillaDetDTO request)
+        {
+
+            ResponseDTO<bool> _ResponseDTO = new ResponseDTO<bool>();
+
+            try
+            {
+                PlantillaDet _PlantillaDet = _mapper.Map<PlantillaDet>(request);
+                PlantillaDet _PlantillaDetEditar = await _PlantillaDetDetRepositorio.Obtener(u => u.IdPlantillaDet == _PlantillaDet.IdPlantillaDet);
+
+                if (_PlantillaDetEditar.IdPlantillaDet != null)
+                {
+
+                    _PlantillaDetEditar.Activo = _PlantillaDet.Activo;
+                    
                     bool respuesta = await _PlantillaDetDetRepositorio.Editar(_PlantillaDetEditar);
 
                     if (respuesta)

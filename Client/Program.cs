@@ -27,6 +27,7 @@ builder.Services.AddScoped<ISubCategoriaService, SubCategoriaService>();
 builder.Services.AddScoped<IEmpresaService, EmpresaService>();
 builder.Services.AddScoped<IPlantillaService, PlantillaService>();
 builder.Services.AddScoped<IPlantillaDetService, PlantillaDetService>();
+builder.Services.AddScoped<IInspeccionService, InspeccionService>();
 
 
 builder.Services.AddOptions();
