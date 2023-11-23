@@ -15,6 +15,8 @@ public partial class Categorium
     /// </summary>
     public string? DescCtg { get; set; }
 
+    public int? NroOrden { get; set; }
+
     /// <summary>
     /// Id Creacion
     /// </summary>

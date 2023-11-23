@@ -1,5 +1,4 @@
-﻿using QHSE.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace QHSE.Server.Models;
@@ -36,6 +35,10 @@ public partial class Inspeccion
     /// </summary>
     public string? NomSuper2 { get; set; }
 
+    public int? IdJefeArea { get; set; }
+
+    public string? NomJefeArea { get; set; }
+
     /// <summary>
     /// Fecha Inspección
     /// </summary>
@@ -61,5 +64,5 @@ public partial class Inspeccion
 
     public virtual TpoInspeccion? IdTpoInspNavigation { get; set; }
 
-    public virtual List<InspeccionDetDTO>? InspeccionDets { get; set; } 
+    public virtual ICollection<InspeccionDet> InspeccionDets { get; set; } = new List<InspeccionDet>();
 }

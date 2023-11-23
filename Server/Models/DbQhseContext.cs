@@ -166,6 +166,7 @@ public partial class DbQhseContext : DbContext
             entity.Property(e => e.IdSuper1).HasComment("Id Trabajador 1");
             entity.Property(e => e.IdSuper2).HasComment("Id Trabajador 2");
             entity.Property(e => e.IdTpoInsp).HasComment("Id Tipo Inspección");
+            entity.Property(e => e.NomJefeArea).HasMaxLength(50);
             entity.Property(e => e.NomSuper2)
                 .HasMaxLength(50)
                 .HasComment("Nombre trabajador 2");
