@@ -34,8 +34,11 @@ namespace QHSE.Server.Utilidades
                    destino.FechaCrea,
                    opt => opt.MapFrom(origen => origen.IdCreateNavigation.FechaCrea))
                 .ForMember(destino =>
-                   destino.Area,
-                   opt => opt.MapFrom(origen => origen.IdSuper1Navigation.NomTraba));
+                   destino.NomSuper1,
+                   opt => opt.MapFrom(origen => origen.IdSuper1Navigation.NomTraba))
+                .ForMember(destino =>
+                   destino.Inspeccion,
+                   opt => opt.MapFrom(origen => origen.IdTpoInspNavigation.Descripcion));
             CreateMap<InspeccionDTO, Inspeccion>();
             #endregion Inspeccion
 
