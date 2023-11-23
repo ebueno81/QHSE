@@ -147,7 +147,7 @@
 
     private async Task AbrirEditar(int codigoInspeccion, int estadoRegistro)
     {
-        _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + codigoInspeccion+ "/" + estadoRegistro);
+        _navigationManager.NavigateTo("/page/RegistroInspeccionDet" + codigoInspeccion+ "/" + estadoRegistro);
     }
 
     private async Task Eliminar(InspeccionDTO model)

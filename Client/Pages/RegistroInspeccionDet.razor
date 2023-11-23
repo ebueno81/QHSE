@@ -2,6 +2,7 @@
 @inject IInspeccionService _inspeccionServicio
 @inject ITipoInspeccionService _tipoinspeccionServicio
 @inject IAreaService _areaServicio
+@inject ITrabajadorService _trabajadorServicio
 @inject IDialogService _dialogService
 @inject SweetAlertService Swal;
 
@@ -12,24 +13,24 @@
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
-        <MudText Typo="Typo.h5" GutterBottom="true">Inspecciones</MudText>
+        <MudText Typo="Typo.h5" GutterBottom="true"> </MudText>
 
         <MudGrid>
 
-            <MudItem xs="12" sm="3">
-                <MudSelect Label="Tipo" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_areaSeleccionado ">
-                    @if (listaAreas.Any())
+            <MudItem xs="12" sm="4">
+                <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @bind-Value="_tipoSeleccionado ">
+                    @if (listaTipoInspeccion.Any())
                     {
-                        foreach (var area in listaAreas)
+                        foreach (var tipo in listaTipoInspeccion)
                         {
-                            <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                            <MudSelectItem Value="@tipo">@tipo.Descripcion</MudSelectItem>
                         }
                     }
                 </MudSelect>
             </MudItem>
 
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" sm="4">
                 <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                 @bind-Value="_areaSeleccionado ">
                     @if (listaAreas.Any())
@@ -42,10 +43,33 @@
                 </MudSelect>
             </MudItem>
 
-           @*  <MudItem xs="12" sm="9">
-                <MudTextField @bind-Value="@_plantilla.Descripcion" Class="mb-1"
-                              Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+@*             <MudItem xs="12" sm="4">
+                <MudSelect Label="Trabajador" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @bind-Value="_trabajadorSeleccionado ">
+                    @if (listaTrabajadores.Any())
+                    {
+                        foreach (var trabajador in listaTrabajadores)
+                        {
+                            <MudSelectItem Value="@trabajador">@trabajador.NomTraba</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
             </MudItem> *@
+
+            <MudItem xs="12" sm="7">
+                <MudAutocomplete T="TrabajadorDTO" Label="Buscar Trabajador" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
+                                 ResetValueOnEmptyText="true"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                 Variant="Variant.Outlined" Margin="Margin.Dense"
+                                 Disabled="vDisabledIngresos"
+                                 ToStringFunc="@(e => e == null ? null : $"{e.NomTraba}")" />
+
+            </MudItem>
+
+            <MudItem xs="12" sm="4">
+                <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="_inspeccion.Fecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+            </MudItem>
+
 
             @if (estadoRegistro != 0)
             {
@@ -90,6 +114,10 @@
 
     public AreaDTO _area { get; set; } = new AreaDTO();
 
+    public TipoInspeccionDTO _tipo { get; set; } = new TipoInspeccionDTO();
+
+    public TrabajadorDTO _trabajador { get; set; } = new TrabajadorDTO();
+
     List<InspeccionDetDTO> listaDetalles = new List<InspeccionDetDTO>();
 
     CreacionDTO _creacion = new CreacionDTO()
@@ -117,6 +145,7 @@
 
         ObtenerCategorias();
 
+        ObtenerTipoInspeccion();
 
 
         // validamos si es mayor a cero editamos o mostramos de lo contrario es nueva
@@ -215,6 +244,61 @@
                 _areaSeleccionado = listaAreas.First();
             }
             StateHasChanged();
+        }
+    }
+
+    //listar tipos de inspeccion
+
+    List<TipoInspeccionDTO> listaTipoInspeccion = new List<TipoInspeccionDTO>();
+    private TipoInspeccionDTO _tipoSeleccionado;
+
+
+    private async Task ObtenerTipoInspeccion()
+    {
+        var response = await _tipoinspeccionServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaTipoInspeccion = response.value!;
+            if (_inspeccion.IdTpoInsp != 0)
+            {
+                _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
+                StateHasChanged();
+
+            }
+            else
+            {
+                _tipoSeleccionado = listaTipoInspeccion.First();
+            }
+            StateHasChanged();
+        }
+    }
+
+    //listar trabajadores
+
+    List<TrabajadorDTO> listaTrabajadores = new List<TrabajadorDTO>();
+    private TrabajadorDTO _trabajadorSeleccionado;
+
+
+    private async Task<IEnumerable<TrabajadorDTO>> BuscarTrabajador(string valor)
+    {
+        var response = await _trabajadorServicio.Lista();
+
+        if (response.status)
+        {
+            if (string.IsNullOrEmpty(valor))
+                return new List<TrabajadorDTO>();
+
+            List<TrabajadorDTO> lista = (List<TrabajadorDTO>)response.value!;
+
+            var x = _trabajadorSeleccionado.IdTraba;
+            return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase) && p.IdTraba == _trabajadorSeleccionado.IdTraba);
+
+        }
+        else
+        {
+            return new List<TrabajadorDTO>();
         }
     }
 

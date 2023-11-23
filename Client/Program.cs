@@ -28,7 +28,7 @@ builder.Services.AddScoped<IEmpresaService, EmpresaService>();
 builder.Services.AddScoped<IPlantillaService, PlantillaService>();
 builder.Services.AddScoped<IPlantillaDetService, PlantillaDetService>();
 builder.Services.AddScoped<IInspeccionService, InspeccionService>();
-
+builder.Services.AddScoped<ITipoInspeccionService, TipoInspeccionService>();
 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
