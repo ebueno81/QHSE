@@ -29,5 +29,11 @@ namespace QHSE.Shared
         public string? Area { get; set; }
 
         public DateTime? FechaCrea { get; set; }
+
+        public string? NomSuper1 { get; set; }
+
+        public string? Inspeccion { get; set; }
+
+
     }
 }
