@@ -18,23 +18,23 @@
         <MudText Typo="Typo.h5" GutterBottom="true">Plantillas</MudText>
 
         <MudGrid>
-                        
+
             <MudItem xs="12" sm="3">
                 <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_areaSeleccionado ">
-                        @if (listaAreas.Any())
+                           @bind-Value="_areaSeleccionado ">
+                    @if (listaAreas.Any())
+                    {
+                        foreach (var area in listaAreas)
                         {
-                            foreach (var area in listaAreas)
-                            {
-                                <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
-                            }
-                        } 
+                            <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                        }
+                    }
                 </MudSelect>
             </MudItem>
-                 
+
             <MudItem xs="12" sm="9">
                 <MudTextField @bind-Value="@_plantilla.Descripcion" Class="mb-1"
-                    Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                              Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
             </MudItem>
 
             @if (estadoRegistro != 0)
@@ -80,22 +80,22 @@
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
-         <MudItem xs="12">
+        <MudItem xs="12">
 
             <MudTable Items="@_plantilla.PlantillaDets"
-                    Striped="true" Bordered="true" Dense="true"
-                    Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
-                    Loading="@_loading" LoadingProgressColor="Color.Info">
+                      Striped="true" Bordered="true" Dense="true"
+                      Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                      Loading="@_loading" LoadingProgressColor="Color.Info">
 
-                   <ToolBarContent>
-                   <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                   </ToolBarContent>
+                <ToolBarContent>
+                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
 
-                   <HeaderContent>
-                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.NroOrden)">Orden</MudTableSortLabel></MudTh>
-                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.Categoria)">Categoria</MudTableSortLabel></MudTh>
-                        <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.IdPlantilla)">SubCategoria</MudTableSortLabel></MudTh>
-                   </HeaderContent> 
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.NroOrden)">Orden</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.Categoria)">Categoria</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.IdPlantilla)">SubCategoria</MudTableSortLabel></MudTh>
+                </HeaderContent>
 
                 <RowTemplate Context="registroRow">
 
@@ -107,24 +107,24 @@
                         @if (estadoRegistro != 0)
                         {
                             <MudFab Color="Color.Primary"
-                            StartIcon="@Icons.Material.Filled.Edit"
-                            Size="Size.Small"
-                            IconSize="Size.Small"
+                                StartIcon="@Icons.Material.Filled.Edit"
+                                Size="Size.Small"
+                                IconSize="Size.Small"
                                 OnClick="@(()=> EditarRegistro(registroRow))" />
                             <MudFab Color="Color.Error"
-                            StartIcon="@Icons.Material.Filled.Delete"
-                            Size="Size.Small"
-                            IconSize="Size.Small"
+                                StartIcon="@Icons.Material.Filled.Delete"
+                                Size="Size.Small"
+                                IconSize="Size.Small"
                                 OnClick="@(() => EliminarSubCategoria(registroRow))" />
-               }
-                   </MudTd>
+                        }
+                    </MudTd>
                 </RowTemplate>
 
                 <PagerContent>
-                <MudTablePager />
+                    <MudTablePager />
                 </PagerContent>
 
-             </MudTable>
+            </MudTable>
 
         </MudItem>
 
@@ -134,8 +134,8 @@
         <br />
 
         <div style="float:right">
-            
-            @if(estadoRegistro!=0)
+
+            @if (estadoRegistro != 0)
             {
                 <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
             }
@@ -348,12 +348,12 @@
                     NroOrden = _nroOrden
                 };
             _plantilla.PlantillaDets!.Add(plantillaDetalle);
-        }
+        //}
 
-            if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
-            {
-                if (validarDuplicidadNroOrden(_nroOrden))
-                {
+        //    if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
+        //    {
+        //        if (validarDuplicidadNroOrden(_nroOrden))
+        //        {
                     // editamos item
                     if (vEdit == 1)
                     {
@@ -365,7 +365,7 @@
                     }
                     else// registramos nuevo item
                     {
-                        var plantillaDetalle = new PlantillaDetDTO()
+                        var plantillaDetalle2 = new PlantillaDetDTO()
                             {
                                 IdPlantillaDet = 0,
                                 IdCtg = _subcategoriaSeleccionado.IdCtg,
@@ -376,7 +376,7 @@
                                 Activo = 1
 
                             };
-                        _plantilla.PlantillaDets!.Add(plantillaDetalle);
+                        _plantilla.PlantillaDets!.Add(plantillaDetalle2);
                     }
 
 
@@ -385,12 +385,9 @@
                     _subcategoriaSeleccionado.IdSubCtg = 0;
                     _subcategoriaSeleccionado.DescSubCtg = "";
                     _nroOrden = "";
-                }
+            //    }
             }
         }
-
-
-    }
 
     private bool ValidarDetalles()
     {
@@ -424,9 +421,7 @@
     //Volver al listado de plantilla
     private void LlamarCabecera()
     {
-
         _navigationManager.NavigateTo("/page/plantilla");
-
     }
 
     //Guardar
@@ -442,12 +437,12 @@
 
 
             _plantilla.IdArea = _areaSeleccionado.IdArea;
-           // _plantilla.IdCreate = 0;
+            // _plantilla.IdCreate = 0;
 
             _creacion.Plantillas!.Add(_plantilla);
 
 
-            if (_creacion.Plantillas.First().IdCreate!= 0)
+            if (_creacion.Plantillas.First().IdCreate != 0)
             {
                 _creacion.IdCreate = _plantilla.IdCreate ?? default(int);
                 _creacion.PcModi = Environment.MachineName;
@@ -458,7 +453,7 @@
             }
             else
             {
-                
+
 
                 _creacion.Activo = 1;
                 _creacion.PcCrea = Environment.MachineName;
@@ -482,7 +477,6 @@
                 myImageClass = "d-none";
             }
         }
-
     }
 
     private void Mensaje(string _mensaje)
@@ -502,7 +496,7 @@
     {
         int x = 0;
         // solo validaremos en caso sea un registro nuevo //
-        if (vEdit==0)
+        if (vEdit == 0)
         {
             foreach (var data in _plantilla.PlantillaDets)
             {
@@ -514,10 +508,10 @@
         }
 
 
-        if (x==1)
+        if (x == 1)
         {
             _snackBar.Add("SubCategoria ya existe, se esta duplicando", Severity.Error, a => a.VisibleStateDuration = 500);
-            return false;   
+            return false;
         }
         else
         {
@@ -558,7 +552,7 @@
     private bool validarDatos()
     {
 
-        if (_areaSeleccionado.IdArea>0 && _areaSeleccionado !=null)
+        if (_areaSeleccionado.IdArea > 0 && _areaSeleccionado != null)
         {
             if (!string.IsNullOrEmpty(_plantilla.Descripcion))
             {
@@ -591,24 +585,24 @@
     {
 
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-                {
-                    Title = "¿Esta seguro? No se podra recuperar el registro",
-                    Text = $"Eliminar la  SubCategoria: {model.SubCategoria}" ,
-                    Icon = SweetAlertIcon.Warning,
-                    ShowCancelButton = true,
-                    ConfirmButtonText = "Si, eliminar",
-                    CancelButtonText = "No, volver"
-                });
+            {
+                Title = "¿Esta seguro? No se podra recuperar el registro",
+                Text = $"Eliminar la  SubCategoria: {model.SubCategoria}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
 
         if (result.IsConfirmed)
         {
-            if (model.IdPlantillaDet>0)
+            if (model.IdPlantillaDet > 0)
             {
                 PlantillaDetDTO _detallePlantilla = new PlantillaDetDTO();
                 _detallePlantilla.IdPlantillaDet = model.IdPlantillaDet;// ?? default(int);
                 _detallePlantilla.Activo = 0;
-                
-                
+
+
                 var resultado = await _plantillaDetServicio.Anular(_detallePlantilla);
 
                 if (resultado)
@@ -619,12 +613,11 @@
                     _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
             }
             _plantilla.PlantillaDets.Remove(model);
-         
-            
-            
+
+
+
         }
-        
-       
+
     }
 
     //Editar Registro
@@ -640,5 +633,4 @@
         vEdit = 1;
         vDisabledIngresos = true;
     }
-
 }
