@@ -45,19 +45,19 @@
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdInsp)">Codigo</MudTableSortLabel></MudTh>
-                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdTpoInsp)">Tipo</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.Inspeccion)">Tipo</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.Area)">Area</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.NomSuper1)">Supervisor</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.Fecha)">Fecha</MudTableSortLabel></MudTh>
-                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdSuper1)">Supervisor</MudTableSortLabel></MudTh>
                     </HeaderContent>
 
                     <RowTemplate Context="registroRow">
 
                         <MudTd DataLabel="Codigo">@registroRow.IdInsp</MudTd>
-                        <MudTd DataLabel="Tipo Inspección">@registroRow.IdTpoInsp</MudTd>
+                        <MudTd DataLabel="Tipo">@registroRow.Inspeccion</MudTd>
                         <MudTd DataLabel="Area">@registroRow.Area</MudTd>
                         <MudTd DataLabel="Fecha">@registroRow.Fecha</MudTd>
-                        <MudTd DataLabel="Supervisor">@registroRow.IdSuper1</MudTd>
+                        <MudTd DataLabel="Supervisor">@registroRow.NomSuper1</MudTd>
 
                         <MudTd DataLabel="">
                             <MudFab Color="Color.Tertiary"
@@ -147,7 +147,7 @@
 
     private async Task AbrirEditar(int codigoInspeccion, int estadoRegistro)
     {
-        _navigationManager.NavigateTo("/page/InspeccionDetalle/" + codigoInspeccion+ "/" + estadoRegistro);
+        _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + codigoInspeccion+ "/" + estadoRegistro);
     }
 
     private async Task Eliminar(InspeccionDTO model)
@@ -184,7 +184,7 @@
     private void LlamarDetalle()
     {
 
-        _navigationManager.NavigateTo("/page/inspeccionDetalle/0/1");
+        _navigationManager.NavigateTo("/page/RegistroInspeccionDet");
 
     }
 }

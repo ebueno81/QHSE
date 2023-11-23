@@ -9,8 +9,6 @@ namespace QHSE.Server.Utilidades
         public AutoMapperProfile() 
         {
             
-
-            
             #region Creacion
             CreateMap<Creacion, CreacionDTO>()
                   .ForMember(destino =>

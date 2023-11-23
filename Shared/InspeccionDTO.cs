@@ -34,6 +34,7 @@ namespace QHSE.Shared
 
         public string? Inspeccion { get; set; }
 
+         public virtual ICollection<InspeccionDetDTO> InspeccionDets { get; set; }
 
     }
 }

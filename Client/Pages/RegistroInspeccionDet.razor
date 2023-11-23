@@ -1,10 +1,410 @@
 ﻿@page "/page/RegistroInspeccionDet"
 @inject IInspeccionService _inspeccionServicio
-@inject ICreacionService _creacionServicio
-@inject IDialogService _dialogServicio
-@inject ISnackbar _snackBar
+@inject ITipoInspeccionService _tipoinspeccionServicio
+@inject IAreaService _areaServicio
+@inject IDialogService _dialogService
 @inject SweetAlertService Swal;
 
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackBar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
+
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
+
+        <MudText Typo="Typo.h5" GutterBottom="true">Inspecciones</MudText>
+
+        <MudGrid>
+
+            <MudItem xs="12" sm="3">
+                <MudSelect Label="Tipo" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @bind-Value="_areaSeleccionado ">
+                    @if (listaAreas.Any())
+                    {
+                        foreach (var area in listaAreas)
+                        {
+                            <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @bind-Value="_areaSeleccionado ">
+                    @if (listaAreas.Any())
+                    {
+                        foreach (var area in listaAreas)
+                        {
+                            <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+
+           @*  <MudItem xs="12" sm="9">
+                <MudTextField @bind-Value="@_plantilla.Descripcion" Class="mb-1"
+                              Label="Descripción" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+            </MudItem> *@
+
+            @if (estadoRegistro != 0)
+            {
+                <MudItem xs="12" sm="3">
+                    <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Disabled="vDisabledIngresos" ref="eSubCategoria"
+                    @bind-Value="_categoriaSeleccionado">
+                        @if (listaCategorias.Any())
+                        {
+                            foreach (var categoria in listaCategorias)
+                            {
+                                <MudSelectItem Value="@categoria">@categoria.DescCtg</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="3">
+                    <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" OnClick="AgregarRegistro">Aceptar</MudButton>
+                </MudItem>
+            }
+
+        </MudGrid>
+
+    </MudPaper>
+
+    <br />
+
+</MudContainer>
+
 @code {
+
+    [Parameter] public int codigoInspeccion { get; set; }
+    [Parameter] public int estadoRegistro { get; set; }
+
+    //[CascadingParameter]
+    //MudDialogInstance MudDialog { get; set; }
+
+    private string searchString1 = "";
+
+    private bool _loading = true;
+
+
+    public AreaDTO _area { get; set; } = new AreaDTO();
+
+    List<InspeccionDetDTO> listaDetalles = new List<InspeccionDetDTO>();
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Inspeccions = new List<InspeccionDTO>()
+        };
+
+    InspeccionDTO _inspeccion = new InspeccionDTO()
+        {
+            InspeccionDets = new List<InspeccionDetDTO>()
+        };
+
+    InspeccionDetDTO selectedItem1 = null;
+
+    int vEdit = 0;
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false, vDisabledIngresos = false;
+    // string _nroOrden;
+    // ElementReference eSubCategoria;
+
+    //cargar listas
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = false;
+
+        ObtenerCategorias();
+
+
+
+        // validamos si es mayor a cero editamos o mostramos de lo contrario es nueva
+        if (codigoInspeccion > 0)
+        {
+            ObtenerPlantilla();
+
+        }
+
+        ObtenerAreas();
+        //  StateHasChanged();
+    }
+
+
+
+    private async Task ObtenerPlantilla()
+    {
+        // var result = await _plantillaServicio.Lista(codigoPlantilla);
+
+        // if (result.status)
+        // {
+        //     _plantilla = result.value.FirstOrDefault()!;
+
+        //     _plantilla.PlantillaDets.Clear();
+        //     List<PlantillaDetDTO> listaPlantillaDetalles = new List<PlantillaDetDTO>();
+        //     var resultado3 = await _plantillaServicio.ListaDetalles(_plantilla.IdPlantilla);
+        //     listaPlantillaDetalles = resultado3.value;
+
+        //     foreach (var data in listaPlantillaDetalles)
+        //     {
+        //         _plantilla.PlantillaDets.Add(data);
+        //     }
+        //     StateHasChanged();
+        // }
+    }
+
+    //Listar Categorias
+    List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
+    private CategoriaDTO _categoriaSeleccionado;
+
+    private async Task ObtenerCategorias()
+    {
+        // var response = await _categoriaServicio.Lista();
+
+        // if (response.status)
+        // {
+
+        //     listaCategorias = response.value!;
+        //     if (_categoria.IdCtg != 0)
+        //     {
+        //         _categoriaSeleccionado = listaCategorias.FirstOrDefault()!;
+
+        //     }
+
+        // }
+    }
+
+    private bool FilterFunc1(PlantillaDetDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(PlantillaDetDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Categoria.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.SubCategoria.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
+    }
+
+
+    //listar area
+
+    List<AreaDTO> listaAreas = new List<AreaDTO>();
+    private AreaDTO _areaSeleccionado;
+
+
+    private async Task ObtenerAreas()
+    {
+        var response = await _areaServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaAreas = response.value!;
+            if (_inspeccion.IdArea != 0)
+            {
+                _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
+                StateHasChanged();
+
+            }
+            else
+            {
+                _areaSeleccionado = listaAreas.First();
+            }
+            StateHasChanged();
+        }
+    }
+
+
+    //Agregar Registro
+    private void AgregarRegistro()
+    {
+        // if (ValidarDetalles())
+        // {
+        //     if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
+        //     {
+        //         if (validarDuplicidadNroOrden(_nroOrden))
+        //         {
+        //             //editamos item
+        //             if (vEdit == 1)
+        //             {
+        //                 var productoEliminar = _plantilla.PlantillaDets.Find(p => p.IdSubCtg == _subcategoriaSeleccionado.IdSubCtg);
+        //                 productoEliminar.IdSubCtg = _subcategoriaSeleccionado.IdSubCtg;
+        //                 productoEliminar.Categoria = _subcategoriaSeleccionado.Categoria;
+        //                 productoEliminar.SubCategoria = _subcategoriaSeleccionado.DescSubCtg;
+        //                 productoEliminar.NroOrden = _nroOrden;
+        //             }
+        //             else// registramos nuevo item
+        //             {
+        //                 var plantillaDetalle = new PlantillaDetDTO()
+        //                     {
+        //                         IdPlantillaDet = 0,
+        //                         IdCtg = _subcategoriaSeleccionado.IdCtg,
+        //                         IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
+        //                         Categoria = _subcategoriaSeleccionado.Categoria,
+        //                         SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
+        //                         NroOrden = _nroOrden,
+        //                         Activo = 1
+
+        //                     };
+        //                 _plantilla.PlantillaDets!.Add(plantillaDetalle);
+        //             }
+
+
+        //             vEdit = 0;
+        //             vDisabledIngresos = false;
+        //             _subcategoriaSeleccionado.IdSubCtg = 0;
+        //             _subcategoriaSeleccionado.DescSubCtg = "";
+        //             _nroOrden = "";
+        //         }
+        //     }
+        // }
+    }
+
+    // private bool ValidarDetalles()
+    // {
+    //     if (!string.IsNullOrEmpty(_nroOrden))
+    //     {
+    //         if (_subcategoriaSeleccionado != null && _categoriaSeleccionado != null)
+    //         {
+    //             if (!string.IsNullOrEmpty(_subcategoriaSeleccionado.DescSubCtg))
+    //             {
+    //                 return true;
+    //             }
+    //             else
+    //             {
+    //                 _snackBar.Add("1. Debe seleccionar la subcategoria", Severity.Error, a => a.VisibleStateDuration = 500);
+    //                 return false;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             _snackBar.Add("2. Debe seleccionar la subcategoria", Severity.Error, a => a.VisibleStateDuration = 500);
+    //             return false;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         _snackBar.Add("3. Falta ingresar el numero de orden", Severity.Error, a => a.VisibleStateDuration = 500);
+    //         return false;
+    //     }
+    // }
+
+    //Volver al listado de plantilla
+
+    private void LlamarCabecera()
+    {
+        _navigationManager.NavigateTo("/page/inspeccion");
+    }
+
+    //Guardar
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+
+
+            _inspeccion.IdArea = _areaSeleccionado.IdArea;
+            // _plantilla.IdCreate = 0;
+
+            _creacion.Inspeccions!.Add(_inspeccion);
+
+
+            if (_inspeccion.IdCreate != null)
+            {
+                _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _inspeccionServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _inspeccionServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+        }
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        _dialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+
+
+
+    private bool validarDatos()
+    {
+
+        if (_areaSeleccionado.IdArea > 0 && _areaSeleccionado != null)
+        {
+            if (!string.IsNullOrEmpty(_inspeccion.Inspeccion))
+            {
+                return true;
+            }
+            else
+            {
+                Mensaje("1. Ingrese tipo de inspeccion...");
+                return false;
+            }
+        }
+        else
+        {
+            Mensaje("2. Falta seleccionar el area...");
+            return false;
+        }
+
+
+    }
+
+
+
+    //Editar Registro
+    private void EditarRegistro(PlantillaDetDTO model)
+    {
+        // _categoriaSeleccionado.IdCtg = model.IdCtg ?? default(int);
+        // _categoriaSeleccionado.DescCtg = model.Categoria;
+
+        // _subcategoriaSeleccionado.IdSubCtg = model.IdSubCtg ?? default(int);
+        // _subcategoriaSeleccionado.DescSubCtg = model.SubCategoria;
+        // _subcategoriaSeleccionado.Categoria = model.Categoria;
+        // _nroOrden = model.NroOrden;
+        // vEdit = 1;
+        // vDisabledIngresos = true;
+    }
 
 }

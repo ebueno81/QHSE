@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QHSE.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace QHSE.Server.Models;
@@ -60,5 +61,5 @@ public partial class Inspeccion
 
     public virtual TpoInspeccion? IdTpoInspNavigation { get; set; }
 
-    public virtual ICollection<InspeccionDet> InspeccionDets { get; set; } = new List<InspeccionDet>();
+    public virtual List<InspeccionDetDTO>? InspeccionDets { get; set; } 
 }

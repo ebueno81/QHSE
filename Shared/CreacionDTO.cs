@@ -35,6 +35,8 @@ public partial class CreacionDTO
 
     public virtual List<SubCategoriaDTO>? SubCategoria { get; set; }
 
-    public virtual List<PlantillaDTO>? Plantillas { get; set; } 
+    public virtual List<PlantillaDTO>? Plantillas { get; set; }
+
+    public virtual List<InspeccionDTO>? Inspeccions { get; set; }
 
 }
