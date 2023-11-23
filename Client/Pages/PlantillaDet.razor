@@ -340,21 +340,11 @@
     {
         if (ValidarDetalles())
         {
-            var plantillaDetalle = new PlantillaDetDTO()
+            if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
+            {
+                if (validarDuplicidadNroOrden(_nroOrden))
                 {
-                    IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
-                    Categoria = _subcategoriaSeleccionado.Categoria,
-                    SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
-                    NroOrden = _nroOrden
-                };
-            _plantilla.PlantillaDets!.Add(plantillaDetalle);
-        //}
-
-        //    if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
-        //    {
-        //        if (validarDuplicidadNroOrden(_nroOrden))
-        //        {
-                    // editamos item
+                    //editamos item
                     if (vEdit == 1)
                     {
                         var productoEliminar = _plantilla.PlantillaDets.Find(p => p.IdSubCtg == _subcategoriaSeleccionado.IdSubCtg);
@@ -365,7 +355,7 @@
                     }
                     else// registramos nuevo item
                     {
-                        var plantillaDetalle2 = new PlantillaDetDTO()
+                        var plantillaDetalle = new PlantillaDetDTO()
                             {
                                 IdPlantillaDet = 0,
                                 IdCtg = _subcategoriaSeleccionado.IdCtg,
@@ -376,7 +366,7 @@
                                 Activo = 1
 
                             };
-                        _plantilla.PlantillaDets!.Add(plantillaDetalle2);
+                        _plantilla.PlantillaDets!.Add(plantillaDetalle);
                     }
 
 
@@ -385,9 +375,10 @@
                     _subcategoriaSeleccionado.IdSubCtg = 0;
                     _subcategoriaSeleccionado.DescSubCtg = "";
                     _nroOrden = "";
-            //    }
+                }
             }
         }
+    }
 
     private bool ValidarDetalles()
     {
@@ -442,7 +433,7 @@
             _creacion.Plantillas!.Add(_plantilla);
 
 
-            if (_creacion.Plantillas.First().IdCreate != 0)
+            if (_plantilla.IdCreate != null)
             {
                 _creacion.IdCreate = _plantilla.IdCreate ?? default(int);
                 _creacion.PcModi = Environment.MachineName;
@@ -453,8 +444,6 @@
             }
             else
             {
-
-
                 _creacion.Activo = 1;
                 _creacion.PcCrea = Environment.MachineName;
                 _creacion.UsuaCrea = appData.usuarioLogin;
@@ -463,7 +452,6 @@
                 _resultado = response.status;
                 _mensaje = "Registro fue creado";
             }
-
 
 
             if (_resultado)
