@@ -1,5 +1,5 @@
 ﻿@page "/page/RegistroInspeccion"
-
+@inject IInspeccionService _inspeccionServicio
 @inject ICreacionService _creacionServicio
 @inject IDialogService _dialogServicio
 @inject ISnackbar _snackBar
@@ -16,7 +16,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
-    <MudText Typo="Typo.h5" GutterBottom="true">Registro de Inspección</MudText>
+    <MudText Typo="Typo.h5" GutterBottom="true">Listado de Inspecciones</MudText>
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
         <MudGrid>
@@ -26,8 +26,8 @@
                         <MudButton Variant="Variant.Filled"
                                    StartIcon="@Icons.Material.Filled.Add"
                                    Color="Color.Primary"
-                                   >
-                            Nueva Inspeccion
+                                   OnClick="LlamarDetalle">
+                            Nueva Inspección
                         </MudButton>
                     </MudItem>
                 </Authorized>
@@ -35,54 +35,156 @@
 
             <MudItem xs="12">
 
+                <MudTable Items="@listaInspeccion"
+                          Striped="true" Bordered="true" Dense="true"
+                          Filter="new Func<InspeccionDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                          Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdInsp)">Codigo</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdTpoInsp)">Tipo Inspección</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.Area)">Area</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.Fecha)">Fecha</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<InspeccionDTO, object>(x=>x.IdSuper1)">Supervisor</MudTableSortLabel></MudTh>
+                    </HeaderContent>
 
-                <MudTablePager Striped="true" Bordered="true" Dense="true">
-                    </MudTablePager>
-            <HeaderContent>
-                <MudTh>Codigo</MudTh>
-                <MudTh>Descripción</MudTh>
-                <MudTh>Tipo Inspeccion</MudTh>
-                <MudTh>Area</MudTh>
-                <MudTh>Fecha</MudTh>
-            <MudTh>Supervisor</MudTh>
-            </HeaderContent>
-          
-                <MudTd DataLabel="Codigo"></MudTd>
-                <MudTd DataLabel="Descripcion"></MudTd>
-            <MudTd DataLabel="Tipo Inspeccion"></MudTd>
-                <MudTd DataLabel="Area"></MudTd>
-                <MudTd DataLabel="Fecha"></MudTd>
-            <MudTd DataLabel="Supervisor"></MudTd>
+                    <RowTemplate Context="registroRow">
 
-                <MudTd DataLabel="">
-                    <AuthorizeView Roles="Administrador,Supervisor">
-                        <Authorized>
-                            <MudFab Color="Color.Primary"
-                                    StartIcon="@Icons.Material.Filled.Edit"
+                        <MudTd DataLabel="Codigo">@registroRow.IdInsp</MudTd>
+                        <MudTd DataLabel="Tipo Inspección">@registroRow.IdTpoInsp</MudTd>
+                        <MudTd DataLabel="Area">@registroRow.Area</MudTd>
+                        <MudTd DataLabel="Fecha">@registroRow.Fecha</MudTd>
+                        <MudTd DataLabel="Supervisor">@registroRow.IdSuper1</MudTd>
+
+                        <MudTd DataLabel="">
+                            <MudFab Color="Color.Tertiary"
+                                    StartIcon="@Icons.Material.Filled.RemoveRedEye"
                                     Size="Size.Small"
                                     IconSize="Size.Small"
-                                    />
-                        </Authorized>
-                    </AuthorizeView>
-                    <AuthorizeView Roles="Administrador">
-                        <Authorized>
-                            <MudFab Color="Color.Error"
-                                    StartIcon="@Icons.Material.Filled.Delete"
-                                    Size="Size.Small"
-                                    IconSize="Size.Small"
-                                   />
-                        </Authorized>
-                    </AuthorizeView>
+                                    OnClick="@(() => AbrirEditar(registroRow.IdInsp,0))" />
+                            <AuthorizeView Roles="Administrador,Supervisor">
+                                <Authorized>
+                                    <MudFab Color="Color.Primary"
+                                            StartIcon="@Icons.Material.Filled.Edit"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => AbrirEditar(registroRow.IdInsp,1))" />
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView Roles="Administrador">
+                                <Authorized>
+                                    <MudFab Color="Color.Error"
+                                            StartIcon="@Icons.Material.Filled.Delete"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => Eliminar(registroRow))" />
+                                </Authorized>
+                            </AuthorizeView>
 
-                </MudTd>
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
 
-                <MudTablePager />
             </MudItem>
         </MudGrid>
     </MudPaper>
 
 </MudContainer>
-
 @code {
 
+    List<InspeccionDTO> listaInspeccion = new List<InspeccionDTO>();
+
+    private string searchString1 = "";
+    private InspeccionDTO selectedItem1 = null;
+    private bool _loading = true;
+
+    private async Task ObtenerInspeccion()
+    {
+        var result = await _inspeccionServicio.Lista(0);
+
+        if (result.status)
+        {
+            listaInspeccion = (List<InspeccionDTO>)result.value!;
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerInspeccion();
+        _loading = false;
+
+        //try
+        //{
+        //    await ObtenerAreas();
+        //    _loading = false;
+        //}
+        //catch (Exception)
+        //{
+
+        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
+        //}
+    }
+
+    private bool FilterFunc1(InspeccionDTO element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(InspeccionDTO element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Area.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
+    }
+
+    private async Task AbrirEditar(int codigoInspeccion, int estadoRegistro)
+    {
+        _navigationManager.NavigateTo("/page/InspeccionDetalle/" + codigoInspeccion+ "/" + estadoRegistro);
+    }
+
+    private async Task Eliminar(InspeccionDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Esta seguro?",
+                Text = $"Eliminar Plantilla: {model.IdInsp}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, volver"
+            });
+
+        if (result.IsConfirmed)
+        {
+            CreacionDTO _creacion = new CreacionDTO();
+            _creacion.IdCreate = model.IdCreate ?? default(int);
+            _creacion.UsuaAnula = appData.usuarioLogin;
+            _creacion.PcAnula = Environment.MachineName;
+
+            var resultado = await _creacionServicio.Anular(_creacion);
+
+            if (resultado)
+            {
+                _snackBar.Add("La inspección fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                await ObtenerInspeccion();
+            }
+            else
+                _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
+    }
+
+    private void LlamarDetalle()
+    {
+
+        _navigationManager.NavigateTo("/page/inspeccionDetalle/0/1");
+
+    }
 }
