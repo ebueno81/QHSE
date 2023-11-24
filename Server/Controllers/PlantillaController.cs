@@ -24,7 +24,7 @@ namespace QHSE.Server.Controllers
 
         [HttpGet]
         [Route("Lista")]
-        public async Task<IActionResult> Lista(int? codigoPlantilla)
+        public async Task<IActionResult> Lista(int? codigoPlantilla, int? tipoBusqueda)
         {
             ResponseDTO<List<PlantillaDTO>> _response = new ResponseDTO<List<PlantillaDTO>>();
 
@@ -32,8 +32,17 @@ namespace QHSE.Server.Controllers
             {
                 List<PlantillaDTO> _listaPlantillas = new List<PlantillaDTO>();
 
+                IQueryable<Plantilla> query;
 
-                IQueryable<Plantilla> query = await _plantillaRepositorio.Consultar(codigoPlantilla>0 ? x =>x.IdPlantilla==codigoPlantilla : null);
+                if (tipoBusqueda==1)
+                {
+                    query = await _plantillaRepositorio.Consultar(codigoPlantilla > 0 ? x => x.IdArea == codigoPlantilla : null);
+                }
+                else
+                {
+                    query = await _plantillaRepositorio.Consultar(codigoPlantilla > 0 ? x => x.IdPlantilla == codigoPlantilla : null);
+                }
+                
 
 
                 query = query.Include(c => c.IdCreateNavigation)

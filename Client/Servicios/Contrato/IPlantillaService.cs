@@ -5,7 +5,7 @@ namespace QHSE.Client.Servicios.Contrato
 {
     public interface IPlantillaService
     {
-        Task<ResponseDTO<List<PlantillaDTO>>> Lista(int? codigoPlantilla);
+        Task<ResponseDTO<List<PlantillaDTO>>> Lista(int? codigoPlantilla, int? tipoBusqueda);
         Task<ResponseDTO<CreacionDTO>> Crear(CreacionDTO entidad);
         Task<bool> Editar(CreacionDTO entidad);
         Task<bool> Eliminar(int id);

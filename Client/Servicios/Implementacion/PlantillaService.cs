@@ -51,9 +51,9 @@ namespace QHSE.Client.Servicios.Implementacion
             return response!.status;
         }
 
-        public async Task<ResponseDTO<List<PlantillaDTO>>> Lista(int? codigoPlantilla)
+        public async Task<ResponseDTO<List<PlantillaDTO>>> Lista(int? codigoPlantilla, int? tipoBusqueda)
         {
-            var result = await _http.GetFromJsonAsync<ResponseDTO<List<PlantillaDTO>>>($"api/plantilla/Lista?codigoPlantilla={codigoPlantilla}");
+            var result = await _http.GetFromJsonAsync<ResponseDTO<List<PlantillaDTO>>>($"api/plantilla/Lista?codigoPlantilla={codigoPlantilla}&tipoBusqueda={tipoBusqueda}");
             return result!;
         }
 
