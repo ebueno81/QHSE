@@ -19,7 +19,10 @@ namespace QHSE.Server.Utilidades
             #endregion Creacion
 
             #region Trabajador
-            CreateMap<Trabajador, TrabajadorDTO>();
+            CreateMap<Trabajador, TrabajadorDTO>()
+                .ForMember(destino =>
+                   destino.NombreApellido,
+                   opt => opt.MapFrom(origen => origen.NomTraba + ' ' + origen.ApeTraba));
             CreateMap<TrabajadorDTO, Trabajador>();
             #endregion Trabajador
 

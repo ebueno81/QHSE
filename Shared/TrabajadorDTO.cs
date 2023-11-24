@@ -21,5 +21,7 @@
 
 
         public int? IdCreate { get; set; }
+
+        public string? NombreApellido { get; set; }
     }
 }

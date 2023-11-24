@@ -3,6 +3,7 @@
 @inject ITipoInspeccionService _tipoinspeccionServicio
 @inject IAreaService _areaServicio
 @inject ITrabajadorService _trabajadorServicio
+@inject ITrabajadorService _jefeareaServicio
 @inject IDialogService _dialogService
 @inject SweetAlertService Swal;
 
@@ -17,7 +18,7 @@
 
         <MudGrid>
 
-            <MudItem xs="12" sm="4">
+            <MudItem xs="12" sm="3">
                 <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                 @bind-Value="_tipoSeleccionado ">
                     @if (listaTipoInspeccion.Any())
@@ -30,7 +31,7 @@
                 </MudSelect>
             </MudItem>
 
-            <MudItem xs="12" sm="4">
+            <MudItem xs="12" sm="3">
                 <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                 @bind-Value="_areaSeleccionado ">
                     @if (listaAreas.Any())
@@ -56,17 +57,25 @@
                 </MudSelect>
             </MudItem> *@
 
-            <MudItem xs="12" sm="7">
-                <MudAutocomplete T="TrabajadorDTO" Label="Buscar Trabajador" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
+            <MudItem xs="12" sm="6">
+                <MudAutocomplete T="TrabajadorDTO" Label="Buscar Supervisor" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
                                  ResetValueOnEmptyText="true"
                                  AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
                                  Variant="Variant.Outlined" Margin="Margin.Dense"
                                  Disabled="vDisabledIngresos"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.NomTraba}")" />
-
+                                 ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
             </MudItem>
 
-            <MudItem xs="12" sm="4">
+            <MudItem xs="12" sm="6">
+                <MudAutocomplete T="TrabajadorDTO" Label="Buscar Jefe de area" @bind-Value="_jefeareaSeleccionado" SearchFunc="@BuscarJefes"
+                                 ResetValueOnEmptyText="true"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                 Variant="Variant.Outlined" Margin="Margin.Dense"
+                                 Disabled="vDisabledIngresos"
+                                 ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
                 <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="_inspeccion.Fecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
             </MudItem>
 
@@ -96,7 +105,47 @@
     </MudPaper>
 
     <br />
+    <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
+        <MudItem xs="12">
+            <MudTable Items="@_plantilla.PlantillaDets"
+                      Striped="true" Bordered="true" Dense="true"
+                      Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
+                      Loading="@_loading" LoadingProgressColor="Color.Info">
+
+                <ToolBarContent>
+                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.NroOrden)">Orden</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.Categoria)">Categoria</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.IdPlantilla)">SubCategoria</MudTableSortLabel></MudTh>
+                    <MudTh>SI</MudTh>
+                    <MudTh>NO</MudTh>
+                    <MudTh>N/A</MudTh>
+                </HeaderContent>
+
+                <RowTemplate Context="registroRow">
+
+                    <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
+                    <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
+                    <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
+
+                    <MudTd>
+                      
+                    </MudTd>
+                </RowTemplate>
+
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+
+            </MudTable>
+
+        </MudItem>
+
+    </MudPaper>
 </MudContainer>
 
 @code {
@@ -130,7 +179,15 @@
             InspeccionDets = new List<InspeccionDetDTO>()
         };
 
+
+    PlantillaDTO _plantilla = new PlantillaDTO()
+        {
+            PlantillaDets = new List<PlantillaDetDTO>()
+        };
+
     InspeccionDetDTO selectedItem1 = null;
+
+    PlantillaDetDTO selectedItem2 = null;
 
     int vEdit = 0;
     string myImageClass { get; set; } = "d-none";
@@ -292,8 +349,7 @@
 
             List<TrabajadorDTO> lista = (List<TrabajadorDTO>)response.value!;
 
-            var x = _trabajadorSeleccionado.IdTraba;
-            return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase) && p.IdTraba == _trabajadorSeleccionado.IdTraba);
+            return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase) || p.ApeTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
 
         }
         else
@@ -302,6 +358,31 @@
         }
     }
 
+    //listar supervidores
+
+    List<TrabajadorDTO> listaJefeArea = new List<TrabajadorDTO>();
+    private TrabajadorDTO _jefeareaSeleccionado;
+
+
+    private async Task<IEnumerable<TrabajadorDTO>> BuscarJefes(string valor)
+    {
+        var response = await _jefeareaServicio.Lista();
+
+        if (response.status)
+        {
+            if (string.IsNullOrEmpty(valor))
+                return new List<TrabajadorDTO>();
+
+            List<TrabajadorDTO> lista = (List<TrabajadorDTO>)response.value!;
+
+            return lista.FindAll(p => p.NomTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase) || p.ApeTraba.Contains(valor, StringComparison.InvariantCultureIgnoreCase));
+
+        }
+        else
+        {
+            return new List<TrabajadorDTO>();
+        }
+    }
 
     //Agregar Registro
     private void AgregarRegistro()
