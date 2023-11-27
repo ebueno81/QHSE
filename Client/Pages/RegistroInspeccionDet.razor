@@ -5,6 +5,8 @@
 @inject ITrabajadorService _trabajadorServicio
 @inject ITrabajadorService _jefeareaServicio
 @inject IDialogService _dialogService
+@inject IPlantillaService _plantillaServicio
+
 @inject SweetAlertService Swal;
 
 @inject NavigationManager _navigationManager
@@ -32,30 +34,18 @@
             </MudItem>
 
             <MudItem xs="12" sm="3">
-                <MudSelect Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_areaSeleccionado ">
+                <MudSelect T="string" Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                           ValueChanged="ObtenerPlantilla">
                     @if (listaAreas.Any())
                     {
                         foreach (var area in listaAreas)
                         {
-                            <MudSelectItem Value="@area">@area.DescArea</MudSelectItem>
+                            <MudSelectItem T="string" Value="@area.IdArea.ToString()">@area.DescArea</MudSelectItem>
                         }
                     }
                 </MudSelect>
             </MudItem>
 
-@*             <MudItem xs="12" sm="4">
-                <MudSelect Label="Trabajador" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_trabajadorSeleccionado ">
-                    @if (listaTrabajadores.Any())
-                    {
-                        foreach (var trabajador in listaTrabajadores)
-                        {
-                            <MudSelectItem Value="@trabajador">@trabajador.NomTraba</MudSelectItem>
-                        }
-                    }
-                </MudSelect>
-            </MudItem> *@
 
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Supervisor" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
@@ -80,26 +70,6 @@
             </MudItem>
 
 
-            @if (estadoRegistro != 0)
-            {
-                <MudItem xs="12" sm="3">
-                    <MudSelect Label="Categoria" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Disabled="vDisabledIngresos" ref="eSubCategoria"
-                    @bind-Value="_categoriaSeleccionado">
-                        @if (listaCategorias.Any())
-                        {
-                            foreach (var categoria in listaCategorias)
-                            {
-                                <MudSelectItem Value="@categoria">@categoria.DescCtg</MudSelectItem>
-                            }
-                        }
-                    </MudSelect>
-                </MudItem>
-
-                <MudItem xs="12" sm="3">
-                    <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" OnClick="AgregarRegistro">Aceptar</MudButton>
-                </MudItem>
-            }
-
         </MudGrid>
 
     </MudPaper>
@@ -111,7 +81,16 @@
             <MudTable Items="@_plantilla.PlantillaDets"
                       Striped="true" Bordered="true" Dense="true"
                       Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
-                      Loading="@_loading" LoadingProgressColor="Color.Info">
+                      Loading="@_loading" LoadingProgressColor="Color.Info"
+                      GroupBy="@_groupDefinition">
+                <ColGroup>
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                </ColGroup>
 
                 <ToolBarContent>
                     <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -119,21 +98,50 @@
 
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.NroOrden)">Orden</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.Categoria)">Categoria</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.IdPlantilla)">SubCategoria</MudTableSortLabel></MudTh>
-                    <MudTh>SI</MudTh>
-                    <MudTh>NO</MudTh>
-                    <MudTh>N/A</MudTh>
+                    <MudTh>Realizado</MudTh>
+                    <MudTh>Imagen</MudTh>
+                    <MudTh></MudTh>
+                    <MudTh>Observacion</MudTh>
                 </HeaderContent>
-
+                <GroupHeaderTemplate>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName}: {context.Key}")</MudTh>
+                    </GroupHeaderTemplate>
                 <RowTemplate Context="registroRow">
 
                     <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
-                    <MudTd DataLabel="Categoria">@registroRow.Categoria</MudTd>
                     <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
 
                     <MudTd>
-                      
+                        <MudRadioGroup @bind-SelectedOption="@registroRow.Estado">
+                            <MudRadio Option="@("0")" Color="Color.Primary">No</MudRadio>
+                            <MudRadio Option="@("1")" Color="Color.Secondary">Si</MudRadio>
+                            <MudRadio Option="@("2")">NA</MudRadio>
+                        </MudRadioGroup>
+                    </MudTd>
+                 
+                    <MudTd>
+                       
+                        <InputFile id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Filled.CloudUpload"
+                                   for="fileInput"
+                                   OnClick="@(()=> EditarRegistro(registroRow))">
+                        </MudButton>
+                    </MudTd>
+                    <MudTd DataLabel="Image">
+                        @if (registroRow.SaveFile != null)
+                        {
+                            <MudPaper Class="pa-2 mx-2">
+                                <img width="50" height="50" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")">
+                                <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
+                            </MudPaper>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Observaciones">
+                        @registroRow.Observacion
                     </MudTd>
                 </RowTemplate>
 
@@ -144,8 +152,10 @@
             </MudTable>
 
         </MudItem>
-
+        
     </MudPaper>
+<br />
+    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Validar">Validar</MudButton>
 </MudContainer>
 
 @code {
@@ -153,13 +163,19 @@
     [Parameter] public int codigoInspeccion { get; set; }
     [Parameter] public int estadoRegistro { get; set; }
 
-    //[CascadingParameter]
-    //MudDialogInstance MudDialog { get; set; }
+    private TableGroupDefinition<PlantillaDetDTO> _groupDefinition = new()
+        {
+            GroupName = "Categoria",
+            Indentation = false,
+            Expandable = false,
+            Selector = (e) => e.Categoria
+        };
 
     private string searchString1 = "";
 
     private bool _loading = true;
 
+    int vEstado=1;
 
     public AreaDTO _area { get; set; } = new AreaDTO();
 
@@ -192,25 +208,123 @@
     int vEdit = 0;
     string myImageClass { get; set; } = "d-none";
     bool disableButton = false, desabilitaUser = false, vDisabledIngresos = false;
-    // string _nroOrden;
-    // ElementReference eSubCategoria;
+
+
+
+
+    SaveFile saveFile = new SaveFile();
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        int conta = 0;
+        foreach (var file in e.GetMultipleFiles())
+        {
+            if (conta==0)
+            {
+                var fileData = new FileData();
+                var buffers = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffers);
+                fileData.FileName = file.Name;
+                fileData.FileSize = file.Size;
+
+                fileData.FileType = file.ContentType;
+                fileData.ImageBytes = buffers;
+                saveFile.Files.Add(fileData);
+                var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+                modeloPlantilla.RutaImagen = file.Name;
+                //modeloPlantilla.Imagen = fileData.ImageBytes();
+                modeloPlantilla.Imagen = buffers;
+
+                saveFile.Files.Clear();
+            }
+
+        }
+    }
+
+
+    private async Task UploadFilesDTO(InputFileChangeEventArgs e)
+    {
+        int conta = 0;
+        foreach (var file in e.GetMultipleFiles())
+        {
+            if (conta==0)
+            {
+                SaveFileDTO saveFileDTO = new SaveFileDTO();
+                var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+
+                var fileData = new FileDataDTO();
+                var buffers = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffers);
+                fileData.FileName = file.Name;
+                fileData.FileSize = file.Size;
+
+                fileData.FileType = file.ContentType;
+                fileData.ImageBytes = buffers;
+
+                saveFileDTO.Files = fileData;
+                modeloPlantilla.RutaImagen = file.Name;
+                modeloPlantilla.SaveFile = saveFileDTO;
+
+                conta += 1;
+            }
+
+        }
+
+    }
+
+
+    private void RemoveImg(int codigoPlanillaDet)
+    {
+        //save.Files.Remove(file);
+        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == codigoPlanillaDet).First();
+        modeloPlantilla.SaveFile = null;
+    }
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+
+        files.Add(file);
+        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+        modeloPlantilla.RutaImagen = file.Name;
+        //TODO upload the files to the server
+    }
+
+    //private void UploadFiles(InputFileChangeEventArgs args)
+    //{
+    //    files.Add(args.File);
+    //    //TODO upload the files to the server
+    //}
+
+    //IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles2(IBrowserFile file)
+    {
+        files.Add(file);
+        //TODO upload the files to the server
+    }
+
+    private void Validar()
+    {
+        string prueba = "";
+        foreach (var data in _plantilla.PlantillaDets)
+        {
+            prueba += data.Imagen;
+        }
+    }
 
     //cargar listas
     protected override async Task OnInitializedAsync()
     {
         _loading = false;
 
-        ObtenerCategorias();
-
         ObtenerTipoInspeccion();
 
 
         // validamos si es mayor a cero editamos o mostramos de lo contrario es nueva
-        if (codigoInspeccion > 0)
-        {
-            ObtenerPlantilla();
+        //if (codigoInspeccion > 0)
+        //{
+        //    ObtenerPlantilla();
 
-        }
+        //}
 
         ObtenerAreas();
         //  StateHasChanged();
@@ -218,47 +332,29 @@
 
 
 
-    private async Task ObtenerPlantilla()
+    private async Task ObtenerPlantilla(string codigoArea)
     {
-        // var result = await _plantillaServicio.Lista(codigoPlantilla);
+        var result = await _plantillaServicio.Lista(int.Parse(codigoArea),1);
 
-        // if (result.status)
-        // {
-        //     _plantilla = result.value.FirstOrDefault()!;
+        if (result.status)
+        {
+            _plantilla = result.value.FirstOrDefault()!;
 
-        //     _plantilla.PlantillaDets.Clear();
-        //     List<PlantillaDetDTO> listaPlantillaDetalles = new List<PlantillaDetDTO>();
-        //     var resultado3 = await _plantillaServicio.ListaDetalles(_plantilla.IdPlantilla);
-        //     listaPlantillaDetalles = resultado3.value;
+            _plantilla.PlantillaDets.Clear();
+            List<PlantillaDetDTO> listaPlantillaDetalles = new List<PlantillaDetDTO>();
+            var resultado3 = await _plantillaServicio.ListaDetalles(_plantilla.IdPlantilla);
+            listaPlantillaDetalles = resultado3.value;
 
-        //     foreach (var data in listaPlantillaDetalles)
-        //     {
-        //         _plantilla.PlantillaDets.Add(data);
-        //     }
-        //     StateHasChanged();
-        // }
+            foreach (var data in listaPlantillaDetalles)
+            {
+                data.Estado = "1";
+                _plantilla.PlantillaDets.Add(data);
+            }
+            StateHasChanged();
+        }
     }
 
-    //Listar Categorias
-    List<CategoriaDTO> listaCategorias = new List<CategoriaDTO>();
-    private CategoriaDTO _categoriaSeleccionado;
 
-    private async Task ObtenerCategorias()
-    {
-        // var response = await _categoriaServicio.Lista();
-
-        // if (response.status)
-        // {
-
-        //     listaCategorias = response.value!;
-        //     if (_categoria.IdCtg != 0)
-        //     {
-        //         _categoriaSeleccionado = listaCategorias.FirstOrDefault()!;
-
-        //     }
-
-        // }
-    }
 
     private bool FilterFunc1(PlantillaDetDTO element) => FilterFunc(element, searchString1);
 
@@ -384,79 +480,6 @@
         }
     }
 
-    //Agregar Registro
-    private void AgregarRegistro()
-    {
-        // if (ValidarDetalles())
-        // {
-        //     if (validarDuplicidad(_subcategoriaSeleccionado.IdSubCtg))
-        //     {
-        //         if (validarDuplicidadNroOrden(_nroOrden))
-        //         {
-        //             //editamos item
-        //             if (vEdit == 1)
-        //             {
-        //                 var productoEliminar = _plantilla.PlantillaDets.Find(p => p.IdSubCtg == _subcategoriaSeleccionado.IdSubCtg);
-        //                 productoEliminar.IdSubCtg = _subcategoriaSeleccionado.IdSubCtg;
-        //                 productoEliminar.Categoria = _subcategoriaSeleccionado.Categoria;
-        //                 productoEliminar.SubCategoria = _subcategoriaSeleccionado.DescSubCtg;
-        //                 productoEliminar.NroOrden = _nroOrden;
-        //             }
-        //             else// registramos nuevo item
-        //             {
-        //                 var plantillaDetalle = new PlantillaDetDTO()
-        //                     {
-        //                         IdPlantillaDet = 0,
-        //                         IdCtg = _subcategoriaSeleccionado.IdCtg,
-        //                         IdSubCtg = _subcategoriaSeleccionado.IdSubCtg,
-        //                         Categoria = _subcategoriaSeleccionado.Categoria,
-        //                         SubCategoria = _subcategoriaSeleccionado.DescSubCtg,
-        //                         NroOrden = _nroOrden,
-        //                         Activo = 1
-
-        //                     };
-        //                 _plantilla.PlantillaDets!.Add(plantillaDetalle);
-        //             }
-
-
-        //             vEdit = 0;
-        //             vDisabledIngresos = false;
-        //             _subcategoriaSeleccionado.IdSubCtg = 0;
-        //             _subcategoriaSeleccionado.DescSubCtg = "";
-        //             _nroOrden = "";
-        //         }
-        //     }
-        // }
-    }
-
-    // private bool ValidarDetalles()
-    // {
-    //     if (!string.IsNullOrEmpty(_nroOrden))
-    //     {
-    //         if (_subcategoriaSeleccionado != null && _categoriaSeleccionado != null)
-    //         {
-    //             if (!string.IsNullOrEmpty(_subcategoriaSeleccionado.DescSubCtg))
-    //             {
-    //                 return true;
-    //             }
-    //             else
-    //             {
-    //                 _snackBar.Add("1. Debe seleccionar la subcategoria", Severity.Error, a => a.VisibleStateDuration = 500);
-    //                 return false;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             _snackBar.Add("2. Debe seleccionar la subcategoria", Severity.Error, a => a.VisibleStateDuration = 500);
-    //             return false;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         _snackBar.Add("3. Falta ingresar el numero de orden", Severity.Error, a => a.VisibleStateDuration = 500);
-    //         return false;
-    //     }
-    // }
 
     //Volver al listado de plantilla
 
@@ -530,8 +553,6 @@
     }
 
 
-
-
     private bool validarDatos()
     {
 
@@ -557,19 +578,16 @@
     }
 
 
-
+    int _idPlantillaDet = 0;
     //Editar Registro
     private void EditarRegistro(PlantillaDetDTO model)
     {
-        // _categoriaSeleccionado.IdCtg = model.IdCtg ?? default(int);
-        // _categoriaSeleccionado.DescCtg = model.Categoria;
-
-        // _subcategoriaSeleccionado.IdSubCtg = model.IdSubCtg ?? default(int);
-        // _subcategoriaSeleccionado.DescSubCtg = model.SubCategoria;
-        // _subcategoriaSeleccionado.Categoria = model.Categoria;
-        // _nroOrden = model.NroOrden;
-        // vEdit = 1;
-        // vDisabledIngresos = true;
+        //if(files!=null)
+        //{
+        //    model.RutaImagen = files.FirstOrDefault().Name;
+        //files.Clear();
+        //}
+        _idPlantillaDet = model.IdPlantillaDet;
     }
 
 }

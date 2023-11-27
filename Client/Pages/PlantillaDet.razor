@@ -212,7 +212,7 @@
 
     private async Task ObtenerPlantilla()
     {
-        var result = await _plantillaServicio.Lista(codigoPlantilla);
+        var result = await _plantillaServicio.Lista(codigoPlantilla,0);
 
         if (result.status)
         {
