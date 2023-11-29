@@ -43,12 +43,12 @@ public partial class InspeccionDet
     /// <summary>
     /// 1° Foto
     /// </summary>
-    public string? Foto1 { get; set; }
+    public byte[]? Foto1 { get; set; }
 
     /// <summary>
     /// 2° Foto
     /// </summary>
-    public string? Foto2 { get; set; }
+    public byte[]? Foto2 { get; set; }
 
     /// <summary>
     /// % cumplimiento

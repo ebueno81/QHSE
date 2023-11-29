@@ -233,7 +233,7 @@ else
             appData.usuarioRol = usuarioDTO.TipoUsuario;
             appData.idTraba = usuarioDTO.IdTraba;
             //appData.idVendedor = usuarioDTO.IdVendedor;
-            //appData.empresa = usuarioDTO.Em;
+            appData.empresa = "FastDye S.A.C.";
 
             var mobile = await _jsServicio.InvokeAsync<bool>("isDevice");
             string isDevice = mobile ? "Mobile" : "Desktop";

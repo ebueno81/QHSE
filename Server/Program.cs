@@ -16,7 +16,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 
-
 builder.Configuration.AddJsonFile("appsettings.json");
 var secretkey = builder.Configuration.GetSection("settings").GetSection("secretkey").ToString();
 var keyBytes = Encoding.UTF8.GetBytes(secretkey);

@@ -12,6 +12,29 @@
 @inject NavigationManager _navigationManager
 @inject ISnackbar _snackBar
 
+
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@using SixLabors.ImageSharp
+@using SixLabors.ImageSharp.Drawing
+@using SixLabors.ImageSharp.Drawing.Processing
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.Formats.Jpeg
+@using SixLabors.Fonts
+@using System.Net.Http
+@using System.IO
+
+
+@*<center>
+    <h1>Usar la Camara</h1>
+    <video id="videoFeed" width="320" height="240" />
+    <canvas class="d-none" id="currentFrame" width="320" height="240" />
+    <br />
+    <input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />
+    <button class="btn btn-primary mb-3" @onclick="CaptureFrame">Capture Frame</button>
+    <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
+</center>*@
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
@@ -50,7 +73,7 @@
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Supervisor" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
                                  ResetValueOnEmptyText="true"
-                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
                                  Variant="Variant.Outlined" Margin="Margin.Dense"
                                  Disabled="vDisabledIngresos"
                                  ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
@@ -59,7 +82,7 @@
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Jefe de area" @bind-Value="_jefeareaSeleccionado" SearchFunc="@BuscarJefes"
                                  ResetValueOnEmptyText="true"
-                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
                                  Variant="Variant.Outlined" Margin="Margin.Dense"
                                  Disabled="vDisabledIngresos"
                                  ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
@@ -75,13 +98,28 @@
     </MudPaper>
 
     <br />
+    @if (encenderCamara)
+    {
+        <center>
+            <h1>Usar la Camara</h1>
+            <video id="videoFeed" width="320" height="240"/>
+            <canvas class="d-none" id="currentFrame" width="320" height="240" />
+            <br />
+            <input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />
+            <button class="btn btn-primary mb-3" @onclick="CaptureFrame">Capture Frame</button>
+            <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
+        </center>
+        <br />
+    }
+    else
+    {
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
         <MudItem xs="12">
             <MudTable Items="@_plantilla.PlantillaDets"
                       Striped="true" Bordered="true" Dense="true"
                       Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
-                      Loading="@_loading" LoadingProgressColor="Color.Info"
+                      Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
                       GroupBy="@_groupDefinition">
                 <ColGroup>
                     <col />
@@ -93,7 +131,7 @@
                 </ColGroup>
 
                 <ToolBarContent>
-                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    <MudTextField @bind-Value="searchString1" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
                 </ToolBarContent>
 
                 <HeaderContent>
@@ -102,7 +140,6 @@
                     <MudTh>Realizado</MudTh>
                     <MudTh>Imagen</MudTh>
                     <MudTh></MudTh>
-                    <MudTh>Observacion</MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
                     <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName}: {context.Key}")</MudTh>
@@ -114,37 +151,52 @@
 
                     <MudTd>
                         <MudRadioGroup @bind-SelectedOption="@registroRow.Estado">
-                            <MudRadio Option="@("0")" Color="Color.Primary">No</MudRadio>
-                            <MudRadio Option="@("1")" Color="Color.Secondary">Si</MudRadio>
+                            <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
+                            <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
                             <MudRadio Option="@("2")">NA</MudRadio>
                         </MudRadioGroup>
                     </MudTd>
                  
                     <MudTd>
                        
-                        <InputFile id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
+                        <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
                         <MudButton HtmlTag="label"
                                    Variant="Variant.Filled"
-                                   Color="Color.Success"
+                                   Color="MudBlazor.Color.Success"
                                    StartIcon="@Icons.Filled.CloudUpload"
                                    for="fileInput"
-                                   OnClick="@(()=> EditarRegistro(registroRow))">
+                                   OnClick="@(()=> EditarRegistro(registroRow,1))">
                         </MudButton>
+                                <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="MudBlazor.Color.Error"
+                                   StartIcon="@Icons.Filled.CameraAlt"
+                                   for="fileInput"
+                                   OnClick="@(()=> EditarRegistro(registroRow,0))">
+                                </MudButton>
                     </MudTd>
                     <MudTd DataLabel="Image">
                         @if (registroRow.SaveFile != null)
                         {
-                            <MudPaper Class="pa-2 mx-2">
-                                <img width="50" height="50" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")">
-                                <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
-                            </MudPaper>
+                            <img width="80" height="80" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")">
+                                <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
                         }
-                    </MudTd>
+                        else
+                        {
+                            @if (registroRow.Imagen != null)
+                            {
+                                var base64 = Convert.ToBase64String(registroRow.Imagen); //La propiedad de tu modelo que es byte[]
+                                var imgSrc = String.Format("data:image/jpeg;base64,{0}", base64); // Damos formato para indicar que se trata de una cadena base64
+                                <img width="80" height="80" src="@imgSrc" />
+                            }
+                        }
+                        </MudTd>
+
                     <MudTd DataLabel="Observaciones">
                         @registroRow.Observacion
                     </MudTd>
                 </RowTemplate>
-
+                 
                 <PagerContent>
                     <MudTablePager />
                 </PagerContent>
@@ -154,14 +206,78 @@
         </MudItem>
         
     </MudPaper>
+    }
 <br />
-    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Validar">Validar</MudButton>
+    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Validar">Grabar</MudButton>
+    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="LlamarCabecera">Cancelar</MudButton>
 </MudContainer>
 
 @code {
-
     [Parameter] public int codigoInspeccion { get; set; }
     [Parameter] public int estadoRegistro { get; set; }
+
+
+    // variables that work only with photo taking
+    bool encenderCamara = false;
+    private string captionText;
+    private string frameUri;
+
+    FontCollection collection = new FontCollection();
+    FontFamily sansFamily;
+    Font captionFont;
+
+    // Cancel o activate of the camera
+    private async Task ActivarCamara(int cancelarCamara)
+    {
+        if (cancelarCamara == 1)
+            encenderCamara = false;
+        else
+        {
+            encenderCamara = true;
+            await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
+        }
+
+
+    }
+    // method that work with the camera
+    private async Task CaptureFrame()
+    {
+        await JSRuntime.InvokeAsync<String>("getFrame", "videoFeed", "currentFrame", DotNetObjectReference.Create(this));
+    }
+    private async Task EncenderCamara()
+    {
+        await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
+
+        //Font stored in wwwroot. Fetch it as byte array, and use it
+        var fontBytes = await Http.GetByteArrayAsync("OpenSans-Regular.ttf");
+        collection.Add(new MemoryStream(fontBytes));
+        collection.TryGet("Open Sans", out sansFamily);
+        captionFont = sansFamily.CreateFont(16, FontStyle.Regular);
+    }
+
+    [JSInvokable]
+    public void ProcessImage(string imageString)
+    {
+        SaveFileDTO saveFileDTO = new SaveFileDTO();
+        var fileData = new FileDataDTO();
+
+        byte[] imageData = Convert.FromBase64String(imageString.Split(',')[1]);
+
+        //Do image processing here
+        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+        modeloPlantilla.Imagen = imageData;
+        ActivarCamara(1);
+        using (var image = Image.Load(imageData))
+        {
+            image.Mutate(x => x
+                .Flip(FlipMode.Horizontal) //To match mirrored webcam image
+                .Fill(SixLabors.ImageSharp.Color.ParseHex("0008"), new RectangularPolygon(0, 220, 320, 20)) //Set footer bar for caption
+            );
+
+            frameUri = image.ToBase64String(JpegFormat.Instance);
+            
+        }
+    }
 
     private TableGroupDefinition<PlantillaDetDTO> _groupDefinition = new()
         {
@@ -244,6 +360,7 @@
     private async Task UploadFilesDTO(InputFileChangeEventArgs e)
     {
         int conta = 0;
+
         foreach (var file in e.GetMultipleFiles())
         {
             if (conta==0)
@@ -263,7 +380,7 @@
                 saveFileDTO.Files = fileData;
                 modeloPlantilla.RutaImagen = file.Name;
                 modeloPlantilla.SaveFile = saveFileDTO;
-
+                modeloPlantilla.Imagen = buffers;
                 conta += 1;
             }
 
@@ -277,6 +394,7 @@
         //save.Files.Remove(file);
         var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == codigoPlanillaDet).First();
         modeloPlantilla.SaveFile = null;
+        modeloPlantilla.Imagen = null;
     }
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
@@ -318,19 +436,11 @@
 
         ObtenerTipoInspeccion();
 
-
-        // validamos si es mayor a cero editamos o mostramos de lo contrario es nueva
-        //if (codigoInspeccion > 0)
-        //{
-        //    ObtenerPlantilla();
-
-        //}
-
         ObtenerAreas();
-        //  StateHasChanged();
+
+     //   EncenderCamara();
+
     }
-
-
 
     private async Task ObtenerPlantilla(string codigoArea)
     {
@@ -545,7 +655,7 @@
         var parameters = new DialogParameters<MsMensaje>();
         parameters.Add(x => x.ContentText, _mensaje);
         parameters.Add(x => x.ButtonText, "Cerrar");
-        parameters.Add(x => x.Color, Color.Error);
+        parameters.Add(x => x.Color, MudBlazor.Color.Error);
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
@@ -580,7 +690,7 @@
 
     int _idPlantillaDet = 0;
     //Editar Registro
-    private void EditarRegistro(PlantillaDetDTO model)
+    private void EditarRegistro(PlantillaDetDTO model, int activamosCamara)
     {
         //if(files!=null)
         //{
@@ -588,6 +698,9 @@
         //files.Clear();
         //}
         _idPlantillaDet = model.IdPlantillaDet;
+        //if (activamosCamara == 1)
+        ActivarCamara(activamosCamara);
+
     }
 
 }
