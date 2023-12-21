@@ -11,9 +11,9 @@
 
                 <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
-                            <MudTextField @bind-Value="@_trabajador.NomTraba" Class="mb-3"
+                    <MudTextField @bind-Value="@_trabajador.NomTraba" Class="mb-3" MaxLength="50"
                                   Label="Nombres" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.AdminPanelSettings" />
-                            <MudTextField @bind-Value="@_trabajador.ApeTraba" Class="mb-3"
+                    <MudTextField @bind-Value="@_trabajador.ApeTraba" Class="mb-3" MaxLength="50"
                                           Label="Apellidos" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
                             <MudTextField @bind-Value="@_trabajador.NroDoc" Class="mb-3"
                                   Label="Nro Documento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />

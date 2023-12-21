@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/18/2023 09:22:02" ReportInfo.Modified="12/20/2023 11:45:27" ReportInfo.CreatorVersion="2022.2.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Table" ReferenceName="DataSet1" DataType="null" Enabled="true">
+      <Column Name="IdArea" DataType="System.Int32"/>
+      <Column Name="DescArea" DataType="System.String"/>
+      <Column Name="IdCreate" DataType="System.Int32"/>
+    </BusinessObjectDataSource>
+    <Parameter Name="Titulo" DataType="System.String"/>
+    <Total Name="Total" TotalType="Count" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="5" TopMargin="5" RightMargin="5" BottomMargin="5" MirrorMargins="true" FirstPageSource="15" OtherPagesSource="15" LastPageSource="15" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="756" Height="37.8">
+      <TextObject Name="Text4" Left="66.15" Top="18.9" Width="481.95" Height="15.9" Text="[Titulo]" HorzAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+      <TextObject Name="Text5" Left="576.45" Top="9.9" Width="132.3" Height="18.9" Text="[Date]" HorzAlign="Right" Font="Tahoma, 7pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="756" Height="18.9">
+      <TableObject Name="Table2" Left="66.15" Width="481.95" Height="18.9">
+        <TableColumn Name="Column4" Width="94.5"/>
+        <TableColumn Name="Column5" Width="321.3"/>
+        <TableColumn Name="Column6"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell4" Border.Lines="All" Border.Color="Maroon" Fill.Color="LightGray" Text="Codigo" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Border.Color="Maroon" Fill.Color="LightGray" Text="Area" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+          <TableCell Name="Cell6" Border.Lines="All" Border.Color="Maroon" Fill.Color="LightGray" Text="IdCreate" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="64.7" Width="756" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Left="66.15" Width="481.95" Height="18.9">
+        <TableColumn Name="Column1" Width="94.5"/>
+        <TableColumn Name="Column2" Width="321.3"/>
+        <TableColumn Name="Column3"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Border.Color="Brown" Text="[Table.IdArea]" HorzAlign="Center" Font="Tahoma, 8pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Border.Color="Brown" Text="[Table.DescArea]" Font="Tahoma, 8pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Border.Color="Brown" Text="[Table.IdCreate]" HorzAlign="Center" Font="Tahoma, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataFooterBand Name="DataFooter1" Top="87.6" Width="756" Height="18.9">
+        <TextObject Name="Text1" Left="481.95" Width="66.15" Height="18.9" Text="[Total]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        <TextObject Name="Text2" Left="283.5" Width="198.45" Height="18.9" Text="Total de Registros:" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      </DataFooterBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="110.5" Width="756" Height="18.9">
+      <TextObject Name="Text3" Left="633.15" Width="75.6" Height="18.9" Text="[PageNofM]" Font="Arial, 8pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

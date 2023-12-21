@@ -277,7 +277,7 @@ public partial class DbQhseContext : DbContext
 
             entity.Property(e => e.IdSubCtg).HasComment("Id Sub Categoria");
             entity.Property(e => e.DescSubCtg)
-                .HasMaxLength(200)
+                .HasMaxLength(500)
                 .HasComment("Desc Sub Categoria");
             entity.Property(e => e.IdCreate).HasComment("Id Creción");
             entity.Property(e => e.IdCtg).HasComment("Id Categoria");

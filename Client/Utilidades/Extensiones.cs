@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace SistemaPedidos.Client.Utilidades
+namespace QHSE.Client.Utilidades
 {
     public static class Devices
     {

@@ -1,10 +1,12 @@
 
 ﻿using AutoMapper;
+using FastReport.Export.PdfSimple;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
+using QHSE.Server.Repositorio.Implementacion;
 using QHSE.Shared;
 
 namespace QHSE.Server.Controllers
@@ -16,11 +18,13 @@ namespace QHSE.Server.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ICategoriaRepositorio _categoriaRepositorio;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public CategoriaController(ICategoriaRepositorio articuloRepositorio, IMapper mapper)
+        public CategoriaController(ICategoriaRepositorio articuloRepositorio, IMapper mapper, IWebHostEnvironment hostingEnvironment)
         {
             _mapper = mapper;
             _categoriaRepositorio = articuloRepositorio;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
@@ -132,6 +136,7 @@ namespace QHSE.Server.Controllers
 
         }
 
+       
 
     }
 }

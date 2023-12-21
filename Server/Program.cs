@@ -37,7 +37,6 @@ builder.Services.AddAuthentication(config =>
     };
 });
 
-
 //envio de correo
 var emailConfig = builder.Configuration
     .GetSection("EmailConfiguration")

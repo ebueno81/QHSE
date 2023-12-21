@@ -25,14 +25,14 @@ public partial class PlantillaDetDTO
 
     public int? IdCtg { get; set; }
 
-    public string Estado { get; set; }
+    public string? Estado { get; set; }
 
     public string? RutaImagen { get; set; }
 
     public string? Observacion { get; set; }
 
     //public byte[]? Imagen { get; set; }
-    public byte[] Imagen { get; set; }
+    public byte[]? Imagen { get; set; }
 
     public FileStream? Archivo { get; set; }
 

@@ -23,7 +23,7 @@
                 </MudGrid>
                 <MudGrid>
                     <MudItem xs="12" sm="4">
-                        <MudTextField @bind-Value="@_usuario.NomUsua" Class="mb-3" Disabled="@desabilitaUser"
+                        <MudTextField @bind-Value="@_usuario.NomUsua" Class="mb-3" Disabled="@desabilitaUser" MaxLength="30"
                               Label="Usuario" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
 
                     </MudItem>
@@ -41,6 +41,7 @@
                                       Adornment="Adornment.End"
                                       AdornmentIcon="@PasswordInputIcon"
                                       OnAdornmentClick="TogglePasswordVisibility"
+                                      MaxLength="15"
                                       For="@(() => _usuario.ClaveUsua)" />
 
                     </MudItem>
@@ -52,6 +53,7 @@
                                       Adornment="Adornment.End"
                                       AdornmentIcon="@PasswordInputIcon"
                                       OnAdornmentClick="TogglePasswordVisibility"
+                                       MaxLength="15"
                                       For="@(() => _usuario.ClaveConfirmacion)" />
                     </MudItem>
                 </MudGrid>

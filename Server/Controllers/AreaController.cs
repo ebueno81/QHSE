@@ -5,24 +5,34 @@ using Microsoft.EntityFrameworkCore;
 using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
 using QHSE.Shared;
+using System.Data;
+using FastReport.Export.PdfSimple;
+
+
 
 namespace QHSE.Server.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class AreaController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IAreaRepositorio _areaRepositorio;
+        private IWebHostEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
 
-        public AreaController(IAreaRepositorio articuloRepositorio, IMapper mapper)
+        public AreaController(IAreaRepositorio articuloRepositorio, IMapper mapper, IConfiguration configuration, 
+            IWebHostEnvironment hostingEnvironment)
         {
             _mapper = mapper;
             _areaRepositorio = articuloRepositorio;
+            _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
+
         }
 
         [HttpGet]
+        [Authorize]
         [Route("Lista")]
         public async Task<IActionResult> Lista()
         {
@@ -32,17 +42,12 @@ namespace QHSE.Server.Controllers
             {
                 List<AreaDTO> _listaAreas = new List<AreaDTO>();
 
-                IQueryable<Area> query = await _areaRepositorio.Consultar();
+                IQueryable<Models.Area> query = await _areaRepositorio.Consultar();
 
                 query = query.Include(c => c.IdCreateNavigation)
                         .Where(c => c.IdCreateNavigation.Activo == 1);
 
                 _listaAreas = _mapper.Map<List<AreaDTO>>(query.ToList());
-
-                //if (_listaAreas.Count > 0)
-                //    _response = new ResponseDTO<List<AreaDTO>>() { status = true, msg = "ok", value = _listaAreas };
-                //else
-                //    _response = new ResponseDTO<List<AreaDTO>>() { status = false, msg = "sin resultados", value = null };
 
                 _response = new ResponseDTO<List<AreaDTO>>() { status = true, msg = "ok", value = _listaAreas };
 
@@ -58,6 +63,7 @@ namespace QHSE.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("Guardar")]
         public async Task<IActionResult> Guardar([FromBody] CreacionDTO request)
         {
@@ -90,6 +96,7 @@ namespace QHSE.Server.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("Editar")]
         public async Task<IActionResult> Editar([FromBody] CreacionDTO request)
         {
@@ -136,5 +143,65 @@ namespace QHSE.Server.Controllers
 
 
 
+        [HttpGet]
+        [Route("imprimirReporte")]
+        public async Task<IActionResult> imprimirReporte(string? tipoArchivo)
+        {
+            List<AreaDTO> listaAreas = _mapper.Map<List<AreaDTO>>(await _areaRepositorio.Lista());
+            
+            FastReport.Report report = new FastReport.Report();
+            
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptAreas.frx");
+            report.RegisterData(listaAreas, "DataSet1");
+            report.Load(path);
+            
+
+            report.SetParameterValue("Titulo","Reporte de Areas");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("imprimirReporte2")]
+        public async Task<IActionResult> imprimirReporte2(string? tipoArchivo)
+        {
+            List<AreaDTO> listaAreas = _mapper.Map<List<AreaDTO>>(await _areaRepositorio.Lista());
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "Reporte.frx");
+            report.RegisterData(listaAreas, "DataSet1");
+            report.Load(path);
+
+
+            report.SetParameterValue("Titulo", "Reporte de Areas");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
+
     }
+
+
 }

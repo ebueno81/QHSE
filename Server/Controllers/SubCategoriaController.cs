@@ -1,27 +1,31 @@
 ﻿using AutoMapper;
+using FastReport.Export.PdfSimple;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
+using QHSE.Server.Repositorio.Implementacion;
 using QHSE.Shared;
 
 namespace QHSE.Server.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class SubCategoriaController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly ISubCategoriaRepositorio _subCategoriaRepositorio;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public SubCategoriaController(ISubCategoriaRepositorio subCategoriaRepositorio, IMapper mapper)
+        public SubCategoriaController(ISubCategoriaRepositorio subCategoriaRepositorio, IMapper mapper, IWebHostEnvironment hostingEnvironment)
         {
             _mapper = mapper;
             _subCategoriaRepositorio = subCategoriaRepositorio;
+            _hostingEnvironment = hostingEnvironment;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("Lista")]
         public async Task<IActionResult> Lista()
@@ -55,6 +59,7 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [Authorize]
         [HttpPost]
         [Route("Guardar")]
         public async Task<IActionResult> Guardar([FromBody] CreacionDTO request)
@@ -87,6 +92,7 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [Authorize]
         [HttpPut]
         [Route("Editar")]
         public async Task<IActionResult> Editar([FromBody] CreacionDTO request)
@@ -132,6 +138,79 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [HttpGet]
+        [Route("imprimirReporte")]
+        public async Task<IActionResult> imprimirReporte()
+        {
+            List<SubCategoriaDTO> _listaSubCategorias = new List<SubCategoriaDTO>();
+
+            IQueryable<SubCategorium> query = await _subCategoriaRepositorio.Consultar();
+            query = query.Include(c => c.IdCreateNavigation)
+                    .Where(c => c.IdCreateNavigation.Activo == 1)
+                    .Include(ca => ca.IdCtgNavigation);
+
+            _listaSubCategorias = _mapper.Map<List<SubCategoriaDTO>>(query.ToList());
+
+            
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptSubCategorias.frx");
+            report.RegisterData(_listaSubCategorias, "DataSet1");
+            report.Load(path);
+
+            //report.SetParameterValue("Titulo", "Reporte de Areas Hoy");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("imprimirReporte2")]
+        public async Task<IActionResult> imprimirReporte2()
+        {
+            List<SubCategoriaDTO> _listaSubCategorias = new List<SubCategoriaDTO>();
+
+            IQueryable<SubCategorium> query = await _subCategoriaRepositorio.Consultar();
+            query = query.Include(c => c.IdCreateNavigation)
+                    .Where(c => c.IdCreateNavigation.Activo == 1)
+                    .Include(ca => ca.IdCtgNavigation);
+
+            _listaSubCategorias = _mapper.Map<List<SubCategoriaDTO>>(query.ToList());
+
+
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "Reporte.frx");
+            report.RegisterData(_listaSubCategorias, "DataSet1");
+            report.Load(path);
+
+            //report.SetParameterValue("Titulo", "Reporte de Areas Hoy");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
 
     }
 

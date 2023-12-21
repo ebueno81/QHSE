@@ -24,17 +24,6 @@
 @using System.Net.Http
 @using System.IO
 
-
-@*<center>
-    <h1>Usar la Camara</h1>
-    <video id="videoFeed" width="320" height="240" />
-    <canvas class="d-none" id="currentFrame" width="320" height="240" />
-    <br />
-    <input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />
-    <button class="btn btn-primary mb-3" @onclick="CaptureFrame">Capture Frame</button>
-    <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
-</center>*@
-
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
@@ -102,10 +91,10 @@
     {
         <center>
             <h1>Usar la Camara</h1>
-            <video id="videoFeed" width="320" height="240"/>
-            <canvas class="d-none" id="currentFrame" width="320" height="240" />
+            <video id="videoFeed" width="400" height="600"/>
+            <canvas class="d-none" id="currentFrame" width="400" height="600" />
             <br />
-            <input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />
+            @*<input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />*@
             <button class="btn btn-primary mb-3" @onclick="CaptureFrame">Capture Frame</button>
             <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
         </center>
@@ -122,8 +111,8 @@
                       Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
                       GroupBy="@_groupDefinition">
                 <ColGroup>
-                    <col />
-                    <col />
+                        <col/>
+                        <col/>
                     <col />
                     <col />
                     <col />
@@ -160,14 +149,14 @@
                     <MudTd>
                        
                         <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
-                        <MudButton HtmlTag="label"
+                        <MudButton HtmlTag="label" style="width: 5%;"
                                    Variant="Variant.Filled"
                                    Color="MudBlazor.Color.Success"
                                    StartIcon="@Icons.Filled.CloudUpload"
                                    for="fileInput"
                                    OnClick="@(()=> EditarRegistro(registroRow,1))">
                         </MudButton>
-                                <MudButton HtmlTag="label"
+                                <MudButton HtmlTag="label" style="width: 5%;"
                                    Variant="Variant.Filled"
                                    Color="MudBlazor.Color.Error"
                                    StartIcon="@Icons.Filled.CameraAlt"
@@ -178,7 +167,9 @@
                     <MudTd DataLabel="Image">
                         @if (registroRow.SaveFile != null)
                         {
-                            <img width="80" height="80" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")">
+                            var imgSrc = "data:" + registroRow.SaveFile.Files.FileType + ";base64," + Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes);
+                            <img width="30" height="40" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")"
+                             @onclick="(()=>AbrirImagen(registroRow,imgSrc))">
                                 <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
                         }
                         else
@@ -187,7 +178,8 @@
                             {
                                 var base64 = Convert.ToBase64String(registroRow.Imagen); //La propiedad de tu modelo que es byte[]
                                 var imgSrc = String.Format("data:image/jpeg;base64,{0}", base64); // Damos formato para indicar que se trata de una cadena base64
-                                <img width="80" height="80" src="@imgSrc" />
+                                <img width="30" height="40" src="@imgSrc" @onclick="(()=>AbrirImagen(registroRow,imgSrc))"/>
+                                <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
                             }
                         }
                         </MudTd>
@@ -219,7 +211,7 @@
 
     // variables that work only with photo taking
     bool encenderCamara = false;
-    private string captionText;
+    //private string captionText;
     private string frameUri;
 
     FontCollection collection = new FontCollection();
@@ -271,12 +263,25 @@
         {
             image.Mutate(x => x
                 .Flip(FlipMode.Horizontal) //To match mirrored webcam image
-                .Fill(SixLabors.ImageSharp.Color.ParseHex("0008"), new RectangularPolygon(0, 220, 320, 20)) //Set footer bar for caption
+                .Fill(SixLabors.ImageSharp.Color.ParseHex("0008"), new RectangularPolygon(0, 0, 600, 400)) //Set footer bar for caption
             );
 
             frameUri = image.ToBase64String(JpegFormat.Instance);
             
         }
+    }
+
+    private void AbrirImagen(PlantillaDetDTO model, string rutaImagen)
+    {
+
+        var parameters = new DialogParameters<MsImagen>();
+        parameters.Add(x => x.rutaMandada, rutaImagen);
+        parameters.Add(x => x.codigoMandado, "");
+        parameters.Add(x => x.articuloMandado, model.SubCategoria);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        _dialogService.Show<MsImagen>(model.SubCategoria, parameters, options);
     }
 
     private TableGroupDefinition<PlantillaDetDTO> _groupDefinition = new()
@@ -595,7 +600,7 @@
 
     private void LlamarCabecera()
     {
-        _navigationManager.NavigateTo("/page/inspeccion");
+        _navigationManager.NavigateTo("/page/RegistroInspeccion");
     }
 
     //Guardar

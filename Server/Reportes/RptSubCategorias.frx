@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/18/2023 11:03:52" ReportInfo.Modified="12/18/2023 17:06:36" ReportInfo.CreatorVersion="2022.2.0.0">
+  <Dictionary>
+      <BusinessObjectDataSource Name="SubCategoria" ReferenceName="DataSet1" DataType="System.Int32" Enabled="true">
+        <Column Name="IdSubCtg" DataType="System.Int32"/>
+        <Column Name="IdCtg" DataType="System.Int32"/>
+        <Column Name="DescSubCtg" DataType="System.String"/>
+        <Column Name="DescCtg" DataType="System.String"/>
+      </BusinessObjectDataSource>
+    <Total Name="Total" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total2" TotalType="Count" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperHeight="287" Guides="708.75,708.75" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="28.35">
+      <TextObject Name="Text1" Left="47.25" Top="9.45" Width="604.8" Height="18.9" Text="LISTADO DE CATEGORIAS Y SUBCATEGORIAS" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Left="585.9" Width="189" Height="18.9" Text="[Date]" HorzAlign="Justify" Font="Arial, 9pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="32.35" Width="718.2"/>
+    <ColumnHeaderBand Name="ColumnHeader1" Top="36.35" Width="718.2" Height="9.45"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="49.8" Width="718.2" Height="18.9" FirstRowStartsNewPage="true" Guides="0" Condition="[SubCategoria.IdCtg]">
+      <TableObject Name="Table2" Left="18.9" Width="472.92" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column6" Width="69.44"/>
+        <TableColumn Name="Column7" Width="324.59"/>
+        <TableColumn Name="Column8" Width="78.89"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="Right" Fill.Color="Silver" Text="[SubCategoria.IdCtg]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+          <TableCell Name="Cell7" Fill.Color="Silver" Text="[SubCategoria.Categoria]" VertAlign="Center" Font="Tahoma, 9pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell8" Fill.Color="White" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="72.7" Width="718.2" Height="18.9" DataSource="SubCategoria" Filter="[SubCategoria.IdSubCtg]">
+        <TableObject Name="Table1" Left="18.9" Width="674.16" Height="18.9">
+          <TableColumn Name="Column1" Width="70.92"/>
+          <TableColumn Name="Column2" Width="524.49"/>
+          <TableColumn Name="Column11" Width="78.75"/>
+          <TableRow Name="Row1">
+            <TableCell Name="Cell1" Border.Lines="All" Text="[SubCategoria.IdSubCtg]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="[SubCategoria.DescSubCtg]" VertAlign="Center" Font="Arial, 9pt" ColSpan="2"/>
+            <TableCell Name="Cell13" Border.Lines="All" Font="Arial, 10pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="95.6" Width="718.2" Height="28.35">
+        <TableObject Name="Table3" Left="89.59" Width="603.68" Height="18.9" Border.Lines="All" Fill.Color="White">
+          <TableColumn Name="Column9" Width="509.76"/>
+          <TableColumn Name="Column10" Width="93.92"/>
+          <TableRow Name="Row3">
+            <TableCell Name="Cell9" Border.Lines="All" Text="SUBTOTAL" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell10" Border.Lines="All" Text="[Total]" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="127.95" Width="718.2" Height="28.35">
+      <TableObject Name="Table4" Left="89.59" Width="603.67" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column12" Width="509.71"/>
+        <TableColumn Name="Column16" Width="93.96"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell14" Text="TOTAL GENERAL" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="[Total2]" HorzAlign="Center" VertAlign="Center" Font="Tahoma, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="160.3" Width="718.2" Height="37.8">
+      <TextObject Name="Text4" Left="689.85" Top="18.9" Width="94.5" Height="18.9" Text="[Page]" HorzAlign="Justify" Font="Arial, 9pt, style=Bold"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>
