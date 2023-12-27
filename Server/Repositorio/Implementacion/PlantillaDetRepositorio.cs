@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class PlantillaDetRepositorio: IPlantillaDetRepositorio
     {
-        private readonly DbQhseContext _dbContext;
+        private readonly DbqhseContext _dbContext;
 
-        public PlantillaDetRepositorio(DbQhseContext dbContext)
+        public PlantillaDetRepositorio(DbqhseContext dbContext)
         {
             _dbContext = dbContext;
         }

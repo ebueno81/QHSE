@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class TipoUsuarioRepositorio : ITipoUsuarioRepositorio
     {
-        private readonly DbQhseContext _dbContext;
+        private readonly DbqhseContext _dbContext;
 
-        public TipoUsuarioRepositorio(DbQhseContext dbContext)
+        public TipoUsuarioRepositorio(DbqhseContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -56,8 +56,8 @@
                         <MudTd DataLabel="Codigo">@registroRow.IdInsp</MudTd>
                         <MudTd DataLabel="Tipo">@registroRow.Inspeccion</MudTd>
                         <MudTd DataLabel="Area">@registroRow.Area</MudTd>
-                        <MudTd DataLabel="Fecha">@registroRow.Fecha</MudTd>
-                        <MudTd DataLabel="Supervisor">@registroRow.NomSuper1</MudTd>
+                        <MudTd DataLabel="Fecha">@registroRow.NomSuper1</MudTd>
+                        <MudTd DataLabel="Supervisor">@registroRow.Fecha</MudTd>
 
                         <MudTd DataLabel="">
                             <MudFab Color="Color.Tertiary"
@@ -72,6 +72,15 @@
                                             Size="Size.Small"
                                             IconSize="Size.Small"
                                             OnClick="@(() => AbrirEditar(registroRow.IdInsp,1))" />
+                                </Authorized>
+                            </AuthorizeView>
+                            <AuthorizeView Roles="Administrador,Supervisor">
+                                <Authorized>
+                                    <MudFab Color="Color.Warning"
+                                            StartIcon="@Icons.Material.Filled.Edit"
+                                            Size="Size.Small"
+                                            IconSize="Size.Small"
+                                            OnClick="@(() => AbrirEditar(registroRow.IdInsp,2))" />
                                 </Authorized>
                             </AuthorizeView>
                             <AuthorizeView Roles="Administrador">
@@ -120,16 +129,6 @@
         await ObtenerInspeccion();
         _loading = false;
 
-        //try
-        //{
-        //    await ObtenerAreas();
-        //    _loading = false;
-        //}
-        //catch (Exception)
-        //{
-
-        //    _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
-        //}
     }
 
     private bool FilterFunc1(InspeccionDTO element) => FilterFunc(element, searchString1);
@@ -147,7 +146,7 @@
 
     private async Task AbrirEditar(int codigoInspeccion, int estadoRegistro)
     {
-        _navigationManager.NavigateTo("/page/RegistroInspeccionDet" + codigoInspeccion+ "/" + estadoRegistro);
+        _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + codigoInspeccion+ "/" + estadoRegistro);
     }
 
     private async Task Eliminar(InspeccionDTO model)
@@ -183,8 +182,6 @@
 
     private void LlamarDetalle()
     {
-
-        _navigationManager.NavigateTo("/page/RegistroInspeccionDet");
-
+        _navigationManager.NavigateTo("/page/RegistroInspeccionDet/0/0");
     }
 }

@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class EmpresaRepositorio:IEmpresaRepositorio
     {
-        private readonly DbQhseContext _dbContext;
+        private readonly DbqhseContext _dbContext;
 
-        public EmpresaRepositorio(DbQhseContext dbContext)
+        public EmpresaRepositorio(DbqhseContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -1,4 +1,4 @@
-﻿@page "/page/RegistroInspeccionDet"
+﻿@page "/page/RegistroInspeccionDet/{codigoInspeccion:int}/{estadoRegistro:int}"
 @inject IInspeccionService _inspeccionServicio
 @inject ITipoInspeccionService _tipoinspeccionServicio
 @inject IAreaService _areaServicio
@@ -34,7 +34,7 @@
 
             <MudItem xs="12" sm="3">
                 <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_tipoSeleccionado ">
+                @bind-Value="_tipoSeleccionado">
                     @if (listaTipoInspeccion.Any())
                     {
                         foreach (var tipo in listaTipoInspeccion)
@@ -46,16 +46,25 @@
             </MudItem>
 
             <MudItem xs="12" sm="3">
-                <MudSelect T="string" Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @if (codigoInspeccion>0)
+                {
+                    <MudTextField @bind-Value="@_inspeccion.Area" Class="mb-1" Disabled
+                              Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                }
+                else
+                {
+                    <MudSelect T="string" Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                            ValueChanged="ObtenerPlantilla">
-                    @if (listaAreas.Any())
-                    {
-                        foreach (var area in listaAreas)
+                        @if (listaAreas.Any())
                         {
-                            <MudSelectItem T="string" Value="@area.IdArea.ToString()">@area.DescArea</MudSelectItem>
+                            foreach (var area in listaAreas)
+                            {
+                                <MudSelectItem T="string" Value="@area.IdArea.ToString()">@area.DescArea</MudSelectItem>
+                            }
                         }
-                    }
-                </MudSelect>
+                    </MudSelect>
+                }
+                
             </MudItem>
 
 
@@ -78,7 +87,7 @@
             </MudItem>
 
             <MudItem xs="12" sm="3">
-                <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="_inspeccion.Fecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="vFecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
             </MudItem>
 
 
@@ -200,7 +209,7 @@
     </MudPaper>
     }
 <br />
-    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Validar">Grabar</MudButton>
+    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
     <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="LlamarCabecera">Cancelar</MudButton>
 </MudContainer>
 
@@ -267,7 +276,7 @@
             );
 
             frameUri = image.ToBase64String(JpegFormat.Instance);
-            
+
         }
     }
 
@@ -293,6 +302,7 @@
         };
 
     private string searchString1 = "";
+    int vCodigoArea=0;
 
     private bool _loading = true;
 
@@ -328,10 +338,8 @@
 
     int vEdit = 0;
     string myImageClass { get; set; } = "d-none";
+    DateTime? vFecha = DateTime.Now;
     bool disableButton = false, desabilitaUser = false, vDisabledIngresos = false;
-
-
-
 
     SaveFile saveFile = new SaveFile();
     private async Task UploadFiles(InputFileChangeEventArgs e)
@@ -360,7 +368,6 @@
 
         }
     }
-
 
     private async Task UploadFilesDTO(InputFileChangeEventArgs e)
     {
@@ -393,7 +400,6 @@
 
     }
 
-
     private void RemoveImg(int codigoPlanillaDet)
     {
         //save.Files.Remove(file);
@@ -412,13 +418,6 @@
         //TODO upload the files to the server
     }
 
-    //private void UploadFiles(InputFileChangeEventArgs args)
-    //{
-    //    files.Add(args.File);
-    //    //TODO upload the files to the server
-    //}
-
-    //IList<IBrowserFile> files = new List<IBrowserFile>();
     private void UploadFiles2(IBrowserFile file)
     {
         files.Add(file);
@@ -439,12 +438,44 @@
     {
         _loading = false;
 
-        ObtenerTipoInspeccion();
-
         ObtenerAreas();
 
-     //   EncenderCamara();
+        if (estadoRegistro>0)
+        {
+            ObtenerInspeccion();
+        }
 
+        ObtenerTipoInspeccion();
+
+    }
+
+    private async Task ObtenerInspeccion()
+    {
+        var resultC = await _inspeccionServicio.Lista(codigoInspeccion);
+
+        if (resultC.status)
+        {
+            _inspeccion = resultC.value.First();
+            vFecha = _inspeccion.Fecha ?? default(DateTime);
+
+            var response = await _trabajadorServicio.Lista();
+            _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
+            _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
+
+            StateHasChanged();
+        }
+
+        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion);
+
+        if (result.status)
+        {
+
+            List<InspeccionDetDTO> listaInspeccionDetalles = new List<InspeccionDetDTO>();
+            listaInspeccionDetalles = result.value;
+
+
+
+        }
     }
 
     private async Task ObtenerPlantilla(string codigoArea)
@@ -454,7 +485,7 @@
         if (result.status)
         {
             _plantilla = result.value.FirstOrDefault()!;
-
+            vCodigoArea = int.Parse(codigoArea);
             _plantilla.PlantillaDets.Clear();
             List<PlantillaDetDTO> listaPlantillaDetalles = new List<PlantillaDetDTO>();
             var resultado3 = await _plantillaServicio.ListaDetalles(_plantilla.IdPlantilla);
@@ -462,14 +493,24 @@
 
             foreach (var data in listaPlantillaDetalles)
             {
-                data.Estado = "1";
-                _plantilla.PlantillaDets.Add(data);
+
+                var inspeccionDetalle = new InspeccionDetDTO()
+                {
+                    SubCategoria = data.SubCategoria,
+                    Categoria = data.Categoria,
+                    IdSubCtg = data.IdSubCtg,
+                    OpcSelect1 = data.Estado,
+                    Obs1 = data.Observacion,
+                    Foto1 = data.Imagen,
+                    NroOrden = data.NroOrden
+                    Activo = 1
+                };
+                _inspeccion.InspeccionDets!.Add(inspeccionDetalle);
+
             }
             StateHasChanged();
         }
     }
-
-
 
     private bool FilterFunc1(PlantillaDetDTO element) => FilterFunc(element, searchString1);
 
@@ -486,12 +527,8 @@
         return false;
     }
 
-
-    //listar area
-
     List<AreaDTO> listaAreas = new List<AreaDTO>();
     private AreaDTO _areaSeleccionado;
-
 
     private async Task ObtenerAreas()
     {
@@ -603,6 +640,24 @@
         _navigationManager.NavigateTo("/page/RegistroInspeccion");
     }
 
+    private void GrabarDetalle()
+    {
+        foreach (var data in _plantilla.PlantillaDets)
+        {
+            var inspeccionDetalle = new InspeccionDetDTO()
+                            {
+
+                                IdSubCtg = data.IdSubCtg,
+                                OpcSelect1 = data.Estado,
+                                Obs1 = data.Observacion,
+                                Foto1 = data.Imagen,
+                                Activo = 1
+                            };
+            _inspeccion.InspeccionDets!.Add(inspeccionDetalle);
+        }
+
+    }
+
     //Guardar
     private async Task Guardar()
     {
@@ -615,7 +670,14 @@
             bool _resultado;
 
 
-            _inspeccion.IdArea = _areaSeleccionado.IdArea;
+            _inspeccion.IdArea = vCodigoArea;
+            _inspeccion.IdTpoInsp =_tipoSeleccionado.IdTpoInsp;
+            _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
+            _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
+
+            _inspeccion.IdEmp = 1;
+
+            GrabarDetalle();
             // _plantilla.IdCreate = 0;
 
             _creacion.Inspeccions!.Add(_inspeccion);
@@ -670,26 +732,49 @@
 
     private bool validarDatos()
     {
-
-        if (_areaSeleccionado.IdArea > 0 && _areaSeleccionado != null)
+        if (_trabajadorSeleccionado !=null)
         {
-            if (!string.IsNullOrEmpty(_inspeccion.Inspeccion))
+            if (listaAreas != null)
             {
-                return true;
+                //if (listaAreas > 0)
+                //{
+                if (_tipoSeleccionado != null)
+                {
+                    if (_tipoSeleccionado.IdTpoInsp>0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Mensaje("1. Ingrese tipo de inspeccion...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Mensaje("2. Ingrese tipo de inspeccion...");
+                    return false;
+                }
             }
             else
             {
-                Mensaje("1. Ingrese tipo de inspeccion...");
+                Mensaje("3. Falta seleccionar el area...");
                 return false;
             }
+            
+            //}
+            //else
+            //{
+            //    Mensaje("4. Falta seleccionar el area...");
+            //    return false;
+            //}
         }
         else
         {
-            Mensaje("2. Falta seleccionar el area...");
+            Mensaje("5. Falta seleccionar el supervisor...");
             return false;
         }
-
-
+        
     }
 
 

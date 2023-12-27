@@ -8,9 +8,9 @@ namespace QHSE.Server.Repositorio.Implementacion
     public class AreaRepositorio : IAreaRepositorio
 
     {
-        private readonly DbQhseContext _dbContext;
+        private readonly DbqhseContext _dbContext;
 
-        public AreaRepositorio(DbQhseContext dbContext)
+        public AreaRepositorio(DbqhseContext dbContext)
         {
             _dbContext = dbContext;
         }

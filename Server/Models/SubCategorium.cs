@@ -29,5 +29,7 @@ public partial class SubCategorium
 
     public virtual Categorium? IdCtgNavigation { get; set; }
 
+    public virtual ICollection<InspeccionDet> InspeccionDets { get; set; } = new List<InspeccionDet>();
+
     public virtual ICollection<PlantillaDet> PlantillaDets { get; set; } = new List<PlantillaDet>();
 }

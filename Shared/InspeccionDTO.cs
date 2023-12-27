@@ -22,6 +22,8 @@ namespace QHSE.Shared
 
         public DateTime? Fecha { get; set; }
 
+        public int? IdJefeArea { get; set; }
+
         public int? IdEmp { get; set; }
 
         public int? IdCreate { get; set; }

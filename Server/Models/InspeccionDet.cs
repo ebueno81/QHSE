@@ -66,4 +66,6 @@ public partial class InspeccionDet
     public int? Activo { get; set; }
 
     public virtual Inspeccion? IdInspNavigation { get; set; }
+
+    public virtual SubCategorium? IdSubCtgNavigation { get; set; }
 }

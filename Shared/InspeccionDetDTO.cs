@@ -31,5 +31,21 @@ namespace QHSE.Shared
         public DateTime? FechaLevanta { get; set; }
 
         public int? Activo { get; set; }
+
+        public string? SubCategoria { get; set; }
+
+        public string? Categoria { get; set; }
+
+        public string? Estado { get; set; }
+
+        public string? RutaImagen { get; set; }
+
+        public byte[]? Imagen { get; set; }
+
+        public FileStream? Archivo { get; set; }
+
+        public SaveFileDTO? SaveFile { get; set; }
+
+        public string? NroOrden { get; set; }
     }
 }

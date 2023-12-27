@@ -44,7 +44,10 @@ namespace QHSE.Server.Utilidades
             #endregion Inspeccion
 
             #region InspeccionDetalle
-            CreateMap<InspeccionDet, InspeccionDetDTO>();
+            CreateMap<InspeccionDet, InspeccionDetDTO>()
+                 .ForMember(destino =>
+                   destino.SubCategoria,
+                   opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg));
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
 
