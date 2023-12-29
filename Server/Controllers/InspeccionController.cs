@@ -76,7 +76,12 @@ namespace QHSE.Server.Controllers
                 IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, numVerificacion);
                 query = query.Include(ca => ca.IdSubCtgNavigation)
                     .Where(r => r.Activo == 1)
-                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation);
+                    .Include(s => s.IdSubCtgNavigation)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
+                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
+                    .Include(tr => tr.IdInspNavigation.IdSuper1Navigation)
+                    .Include(t => t.IdInspNavigation.IdTpoInspNavigation);
 
                 _listaInspeccion = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
 

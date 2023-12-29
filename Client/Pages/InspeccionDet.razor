@@ -729,15 +729,27 @@
 
             
             _inspeccion.IdTpoInsp =_tipoSeleccionado.IdTpoInsp;
-            _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
             _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
+            _inspeccion.NomJefeArea = _jefeareaSeleccionado.NombreApellido;
+
+            
             _inspeccion.Fecha = vFecha;
 
             _inspeccion.IdEmp = 1;
 
             if (_inspeccion.IdCreate != null)
             {
-                _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
+                if (estadoRegistro==1)
+                {
+                    _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
+                    _inspeccion.NomSuper1 = _trabajadorSeleccionado.NombreApellido;
+                }
+                else
+                {
+                    _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
+                    _inspeccion.NomSuper2 = _trabajadorSeleccionado.NombreApellido;
+                }
+                
                 
 
                 _creacion.Inspeccions!.Add(_inspeccion);

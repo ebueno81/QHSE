@@ -201,12 +201,10 @@
 
     private async Task ImprimirPDF(int codigoInspeccion, int numVerificacion)
     {
-
         string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirReporte?codigoInspeccion={codigoInspeccion}&numVerificacion={numVerificacion}";
-
         _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
-
     }
+
     private async Task ExportarExcel(int codigoPlantilla)
     {
         var result = await _inspeccionServicio.ListaDetalles(codigoPlantilla,1);

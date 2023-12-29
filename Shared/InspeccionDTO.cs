@@ -38,5 +38,8 @@ namespace QHSE.Shared
 
          public virtual List<InspeccionDetDTO> InspeccionDets { get; set; }
 
+        public string? NomJefeArea { get; set; }
+        
+
     }
 }

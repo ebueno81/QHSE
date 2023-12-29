@@ -71,7 +71,20 @@ namespace QHSE.Server.Utilidades
                    opt => opt.MapFrom(origen => origen.IdInspNavigation.IdTpoInspNavigation.Descripcion))
                  .ForMember(destino =>
                    destino.Fecha,
-                   opt => opt.MapFrom(origen => origen.IdInspNavigation.Fecha));
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.Fecha))
+                 .ForMember(destino =>
+                   destino.NomJefeArea,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.NomJefeArea))
+                 .ForMember(destino =>
+                   destino.SI,
+                   opt => opt.MapFrom(origen => origen.OpcSelect1=="1"?"X":""))
+                 .ForMember(destino =>
+                   destino.NO,
+                   opt => opt.MapFrom(origen => origen.OpcSelect1 == "0" ? "X" : ""))
+                 .ForMember(destino =>
+                   destino.NA,
+                   opt => opt.MapFrom(origen => origen.OpcSelect1 == "2" ? "X" : ""))
+                 ;
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
 
