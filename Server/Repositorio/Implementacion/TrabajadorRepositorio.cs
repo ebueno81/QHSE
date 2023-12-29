@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class TrabajadorRepositorio : ITrabajadorRepositorio
     {
-        private readonly DbqhseContext _dbContext;
+        private readonly DbQhseContext _dbContext;
 
-        public TrabajadorRepositorio(DbqhseContext dbContext)
+        public TrabajadorRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }

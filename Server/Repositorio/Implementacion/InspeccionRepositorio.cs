@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class InspeccionRepositorio:IInspeccionRepositorio
     {
-        private readonly DbqhseContext _dbContext;
+        private readonly DbQhseContext _dbContext;
 
-        public InspeccionRepositorio(DbqhseContext dbContext)
+        public InspeccionRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -73,10 +73,20 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion)
+        public async Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion, int numVerificacion)
         {
-            IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion);
-            return queryEntidad;
+            // segunda verificacion
+            if (numVerificacion== 2)
+            {
+                IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion && d.OpcSelect1 == "0");
+                return queryEntidad;
+            }
+            else// primera verificacion
+            {
+                IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion);
+                return queryEntidad;
+            }
+            
         }
     }
 }

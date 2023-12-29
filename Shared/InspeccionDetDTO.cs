@@ -47,5 +47,26 @@ namespace QHSE.Shared
         public SaveFileDTO? SaveFile { get; set; }
 
         public string? NroOrden { get; set; }
+
+        public int? IdCtg { get; set; }
+
+        public string? Trabajador { get; set; }
+
+        public string? Area { get; set; }
+
+        public string? Empresa { get; set; }
+
+        public string? Tipo { get; set; }
+
+        public DateTime? Fecha { get; set; }
+
+        public string? SI { get; set; }
+
+        public string? NO { get; set; }
+
+        public string? NA { get; set; }
+
+        public string? NomJefeArea { get; set; }
+
     }
 }

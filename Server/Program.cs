@@ -45,7 +45,7 @@ builder.Services.AddSingleton(emailConfig);
 builder.Services.AddScoped<IEMailSenderRepositorio, EmailConfigRepositorio>();
 
 
-builder.Services.AddDbContext<DbqhseContext>(options =>
+builder.Services.AddDbContext<DbQhseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL"));
 });

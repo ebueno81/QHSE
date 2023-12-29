@@ -6,9 +6,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class TipoInspeccionRepositorio:ITipoInspeccionRepositorio
     {
-        private readonly DbqhseContext _dbContext;
+        private readonly DbQhseContext _dbContext;
 
-        public TipoInspeccionRepositorio(DbqhseContext dbContext)
+        public TipoInspeccionRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }

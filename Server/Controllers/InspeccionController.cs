@@ -1,27 +1,31 @@
 ﻿using AutoMapper;
+using FastReport.Export.PdfSimple;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
+using QHSE.Server.Repositorio.Implementacion;
 using QHSE.Shared;
 
 namespace QHSE.Server.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class InspeccionController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IInspeccionRepositorio _InspeccionRepositorio;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public InspeccionController(IInspeccionRepositorio InspeccionRepositorio, IMapper mapper)
+        public InspeccionController(IInspeccionRepositorio InspeccionRepositorio, IMapper mapper, IWebHostEnvironment hostingEnvironment)
         {
             _mapper = mapper;
             _InspeccionRepositorio = InspeccionRepositorio;
+            _hostingEnvironment = hostingEnvironment;   
         }
 
+        [Authorize]
         [HttpGet]
         [Route("Lista")]
         public async Task<IActionResult> Lista(int? codigoInspeccion)
@@ -61,7 +65,7 @@ namespace QHSE.Server.Controllers
         [Authorize]
         [HttpGet]
         [Route("ListaDetalles")]
-        public async Task<IActionResult> ListaDetalles(int codigoInspeccion)
+        public async Task<IActionResult> ListaDetalles(int codigoInspeccion, int numVerificacion)
         {
             ResponseDTO<List<InspeccionDetDTO>> _response = new ResponseDTO<List<InspeccionDetDTO>>();
 
@@ -69,9 +73,10 @@ namespace QHSE.Server.Controllers
             {
                 List<InspeccionDetDTO> _listaInspeccion = new List<InspeccionDetDTO>();
 
-                IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion);
+                IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, numVerificacion);
                 query = query.Include(ca => ca.IdSubCtgNavigation)
-                    .Where(r => r.Activo == 1);
+                    .Where(r => r.Activo == 1)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation);
 
                 _listaInspeccion = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
 
@@ -91,6 +96,7 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [Authorize]
         [HttpPost]
         [Route("Guardar")]
         public async Task<IActionResult> Guardar([FromBody] CreacionDTO request)
@@ -126,6 +132,7 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [Authorize]
         [HttpPut]
         [Route("Editar")]
         public async Task<IActionResult> Editar([FromBody] CreacionDTO request)
@@ -171,7 +178,45 @@ namespace QHSE.Server.Controllers
 
         }
 
+        [HttpGet]
+        [Route("imprimirReporte")]
+        public async Task<IActionResult> imprimirReporte(int codigoInspeccion, int numVerificacion)
+        {
+            List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
 
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, numVerificacion);
+            query = query.Include(c => c.IdInspNavigation)
+                    .Include(s => s.IdSubCtgNavigation)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
+                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
+                    .Include(t => t.IdInspNavigation.IdSuper1Navigation)
+                    .Include(t => t.IdInspNavigation.IdTpoInspNavigation)
+                    ;
+
+            _listaRegistros = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion.frx");
+            report.RegisterData(_listaRegistros, "DataSet1");
+            report.Load(path);
+
+            //report.SetParameterValue("Titulo", "Reporte de Areas Hoy");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
 
     }
 }

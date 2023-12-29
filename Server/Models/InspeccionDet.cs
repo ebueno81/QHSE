@@ -20,6 +20,8 @@ public partial class InspeccionDet
     /// </summary>
     public int? IdSubCtg { get; set; }
 
+    public string? NroOrden { get; set; }
+
     /// <summary>
     /// 1° Inspeccion S,N,NA
     /// </summary>

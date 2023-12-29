@@ -45,9 +45,33 @@ namespace QHSE.Server.Utilidades
 
             #region InspeccionDetalle
             CreateMap<InspeccionDet, InspeccionDetDTO>()
+                .ForMember(destino =>
+                   destino.IdCtg,
+                   opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.IdCtg))
+                .ForMember(destino =>
+                   destino.Categoria,
+                   opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.DescCtg))
                  .ForMember(destino =>
                    destino.SubCategoria,
-                   opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg));
+                   opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg))
+                 .ForMember(destino =>
+                   destino.NroOrden,
+                   opt => opt.MapFrom(origen => origen.NroPctg))
+                 .ForMember(destino =>
+                   destino.Trabajador,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdSuper1Navigation.NomTraba + " " + origen.IdInspNavigation.IdSuper1Navigation.ApeTraba))
+                 .ForMember(destino =>
+                   destino.Area,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdAreaNavigation.DescArea))
+                 .ForMember(destino =>
+                   destino.Empresa,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdEmpNavigation.RazEmp))
+                 .ForMember(destino =>
+                   destino.Tipo,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdTpoInspNavigation.Descripcion))
+                 .ForMember(destino =>
+                   destino.Fecha,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.Fecha));
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
 
@@ -69,7 +93,16 @@ namespace QHSE.Server.Utilidades
                     opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg))
                  .ForMember(destino =>
                     destino.Categoria,
-                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.DescCtg));
+                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.DescCtg))
+                 .ForMember(destino =>
+                    destino.IdCtg,
+                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.IdCtg))
+                 .ForMember(destino =>
+                    destino.Area,
+                    opt => opt.MapFrom(origen => origen.IdPlantillaNavigation.IdAreaNavigation.DescArea))
+                 .ForMember(destino =>
+                    destino.Descripcion,
+                    opt => opt.MapFrom(origen => origen.IdPlantillaNavigation.Descripcion));
             CreateMap<PlantillaDetDTO, PlantillaDet>();
             #endregion PlantillaDetalle
 

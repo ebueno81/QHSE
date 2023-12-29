@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QHSE.Server.Models;
 
-public partial class DbqhseContext : DbContext
+public partial class DbQhseContext : DbContext
 {
-    public DbqhseContext()
+    public DbQhseContext()
     {
     }
 
-    public DbqhseContext(DbContextOptions<DbqhseContext> options)
+    public DbQhseContext(DbContextOptions<DbQhseContext> options)
         : base(options)
     {
     }
@@ -42,7 +42,8 @@ public partial class DbqhseContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    { }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQHSE;user id=sa; pwd=ACEace11");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -205,6 +206,7 @@ public partial class DbqhseContext : DbContext
             entity.Property(e => e.Foto2).HasComment("2° Foto");
             entity.Property(e => e.IdInsp).HasComment("Id Inspección");
             entity.Property(e => e.IdSubCtg).HasComment("Id Categoria");
+            entity.Property(e => e.NroOrden).HasMaxLength(5);
             entity.Property(e => e.NroPctg)
                 .HasComment("% cumplimiento")
                 .HasColumnType("decimal(2, 2)");

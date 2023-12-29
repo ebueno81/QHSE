@@ -31,10 +31,14 @@ public partial class PlantillaDetDTO
 
     public string? Observacion { get; set; }
 
-    //public byte[]? Imagen { get; set; }
     public byte[]? Imagen { get; set; }
 
     public FileStream? Archivo { get; set; }
 
     public SaveFileDTO? SaveFile { get; set; }
+
+    public string? Area { get; set; }
+
+    public string? Descripcion { get; set; }
+
 }

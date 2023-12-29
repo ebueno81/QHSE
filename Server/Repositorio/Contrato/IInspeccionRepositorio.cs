@@ -10,6 +10,6 @@ namespace QHSE.Server.Repositorio.Contrato
         Task<Creacion> Crear(Creacion entidad);
         Task<bool> Editar(Creacion entidad);
         Task<IQueryable<Inspeccion>> Consultar(Expression<Func<Inspeccion, bool>> filtro = null);
-        Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion);
+        Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion, int numVerificacion);
     }
 }

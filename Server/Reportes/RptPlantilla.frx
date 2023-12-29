@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/21/2023 17:03:22" ReportInfo.Modified="12/22/2023 15:41:33" ReportInfo.CreatorVersion="2022.2.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Table" ReferenceName="DataSet1" DataType="System.Int32" Enabled="true">
+        <Column Name="Area" DataType="System.String"/>
+        <Column Name="IdPlantilla" DataType="System.Int32"/>
+        <Column Name="DescPlantilla" DataType="System.String"/>
+        <Column Name="NroOrden" DataType="System.String"/>
+        <Column Name="IdSubCtg" DataType="System.Int32"/>
+        <Column Name="DescCtg" DataType="System.String"/>
+        <Column Name="IdCtg" DataType="System.Int32"/>
+        <Column Name="DescSubCtg" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Fill.Color="White"/>
+    <PageHeaderBand Name="PageHeader1" Top="4" Width="718.2"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="8" Width="718.2" Height="37.8" FirstRowStartsNewPage="true" Guides="0" Condition="[Table.area]">
+      <TableObject Name="Table3" Left="18.9" Width="670.95" Height="28.35">
+        <TableColumn Name="Column5" Width="670.95"/>
+        <TableRow Name="Row4" Height="28.35">
+          <TableCell Name="Cell10" Fill.Color="White" Text="[Table.Descripcion]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader2" Top="49.8" Width="718.2" Height="18.9" FirstRowStartsNewPage="true" Guides="0" Condition="[Table.IdCtg]">
+        <TableObject Name="Table2" Left="9.45" Width="699.38" Height="18.9">
+          <TableColumn Name="Column3" Width="47.41"/>
+          <TableColumn Name="Column4" Width="434.64"/>
+          <TableColumn Name="Column9" Width="33.06"/>
+          <TableColumn Name="Column10" Width="33.08"/>
+          <TableColumn Name="Column11" Width="33.08"/>
+          <TableColumn Name="Column12" Width="118.11"/>
+          <TableRow Name="Row3">
+            <TableCell Name="Cell8" Border.Lines="Left, Top, Bottom" Fill.Color="Silver" Text="[Table.IdCtg]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell9" Border.Lines="Right, Top, Bottom" Fill.Color="Silver" Text="[Table.Categoria]" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Silver" Text="SI" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Silver" Text="NO" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell16" Border.Lines="All" Fill.Color="Silver" Text="NA" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+            <TableCell Name="Cell17" Border.Lines="All" Fill.Color="Silver" Text="Observación" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+        <DataBand Name="Data1" Top="72.7" Width="718.2" Height="18.9" DataSource="Table" Filter="[Table.NroOrden]">
+          <TableObject Name="Table4" Left="9.45" Width="699.38" Height="18.9">
+            <TableColumn Name="Column13" Width="47.41"/>
+            <TableColumn Name="Column14" Width="434.64"/>
+            <TableColumn Name="Column15" Width="33.06"/>
+            <TableColumn Name="Column16" Width="33.08"/>
+            <TableColumn Name="Column17" Width="33.08"/>
+            <TableColumn Name="Column18" Width="118.11"/>
+            <TableRow Name="Row5">
+              <TableCell Name="Cell18" Border.Lines="All" Text="[Table.NroOrden]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+              <TableCell Name="Cell19" Border.Lines="Right, Top, Bottom" Text="[Table.SubCategoria]" VertAlign="Center" Font="Arial, 9pt"/>
+              <TableCell Name="Cell20" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+              <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+              <TableCell Name="Cell22" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+              <TableCell Name="Cell23" Border.Lines="All" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+            </TableRow>
+          </TableObject>
+          <Sort>
+            <Sort Expression="[Table.NroOrden]"/>
+          </Sort>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter2" Top="95.6" Width="718.2" Height="9.45"/>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter1" Top="109.05" Width="718.2"/>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="113.05" Width="718.2" Height="28.35"/>
+  </ReportPage>
+</Report>

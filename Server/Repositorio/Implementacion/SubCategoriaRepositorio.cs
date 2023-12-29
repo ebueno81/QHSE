@@ -8,9 +8,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class SubCategoriaRepositorio: ISubCategoriaRepositorio
     {
-        private readonly DbqhseContext _dbContext;
+        private readonly DbQhseContext _dbContext;
 
-        public SubCategoriaRepositorio(DbqhseContext dbContext)
+        public SubCategoriaRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
         }

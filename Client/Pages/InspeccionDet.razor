@@ -64,9 +64,7 @@
                         }
                     </MudSelect>
                 }
-                
             </MudItem>
-
 
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Supervisor" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
@@ -103,25 +101,25 @@
             <video id="videoFeed" width="400" height="600"/>
             <canvas class="d-none" id="currentFrame" width="400" height="600" />
             <br />
-            @*<input class="form-control mb-3" style="width:320px;" type="text" @bind="captionText" placeholder="Enter caption" />*@
-            <button class="btn btn-primary mb-3" @onclick="CaptureFrame">Capture Frame</button>
+            <button class="btn btn-primary mb-3" disabled="@vCargando" @onclick="CaptureFrame">Tomar Foto</button>
             <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
         </center>
         <br />
+       
     }
     else
     {
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
         <MudItem xs="12">
-            <MudTable Items="@_plantilla.PlantillaDets"
+            <MudTable Items="@_inspeccion.InspeccionDets"
                       Striped="true" Bordered="true" Dense="true"
-                      Filter="new Func<PlantillaDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
+                      Filter="new Func<InspeccionDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
                       Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
                       GroupBy="@_groupDefinition">
                 <ColGroup>
-                        <col/>
-                        <col/>
+                    <col/>
+                    <col/>
                     <col />
                     <col />
                     <col />
@@ -133,14 +131,14 @@
                 </ToolBarContent>
 
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.NroOrden)">Orden</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<PlantillaDetDTO, object>(x=>x.IdPlantilla)">SubCategoria</MudTableSortLabel></MudTh>
+                    <MudTh>Orden</MudTh>
+                    <MudTh>SubCategoria</MudTh>
                     <MudTh>Realizado</MudTh>
                     <MudTh>Imagen</MudTh>
                     <MudTh></MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
-                    <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName}: {context.Key}")</MudTh>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.Key}")</MudTh>
                     </GroupHeaderTemplate>
                 <RowTemplate Context="registroRow">
 
@@ -148,11 +146,23 @@
                     <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
 
                     <MudTd>
-                        <MudRadioGroup @bind-SelectedOption="@registroRow.Estado">
-                            <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
-                            <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
-                            <MudRadio Option="@("2")">NA</MudRadio>
-                        </MudRadioGroup>
+                        @if (estadoRegistro==2)
+                        {
+                            <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect2">
+                                <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
+                                <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
+                                <MudRadio Option="@("2")">NA</MudRadio>
+                            </MudRadioGroup>
+                        }
+                        else
+                        {
+                            <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect1">
+                                <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
+                                <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
+                                <MudRadio Option="@("2")">NA</MudRadio>
+                            </MudRadioGroup>
+                        }
+                        
                     </MudTd>
                  
                     <MudTd>
@@ -165,36 +175,47 @@
                                    for="fileInput"
                                    OnClick="@(()=> EditarRegistro(registroRow,1))">
                         </MudButton>
-                                <MudButton HtmlTag="label" style="width: 5%;"
-                                   Variant="Variant.Filled"
-                                   Color="MudBlazor.Color.Error"
-                                   StartIcon="@Icons.Filled.CameraAlt"
-                                   for="fileInput"
-                                   OnClick="@(()=> EditarRegistro(registroRow,0))">
-                                </MudButton>
+                        <MudButton HtmlTag="label" style="width: 5%;"
+                            Variant="Variant.Filled"
+                            Color="MudBlazor.Color.Error"
+                            StartIcon="@Icons.Filled.CameraAlt"
+                            for="fileInput"
+                            OnClick="@(()=> EditarRegistro(registroRow,0))">
+                        </MudButton>
                     </MudTd>
-                    <MudTd DataLabel="Image">
-                        @if (registroRow.SaveFile != null)
-                        {
-                            var imgSrc = "data:" + registroRow.SaveFile.Files.FileType + ";base64," + Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes);
-                            <img width="30" height="40" src="@($"data:{registroRow.SaveFile.Files.FileType};base64,{Convert.ToBase64String(registroRow.SaveFile.Files.ImageBytes)}")"
-                             @onclick="(()=>AbrirImagen(registroRow,imgSrc))">
-                                <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
-                        }
-                        else
-                        {
-                            @if (registroRow.Imagen != null)
+
+                    
+                    @if (estadoRegistro == 2)
+                    {
+                            if (registroRow.Foto2 != null)
                             {
-                                var base64 = Convert.ToBase64String(registroRow.Imagen); //La propiedad de tu modelo que es byte[]
-                                var imgSrc = String.Format("data:image/jpeg;base64,{0}", base64); // Damos formato para indicar que se trata de una cadena base64
-                                <img width="30" height="40" src="@imgSrc" @onclick="(()=>AbrirImagen(registroRow,imgSrc))"/>
-                                <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdPlantillaDet))" aria-label="delete"></MudIconButton>
+                                @if (registroRow.Foto2.Length > 0)
+                                {
+                                    var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto2);
+                                    <MudTd DataLabel="Image">
+                                        <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
+                                        <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
+                                    </MudTd>
+                                }
+                            }
+                    }
+                    else
+                    {
+                        if (registroRow.Foto1 != null)
+                        {
+                            @if (registroRow.Foto1.Length > 0)
+                            {
+                                var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto1);
+                                <MudTd DataLabel="Image">
+                                    <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
+                                    <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
+                                </MudTd>
                             }
                         }
-                        </MudTd>
-
+                    }
+                 
                     <MudTd DataLabel="Observaciones">
-                        @registroRow.Observacion
+                        @registroRow.Obs1
                     </MudTd>
                 </RowTemplate>
                  
@@ -208,9 +229,14 @@
         
     </MudPaper>
     }
-<br />
-    <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
-    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="LlamarCabecera">Cancelar</MudButton>
+    <br />
+    <MudProgressLinear Color="MudBlazor.Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    @if(estadoRegistro>0)
+    {
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
+    }
+    &nbsp;&nbsp;
+    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Disabled="@disableButtonCancel" OnClick="LlamarCabecera">Cancelar</MudButton>
 </MudContainer>
 
 @code {
@@ -231,9 +257,15 @@
     private async Task ActivarCamara(int cancelarCamara)
     {
         if (cancelarCamara == 1)
+        {
             encenderCamara = false;
+            disableButton = false;
+            disableButtonCancel = false;
+        }
         else
         {
+            disableButton = true;
+            disableButtonCancel = true;
             encenderCamara = true;
             await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
         }
@@ -243,7 +275,16 @@
     // method that work with the camera
     private async Task CaptureFrame()
     {
+        myImageClass = "d-block";
+        vCargando = true;
+        disableButtonCancel = true;
+        //StateHasChanged();
         await JSRuntime.InvokeAsync<String>("getFrame", "videoFeed", "currentFrame", DotNetObjectReference.Create(this));
+        myImageClass = "d-none";
+        vCargando = false;
+        disableButton = false;
+        disableButtonCancel = false;
+        StateHasChanged();
     }
     private async Task EncenderCamara()
     {
@@ -265,8 +306,14 @@
         byte[] imageData = Convert.FromBase64String(imageString.Split(',')[1]);
 
         //Do image processing here
-        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+        var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == _idPlantillaDet).First();
         modeloPlantilla.Imagen = imageData;
+        if (estadoRegistro<2)
+            modeloPlantilla.Foto1 = imageData;
+        if (estadoRegistro == 2)
+            modeloPlantilla.Foto2 = imageData;
+
+
         ActivarCamara(1);
         using (var image = Image.Load(imageData))
         {
@@ -276,11 +323,11 @@
             );
 
             frameUri = image.ToBase64String(JpegFormat.Instance);
-
         }
+       
     }
 
-    private void AbrirImagen(PlantillaDetDTO model, string rutaImagen)
+    private void AbrirImagen(InspeccionDetDTO model, string rutaImagen)
     {
 
         var parameters = new DialogParameters<MsImagen>();
@@ -293,7 +340,7 @@
         _dialogService.Show<MsImagen>(model.SubCategoria, parameters, options);
     }
 
-    private TableGroupDefinition<PlantillaDetDTO> _groupDefinition = new()
+    private TableGroupDefinition<InspeccionDetDTO> _groupDefinition = new()
         {
             GroupName = "Categoria",
             Indentation = false,
@@ -304,7 +351,7 @@
     private string searchString1 = "";
     int vCodigoArea=0;
 
-    private bool _loading = true;
+    private bool vDesactiva = false, vCargando = false, _loading = true;
 
     int vEstado=1;
 
@@ -334,12 +381,12 @@
 
     InspeccionDetDTO selectedItem1 = null;
 
-    PlantillaDetDTO selectedItem2 = null;
+    InspeccionDetDTO selectedItem2 = null;
 
     int vEdit = 0;
     string myImageClass { get; set; } = "d-none";
     DateTime? vFecha = DateTime.Now;
-    bool disableButton = false, desabilitaUser = false, vDisabledIngresos = false;
+    bool disableButton = false, disableButtonCancel = false, desabilitaUser = false, vDisabledIngresos = false;
 
     SaveFile saveFile = new SaveFile();
     private async Task UploadFiles(InputFileChangeEventArgs e)
@@ -358,9 +405,9 @@
                 fileData.FileType = file.ContentType;
                 fileData.ImageBytes = buffers;
                 saveFile.Files.Add(fileData);
-                var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+                var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet== _idPlantillaDet).First();
                 modeloPlantilla.RutaImagen = file.Name;
-                //modeloPlantilla.Imagen = fileData.ImageBytes();
+                modeloPlantilla.Foto1 = buffers;
                 modeloPlantilla.Imagen = buffers;
 
                 saveFile.Files.Clear();
@@ -378,7 +425,7 @@
             if (conta==0)
             {
                 SaveFileDTO saveFileDTO = new SaveFileDTO();
-                var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+                var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == _idPlantillaDet).First();
 
                 var fileData = new FileDataDTO();
                 var buffers = new byte[file.Size];
@@ -389,10 +436,17 @@
                 fileData.FileType = file.ContentType;
                 fileData.ImageBytes = buffers;
 
+                modeloPlantilla.Foto1 = null;
                 saveFileDTO.Files = fileData;
                 modeloPlantilla.RutaImagen = file.Name;
                 modeloPlantilla.SaveFile = saveFileDTO;
                 modeloPlantilla.Imagen = buffers;
+
+                if (estadoRegistro==2)
+                    modeloPlantilla.Foto2 = buffers;
+                else
+                    modeloPlantilla.Foto1 = buffers;
+
                 conta += 1;
             }
 
@@ -400,12 +454,18 @@
 
     }
 
-    private void RemoveImg(int codigoPlanillaDet)
+    private void RemoveImg(int codigoInspeccionDet)
     {
         //save.Files.Remove(file);
-        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == codigoPlanillaDet).First();
+        var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == codigoInspeccionDet).First();
         modeloPlantilla.SaveFile = null;
         modeloPlantilla.Imagen = null;
+
+        if (estadoRegistro==2)
+            modeloPlantilla.Foto2 = null;
+        else
+            modeloPlantilla.Foto1 = null;
+
     }
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
@@ -413,8 +473,9 @@
     {
 
         files.Add(file);
-        var modeloPlantilla = _plantilla.PlantillaDets.Where(x => x.IdPlantillaDet == _idPlantillaDet).First();
+        var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == _idPlantillaDet).First();
         modeloPlantilla.RutaImagen = file.Name;
+
         //TODO upload the files to the server
     }
 
@@ -427,7 +488,7 @@
     private void Validar()
     {
         string prueba = "";
-        foreach (var data in _plantilla.PlantillaDets)
+        foreach (var data in _inspeccion.InspeccionDets)
         {
             prueba += data.Imagen;
         }
@@ -440,7 +501,7 @@
 
         ObtenerAreas();
 
-        if (estadoRegistro>0)
+        if (codigoInspeccion>0)
         {
             ObtenerInspeccion();
         }
@@ -457,23 +518,35 @@
         {
             _inspeccion = resultC.value.First();
             vFecha = _inspeccion.Fecha ?? default(DateTime);
+            vCodigoArea = _inspeccion.IdArea ?? default(int);
 
             var response = await _trabajadorServicio.Lista();
-            _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
+            if (estadoRegistro==2)
+                _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper2);            
+            else
+                _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
+
             _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
 
             StateHasChanged();
         }
 
-        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion);
+        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion, estadoRegistro);
 
         if (result.status)
         {
 
-            List<InspeccionDetDTO> listaInspeccionDetalles = new List<InspeccionDetDTO>();
-            listaInspeccionDetalles = result.value;
-
-
+            _inspeccion.InspeccionDets = result.value;
+            if (estadoRegistro==2)
+            {
+                foreach (var data in _inspeccion.InspeccionDets)
+                {
+                    data.OpcSelect2 = "1";
+                }
+            }
+            
+              StateHasChanged();
+          
 
         }
     }
@@ -486,7 +559,7 @@
         {
             _plantilla = result.value.FirstOrDefault()!;
             vCodigoArea = int.Parse(codigoArea);
-            _plantilla.PlantillaDets.Clear();
+            _inspeccion.InspeccionDets.Clear();
             List<PlantillaDetDTO> listaPlantillaDetalles = new List<PlantillaDetDTO>();
             var resultado3 = await _plantillaServicio.ListaDetalles(_plantilla.IdPlantilla);
             listaPlantillaDetalles = resultado3.value;
@@ -499,22 +572,22 @@
                     SubCategoria = data.SubCategoria,
                     Categoria = data.Categoria,
                     IdSubCtg = data.IdSubCtg,
-                    OpcSelect1 = data.Estado,
-                    Obs1 = data.Observacion,
-                    Foto1 = data.Imagen,
-                    NroOrden = data.NroOrden
-                    Activo = 1
+                    OpcSelect1 = "1",
+                    NroOrden = data.NroOrden,
+                    Activo = 1,
+                    IdInspDet = 0
                 };
-                _inspeccion.InspeccionDets!.Add(inspeccionDetalle);
+                _inspeccion.InspeccionDets.Add(inspeccionDetalle);
+                
 
             }
             StateHasChanged();
         }
     }
 
-    private bool FilterFunc1(PlantillaDetDTO element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(InspeccionDetDTO element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(PlantillaDetDTO element, string searchString)
+    private bool FilterFunc(InspeccionDetDTO element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -640,23 +713,7 @@
         _navigationManager.NavigateTo("/page/RegistroInspeccion");
     }
 
-    private void GrabarDetalle()
-    {
-        foreach (var data in _plantilla.PlantillaDets)
-        {
-            var inspeccionDetalle = new InspeccionDetDTO()
-                            {
-
-                                IdSubCtg = data.IdSubCtg,
-                                OpcSelect1 = data.Estado,
-                                Obs1 = data.Observacion,
-                                Foto1 = data.Imagen,
-                                Activo = 1
-                            };
-            _inspeccion.InspeccionDets!.Add(inspeccionDetalle);
-        }
-
-    }
+   
 
     //Guardar
     private async Task Guardar()
@@ -670,21 +727,21 @@
             bool _resultado;
 
 
-            _inspeccion.IdArea = vCodigoArea;
+            
             _inspeccion.IdTpoInsp =_tipoSeleccionado.IdTpoInsp;
             _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
             _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
+            _inspeccion.Fecha = vFecha;
 
             _inspeccion.IdEmp = 1;
 
-            GrabarDetalle();
-            // _plantilla.IdCreate = 0;
-
-            _creacion.Inspeccions!.Add(_inspeccion);
-
-
             if (_inspeccion.IdCreate != null)
             {
+                _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
+                
+
+                _creacion.Inspeccions!.Add(_inspeccion);
+ 
                 _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
                 _creacion.PcModi = Environment.MachineName;
                 _creacion.UsuaModi = appData.usuarioLogin;
@@ -694,9 +751,18 @@
             }
             else
             {
+                _inspeccion.IdArea = vCodigoArea;
+                _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
+                _creacion.Inspeccions!.Add(_inspeccion);
+
                 _creacion.Activo = 1;
                 _creacion.PcCrea = Environment.MachineName;
                 _creacion.UsuaCrea = appData.usuarioLogin;
+
+               // GrabarDetalle();
+                
+
+               
 
                 var response = await _inspeccionServicio.Crear(_creacion);
                 _resultado = response.status;
@@ -712,8 +778,8 @@
             {
                 _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
                 disableButton = false;
-                myImageClass = "d-none";
             }
+            myImageClass = "d-none";
         }
     }
 
@@ -780,15 +846,9 @@
 
     int _idPlantillaDet = 0;
     //Editar Registro
-    private void EditarRegistro(PlantillaDetDTO model, int activamosCamara)
+    private void EditarRegistro(InspeccionDetDTO model, int activamosCamara)
     {
-        //if(files!=null)
-        //{
-        //    model.RutaImagen = files.FirstOrDefault().Name;
-        //files.Clear();
-        //}
-        _idPlantillaDet = model.IdPlantillaDet;
-        //if (activamosCamara == 1)
+        _idPlantillaDet = model.IdInspDet;
         ActivarCamara(activamosCamara);
 
     }

@@ -7,9 +7,9 @@ namespace QHSE.Server.Repositorio.Implementacion
 {
     public class CreacionRepositorio: ICreacionRepositorio
     {
-        private readonly DbqhseContext _dbContext;
+        private readonly DbQhseContext _dbContext;
 
-        public CreacionRepositorio(DbqhseContext dbContext)
+        public CreacionRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
 

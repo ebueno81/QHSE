@@ -7,6 +7,6 @@
         Task<bool> Editar(CreacionDTO entidad);
         Task<bool> Eliminar(int id);
         Task<ResponseDTO<List<InspeccionDTO>>> Consultar(int codigoInspeccion);
-        Task<ResponseDTO<List<InspeccionDetDTO>>> ListaDetalles(int codigoInspeccion);
+        Task<ResponseDTO<List<InspeccionDetDTO>>> ListaDetalles(int codigoInspeccion, int numVerifcacion);
     }
 }
