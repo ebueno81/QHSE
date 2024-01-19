@@ -39,6 +39,8 @@ public partial class Inspeccion
 
     public string? NomJefeArea { get; set; }
 
+    public byte[]? FirmaJefeArea { get; set; }
+
     /// <summary>
     /// Fecha Inspección
     /// </summary>

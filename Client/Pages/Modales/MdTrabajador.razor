@@ -1,12 +1,13 @@
 ﻿@inject ITrabajadorService _trabajadorServicio
 @inject IDialogService DialogService
+@inject IDialogService _dialogService
 
 @inject ISnackbar _snackBar
 
 <MudDialog Style="width:500px">
 
     <DialogContent>
-        <MudContainer Style="max-height: 400px;" Class="m-0 p-0">
+        <MudContainer Class="m-0 p-0">
             <EditForm Model="@_trabajador">
 
                 <MudPaper Elevation="3" Class="pa-4" Width="100%">
@@ -21,6 +22,26 @@
                                   Label="Nro Telefono" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Phone" />
                             <MudTextField @bind-Value="@_trabajador.CorreoTraba" Class="mb-3"
                                   Label="Correo" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Email" />
+
+                 
+                                  <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
+                    @if (_trabajador.Firma != null)
+                    {
+
+                        var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(_trabajador.Firma);
+                        <MudTd DataLabel="Image">
+                            <img width="70" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(_trabajador,imgSrc2))" />
+                            <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg())" aria-label="delete"></MudIconButton>
+                            <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="MudBlazor.Color.Info"
+                                   StartIcon="@Icons.Filled.CameraAlt"
+                                   for="fileInput">
+                            </MudButton>
+                        </MudTd>
+                       
+                    }
+                    
                   
                 </MudPaper>
             </EditForm>
@@ -28,9 +49,12 @@
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
     </DialogContent>
     <DialogActions>
+        
+      
         <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancelar</MudButton>
         <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
     </DialogActions>
+    
 </MudDialog>
 
 @code {
@@ -56,6 +80,56 @@
 
     protected override async Task OnInitializedAsync()
     {
+
+    }
+
+     private void AbrirImagen(TrabajadorDTO model, string rutaImagen)
+    {
+
+        var parameters = new DialogParameters<MsImagen>();
+        parameters.Add(x => x.rutaMandada, rutaImagen);
+        parameters.Add(x => x.codigoMandado, "");
+        parameters.Add(x => x.articuloMandado, "");
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        _dialogService.Show<MsImagen>(model.NombreApellido, parameters, options);
+
+    }
+
+    private void RemoveImg()
+    {
+        
+        _trabajador.Firma = null;
+
+    }
+
+    private async Task UploadFilesDTO(InputFileChangeEventArgs e)
+    {
+        int conta = 0;
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            if (conta == 0)
+            {
+                SaveFileDTO saveFileDTO = new SaveFileDTO();
+                
+                var fileData = new FileDataDTO();
+                var buffers = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffers);
+                fileData.FileName = file.Name;
+                fileData.FileSize = file.Size;
+
+                fileData.FileType = file.ContentType;
+                fileData.ImageBytes = buffers;
+
+                saveFileDTO.Files = fileData;
+               _trabajador.Firma = buffers;
+               
+                conta += 1;
+            }
+
+        }
 
     }
 

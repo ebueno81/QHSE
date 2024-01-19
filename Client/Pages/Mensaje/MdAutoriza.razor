@@ -1,0 +1,114 @@
+﻿@inject IUsuarioService _usuarioServicio
+@inject IDialogService DialogService
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@trabajadorMandado" Class="mb-3" Disabled
+                      Label="Jefe de Area" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+
+        <MudTextField @bind-Value="@usuario" Class="mb-3"
+                      Label="Usuario" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+
+        <MudTextField @bind-Value="@claveJefeArea"
+                      Label="Autorizacion"
+                      Variant="Variant.Outlined"
+                      InputType="@PasswordInput"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@PasswordInputIcon"
+                      OnAdornmentClick="TogglePasswordVisibility"
+                      For="@(() => claveJefeArea)" />
+        <MudProgressLinear nnColor="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OK">Aceptar</MudButton>
+        &nbsp;
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Cancel">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public int codigoMandado { get; set; }
+    [Parameter]
+    public string trabajadorMandado { get; set; }
+
+    string claveJefeArea, usuario;
+
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    string myImageClass { get; set; } = "d-none";
+    string myAlert { get; set; } = "d-none";
+    bool disableButton { get; set; } = false;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    async void OK()
+    {
+        List<UsuarioDTO> listaUsuarios = new List<UsuarioDTO>();
+
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+        myImageClass = "d-block";
+        disableButton = true;
+
+        usuarioDTO.NomUsua = usuario;
+        usuarioDTO.ClaveUsua = claveJefeArea;
+
+        var result =await _usuarioServicio.Login(usuarioDTO);
+
+        if (result.status)
+        {
+            if (codigoMandado == result.value.First().IdTraba)
+                MudDialog.Close(DialogResult.Ok("1"));
+            else
+            { 
+                myAlert = "d-none"; 
+                Mensaje("Usuario ingresado asignado al jefe de area no coinciden, revisar...");
+                StateHasChanged();
+            }
+                
+        }
+        else
+        {
+            myImageClass = "d-none";
+            disableButton = false;
+            myAlert = "d-block";
+        }
+
+    }
+    
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+  
+}

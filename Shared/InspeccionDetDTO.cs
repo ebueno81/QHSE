@@ -68,5 +68,14 @@ namespace QHSE.Shared
 
         public string? NomJefeArea { get; set; }
 
+        public string? SI2 { get; set; }
+
+        public string? NO2 { get; set; }
+
+        public byte[]? FirmaJefeArea { get; set; }
+
+        public byte[]? Firma { get; set; }
+
+
     }
 }

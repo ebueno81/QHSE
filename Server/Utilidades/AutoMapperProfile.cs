@@ -10,12 +10,8 @@ namespace QHSE.Server.Utilidades
         {
             
             #region Creacion
-            CreateMap<Creacion, CreacionDTO>()
-                  .ForMember(destino =>
-                destino.Usuarios,
-                opt => opt.Ignore());
+            CreateMap<Creacion, CreacionDTO>();
             CreateMap<CreacionDTO, Creacion>();
-
             #endregion Creacion
 
             #region Trabajador
@@ -56,7 +52,7 @@ namespace QHSE.Server.Utilidades
                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.DescSubCtg))
                  .ForMember(destino =>
                    destino.NroOrden,
-                   opt => opt.MapFrom(origen => origen.NroPctg))
+                   opt => opt.MapFrom(origen => origen.NroOrden))
                  .ForMember(destino =>
                    destino.Trabajador,
                    opt => opt.MapFrom(origen => origen.IdInspNavigation.IdSuper1Navigation.NomTraba + " " + origen.IdInspNavigation.IdSuper1Navigation.ApeTraba))
@@ -84,6 +80,19 @@ namespace QHSE.Server.Utilidades
                  .ForMember(destino =>
                    destino.NA,
                    opt => opt.MapFrom(origen => origen.OpcSelect1 == "2" ? "X" : ""))
+                  .ForMember(destino =>
+                   destino.SI2,
+                   opt => opt.MapFrom(origen => origen.OpcSelect2 == "1" ? "X" : ""))
+                 .ForMember(destino =>
+                   destino.NO2,
+                   opt => opt.MapFrom(origen => origen.OpcSelect2 == "0" ? "X" : ""))
+                 .ForMember(destino =>
+                   destino.FirmaJefeArea,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.FirmaJefeArea))
+                 .ForMember(destino =>
+                   destino.Firma,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdSuper1Navigation.Firma))
+
                  ;
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
@@ -122,6 +131,11 @@ namespace QHSE.Server.Utilidades
             #region Area
             CreateMap<Area, AreaDTO>();
             CreateMap<AreaDTO, Area>();
+            #endregion Area
+
+            #region Acta
+            CreateMap<Actum, ActaDTO>();
+            CreateMap<ActaDTO, Actum>();
             #endregion Area
 
             #region Categoria

@@ -55,6 +55,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<ITrabajadorRepositorio, TrabajadorRepositorio>();
 builder.Services.AddScoped<IAreaRepositorio, AreaRepositorio>();
+builder.Services.AddScoped<IActaRepositorio, ActaRepositorio>();
 builder.Services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
 builder.Services.AddScoped<ISubCategoriaRepositorio, SubCategoriaRepositorio>();
 builder.Services.AddScoped<ITipoUsuarioRepositorio, TipoUsuarioRepositorio>();

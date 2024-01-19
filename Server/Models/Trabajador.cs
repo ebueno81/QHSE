@@ -35,6 +35,8 @@ public partial class Trabajador
     /// </summary>
     public string? CorreoTraba { get; set; }
 
+    public byte[]? Firma { get; set; }
+
     /// <summary>
     /// Id Creación
     /// </summary>

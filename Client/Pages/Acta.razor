@@ -1,9 +1,10 @@
-﻿@page "/page/area"
-@inject IAreaService _AreaServicio
+﻿@page "/page/acta"
+@inject IActaService _actaServicio
 @inject ICreacionService _creacionServicio
 @inject IDialogService _dialogServicio
 @inject ISnackbar _snackBar
 @inject SweetAlertService Swal;
+@inject IJSRuntime _jsServicio;
 
 <AuthorizeView Roles="Administrador,Supervisor">
     <NotAuthorized>
@@ -17,7 +18,7 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
-    <MudText Typo="Typo.h5" GutterBottom="true">Areas  </MudText>
+    <MudText Typo="Typo.h5" GutterBottom="true">Actas  </MudText>
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
         <MudGrid>
@@ -28,7 +29,7 @@
                                    StartIcon="@Icons.Material.Filled.Add"
                                    Color="Color.Primary"
                                    OnClick="AbrirNuevo">
-                            Nuevo Area
+                            Nueva Acta
                         </MudButton>
                     </MudItem>
                 </Authorized>
@@ -36,9 +37,9 @@
 
             <MudItem xs="12">
 
-                <MudTable Items="@listaAreas"
+                <MudTable Items="@listaActas"
                           Striped="true" Bordered="true" Dense="true"
-                          Filter="new Func<AreaDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
+                          Filter="new Func<ActaDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1"
                           Loading="@_loading" LoadingProgressColor="Color.Info">
                     <ToolBarContent>
                         <MudSpacer />
@@ -46,13 +47,17 @@
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Codigo</MudTh>
-                        <MudTh>Area</MudTh>
-                        <MudTh></MudTh>
+                        <MudTh>Nro.Acta</MudTh>
+                        <MudTh>Fecha</MudTh>
+                        <MudTh>Observacion</MudTh>
+
                     </HeaderContent>
                     <RowTemplate Context="registroRow">
-                        <MudTd DataLabel="Codigo">@registroRow.IdArea</MudTd>
-                        <MudTd DataLabel="Area">@registroRow.DescArea</MudTd>
-                       
+                        <MudTd DataLabel="Codigo">@registroRow.IdActa</MudTd>
+                        <MudTd DataLabel="Nro.Acta">@registroRow.NroActa</MudTd>
+                        <MudTd DataLabel="Fecha">@registroRow.FechaProg</MudTd>
+                        <MudTd DataLabel="Observación">@registroRow.Obs</MudTd>
+
                         <MudTd DataLabel="">
                             <AuthorizeView Roles="Administrador,Supervisor">
                                 <Authorized>
@@ -72,7 +77,11 @@
                                             OnClick="@(() => Eliminar(registroRow))" />
                                 </Authorized>
                             </AuthorizeView>
-
+                            <MudFab Color="Color.Info"
+                                    StartIcon="@Icons.Material.Filled.PictureAsPdf"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    OnClick="@(() => ImprimirPDF(registroRow.IdActa))" />
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
@@ -88,30 +97,29 @@
 </MudContainer>
 
 @code {
-    List<AreaDTO> listaAreas = new List<AreaDTO>();
+    List<ActaDTO> listaActas = new List<ActaDTO>();
 
 
     private string searchString1 = "";
-    private AreaDTO selectedItem1 = null;
+    private ActaDTO selectedItem1 = null;
     private bool _loading = true;
 
-    private async Task ObtenerAreas()
+    private async Task ObtenerActas()
     {
-        var result = await _AreaServicio.Lista();
+        var result = await _actaServicio.Lista();
 
         if (result.status)
         {
-            listaAreas = (List<AreaDTO>)result.value!;
+            listaActas = (List<ActaDTO>)result.value!;
         }
     }
 
 
     protected override async Task OnInitializedAsync()
     {
-        
         try
         {
-            await ObtenerAreas();
+            await ObtenerActas();
             _loading = false;
         }
         catch (Exception)
@@ -121,50 +129,48 @@
         }
     }
 
-    private bool FilterFunc1(AreaDTO element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(ActaDTO element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(AreaDTO element, string searchString)
+    private bool FilterFunc(ActaDTO element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.DescArea.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.NroActa.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-       
-
 
         return false;
     }
 
     private async Task AbrirNuevo()
     {
-        var dialogo = _dialogServicio.Show<MdArea>("Nuevo Area");
+        var dialogo = _dialogServicio.Show<MdActa>("Nuevo Acta");
         var resultado = await dialogo.Result;
 
         if (!resultado.Canceled)
         {
-            await ObtenerAreas();
+            await ObtenerActas();
         }
     }
 
-    private async Task AbrirEditar(AreaDTO model)
+    private async Task AbrirEditar(ActaDTO model)
     {
-        var parametros = new DialogParameters { ["_Area"] = model };
+        var parametros = new DialogParameters { ["_acta"] = model };
 
-        var dialogo = _dialogServicio.Show<MdArea>("Editar Area", parametros);
+        var dialogo = _dialogServicio.Show<MdActa>("Editar Acta", parametros);
         var resultado = await dialogo.Result;
 
         if (!resultado.Canceled)
         {
-            await ObtenerAreas();
+            await ObtenerActas();
         }
     }
 
-    private async Task Eliminar(AreaDTO model)
+    private async Task Eliminar(ActaDTO model)
     {
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Esta seguro?",
-                Text = $"Eliminar Area: {model.DescArea}",
+                Text = $"Eliminar Acta: {model.NroActa}",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Si, eliminar",
@@ -183,11 +189,16 @@
 
             if (resultado)
             {
-                _snackBar.Add("El area fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
-                await ObtenerAreas();
+                _snackBar.Add("El registro fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
+                await ObtenerActas();
             }
             else
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
         }
+    }
+    private async Task ImprimirPDF(int codigoActa)
+    {
+        string rutaUrl = $"{appData.urlReporte}api/acta/imprimirReporte?codigo={codigoActa}";
+        _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
     }
 }

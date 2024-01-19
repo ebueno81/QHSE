@@ -6,7 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
-  </PropertyGroup>  
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Reportes\RptActa.frx~RFba2ce3.TMP" />
+  </ItemGroup>  
 
 
   <ItemGroup>
@@ -34,6 +38,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Reportes\RptActa.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Reportes\RptInspeccion.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Reportes\RptInspeccion3.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Reportes\RptPlantilla.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

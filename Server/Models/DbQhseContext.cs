@@ -15,6 +15,8 @@ public partial class DbQhseContext : DbContext
     {
     }
 
+    public virtual DbSet<Actum> Acta { get; set; }
+
     public virtual DbSet<Area> Areas { get; set; }
 
     public virtual DbSet<Categorium> Categoria { get; set; }
@@ -42,11 +44,23 @@ public partial class DbQhseContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=177.91.254.124,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQHSE;user id=sa; pwd=ACEace11");
+    { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Actum>(entity =>
+        {
+            entity.HasKey(e => e.IdActa);
+
+            entity.Property(e => e.FechaProg).HasColumnType("date");
+            entity.Property(e => e.NroActa).HasMaxLength(15);
+            entity.Property(e => e.Obs).HasMaxLength(300);
+
+            entity.HasOne(d => d.IdCreateNavigation).WithMany(p => p.Acta)
+                .HasForeignKey(d => d.IdCreate)
+                .HasConstraintName("FK_Acta_Creacion");
+        });
+
         modelBuilder.Entity<Area>(entity =>
         {
             entity.HasKey(e => e.IdArea);

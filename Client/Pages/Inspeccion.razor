@@ -62,17 +62,7 @@
                         <MudTd DataLabel="Supervisor">@registroRow.Fecha</MudTd>
 
                         <MudTd DataLabel="">
-                            <MudFab Color="Color.Info"
-                                    StartIcon="@Icons.Material.Filled.PictureAsPdf"
-                                    Size="Size.Small"
-                                    IconSize="Size.Small"
-                                    OnClick="@(() => ImprimirPDF(registroRow.IdInsp,1))" />
-                            <MudFab Color="Color.Warning"
-                                    StartIcon="@Icons.Material.Filled.AccountTree"
-                                    Size="Size.Small"
-                                    IconSize="Size.Small"
-                                    OnClick="@(() => ExportarExcel(registroRow.IdInsp))" />
-
+                            
                             <MudFab Color="Color.Tertiary"
                                     StartIcon="@Icons.Material.Filled.RemoveRedEye"
                                     Size="Size.Small"
@@ -80,7 +70,7 @@
                                     OnClick="@(() => AbrirEditar(registroRow.IdInsp,0))" />
                             <AuthorizeView Roles="Administrador,Supervisor">
                                 <Authorized>
-                                    <MudFab Color="Color.Primary"
+                                    <MudFab Color="Color.Secondary"
                                             StartIcon="@Icons.Material.Filled.Edit"
                                             Size="Size.Small"
                                             IconSize="Size.Small"
@@ -89,8 +79,8 @@
                             </AuthorizeView>
                             <AuthorizeView Roles="Administrador,Supervisor">
                                 <Authorized>
-                                    <MudFab Color="Color.Warning"
-                                            StartIcon="@Icons.Material.Filled.TwoWheeler"
+                                    <MudFab Color="Color.Primary"
+                                            StartIcon="@Icons.Material.Filled.Edit"
                                             Size="Size.Small"
                                             IconSize="Size.Small"
                                             OnClick="@(() => AbrirEditar(registroRow.IdInsp,2))" />
@@ -105,6 +95,17 @@
                                             OnClick="@(() => Eliminar(registroRow))" />
                                 </Authorized>
                             </AuthorizeView>
+
+                            <MudFab Color="Color.Info"
+                                    StartIcon="@Icons.Material.Filled.PictureAsPdf"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    OnClick="@(() => ImprimirPDF(registroRow.IdInsp,1))" />
+                            <MudFab Color="Color.Warning"
+                                    StartIcon="@Icons.Material.Filled.FileDownload"
+                                    Size="Size.Small"
+                                    IconSize="Size.Small"
+                                    OnClick="@(() => ExportarExcel(registroRow.IdInsp))" />
 
                         </MudTd>
                     </RowTemplate>

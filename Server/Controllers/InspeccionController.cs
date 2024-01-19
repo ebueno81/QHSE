@@ -203,7 +203,7 @@ namespace QHSE.Server.Controllers
 
             FastReport.Report report = new FastReport.Report();
 
-            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion.frx");
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion3.frx");
             report.RegisterData(_listaRegistros, "DataSet1");
             report.Load(path);
 

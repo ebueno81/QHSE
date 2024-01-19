@@ -60,6 +60,8 @@ public partial class Creacion
     /// </summary>
     public int? Activo { get; set; }
 
+    public virtual ICollection<Actum> Acta { get; set; } = new List<Actum>();
+
     public virtual ICollection<Area> Areas { get; set; } = new List<Area>();
 
     public virtual ICollection<Categorium> Categoria { get; set; } = new List<Categorium>();

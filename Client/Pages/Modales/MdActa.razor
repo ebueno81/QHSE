@@ -1,0 +1,167 @@
+﻿@inject IActaService _actaServicio
+@inject IDialogService DialogService
+
+@inject ISnackbar _snackBar
+
+<MudDialog Style="width:900px">
+
+    <DialogContent>
+        <MudContainer Style="max-height: 400px; overflow-x:hidden;" Class="m-0 p-0">
+
+            <EditForm Model="@_acta">
+
+          
+                <MudGrid>
+                  
+                    <MudItem xs="12" sm="11">
+                        <MudTextField @bind-Value="@_acta.NroActa" MaxLength="15"
+                                      Label="Nro Acta" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+                    </MudItem>
+                    <MudItem xs="12" sm="11">
+                        <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="vFecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="11">
+                        <MudTextField  @bind-Value="@_acta.Obs" MaxLength="50"
+                                      Label="Observacion" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+                     </MudItem>
+                    
+                 </MudGrid>
+              
+            </EditForm>
+        </MudContainer>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="Color.Primary" OnClick="Guardar">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+    [Parameter]
+    public ActaDTO _acta { get; set; } = new ActaDTO();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    CreacionDTO _creacion = new CreacionDTO()
+        {
+            Acta = new List<ActaDTO>()
+        };
+
+
+
+    string myImageClass { get; set; } = "d-none";
+    bool disableButton = false, desabilitaUser = false;
+    DateTime? vFecha = DateTime.Now;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Guardar()
+    {
+        if (validarDatos())
+        {
+            //if (validarDuplicidad())
+            //{
+            myImageClass = "d-block";
+            disableButton = true;
+
+            string _mensaje = "";
+            bool _resultado;
+            _acta.FechaProg = vFecha;
+
+            _creacion.Acta!.Add(_acta);
+
+
+            if (_acta.IdActa != 0)
+            {
+                _creacion.IdCreate = _acta.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _actaServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else
+            {
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _actaServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackBar.Add("Error al guardar cambios, al parecer la area esta duplicado..", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
+                myImageClass = "d-none";
+            }
+
+            //}
+        }
+
+    }
+
+    private void Mensaje(string _mensaje)
+    {
+        var parameters = new DialogParameters<MsMensaje>();
+        parameters.Add(x => x.ContentText, _mensaje);
+        parameters.Add(x => x.ButtonText, "Cerrar");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        DialogService.Show<MsMensaje>("Delete", parameters, options);
+    }
+
+    //validar que no se repite el area //
+    private bool validarDuplicidad()
+    {
+        return true;
+    }
+
+    private bool validarDatos()
+    {
+        if (!string.IsNullOrEmpty(_acta.NroActa))
+        {
+            if(_acta.NroActa.Length>0)
+            {
+                return true;    
+            }
+            else
+            {
+                Mensaje("1. Falta Ingresar el numero de acta...");
+                return false;
+            }
+        }
+        else
+        {
+            Mensaje("2. Falta Ingresar el numero de acta...");
+            return false;
+        }
+        
+    }
+
+}

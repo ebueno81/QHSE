@@ -102,12 +102,12 @@ else
 
     private config[] _config;
 
-    private async Task leerJson()
-    {
+    //private async Task leerJson()
+    //{
 
-        _config = await _http.GetFromJsonAsync<config[]>("config.json");
+    //    _config = await _http.GetFromJsonAsync<config[]>("config2.json");
 
-    }
+    //}
 
 
     public class config
@@ -247,7 +247,7 @@ else
 
 
             // enviammos la ruta del reporte //
-            _config = await _http.GetFromJsonAsync<config[]>("config.json");
+            _config = await _http.GetFromJsonAsync<config[]>("config3.json");
             appData.urlReporte = _config.First().rutaReporte;
 
 

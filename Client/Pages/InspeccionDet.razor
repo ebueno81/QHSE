@@ -5,6 +5,7 @@
 @inject ITrabajadorService _trabajadorServicio
 @inject ITrabajadorService _jefeareaServicio
 @inject IDialogService _dialogService
+
 @inject IPlantillaService _plantillaServicio
 
 @inject SweetAlertService Swal;
@@ -24,6 +25,8 @@
 @using System.Net.Http
 @using System.IO
 
+@inject MudBlazor.IDialogService _DialogService
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
@@ -34,7 +37,7 @@
 
             <MudItem xs="12" sm="3">
                 <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                @bind-Value="_tipoSeleccionado">
+                           @bind-Value="_tipoSeleccionado" Disabled="vDisabledIngresos">
                     @if (listaTipoInspeccion.Any())
                     {
                         foreach (var tipo in listaTipoInspeccion)
@@ -85,7 +88,8 @@
             </MudItem>
 
             <MudItem xs="12" sm="3">
-                <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="vFecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="vFecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy"
+                               Disabled="vDisabledIngresos" />
             </MudItem>
 
 
@@ -132,10 +136,14 @@
 
                 <HeaderContent>
                     <MudTh>Orden</MudTh>
-                    <MudTh>SubCategoria</MudTh>
+                    <MudTh>Pregunta</MudTh>
                     <MudTh>Realizado</MudTh>
                     <MudTh>Imagen</MudTh>
-                    <MudTh></MudTh>
+                     @if(estadoRegistro != 0)
+                     {
+                         <MudTh></MudTh>
+                     }
+                    <MudTh>Observacion</MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
                     <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.Key}")</MudTh>
@@ -146,58 +154,81 @@
                     <MudTd DataLabel="SubCategoria">@registroRow.SubCategoria</MudTd>
 
                     <MudTd>
-                        @if (estadoRegistro==2)
+                        @if (estadoRegistro==0)
                         {
-                            <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect2">
-                                <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
-                                <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
-                                <MudRadio Option="@("2")">NA</MudRadio>
-                            </MudRadioGroup>
+                            if(registroRow.OpcSelect1=="0")
+                            {
+                                 <MudTd DataLabel="Realizado">No</MudTd>
+                            }
+                            if(registroRow.OpcSelect1=="1")
+                            {
+                                 <MudTd DataLabel="Realizado">Si</MudTd>
+                            }
+                            if(registroRow.OpcSelect1=="2")
+                            {
+                                 <MudTd DataLabel="Realizado">NA</MudTd>
+                            }
+
                         }
                         else
                         {
-                            <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect1">
-                                <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
-                                <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
-                                <MudRadio Option="@("2")">NA</MudRadio>
-                            </MudRadioGroup>
+                            @if (estadoRegistro==2)
+                            {
+                                <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect2">
+                                    <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
+                                    <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
+                                    <MudRadio Option="@("2")">NA</MudRadio>
+                                </MudRadioGroup>
+                            }
+                            else
+                            {
+                                <MudRadioGroup @bind-SelectedOption="@registroRow.OpcSelect1">
+                                    <MudRadio Option="@("1")" Color="MudBlazor.Color.Primary">Si</MudRadio>
+                                    <MudRadio Option="@("0")" Color="MudBlazor.Color.Secondary">No</MudRadio>
+                                    <MudRadio Option="@("2")">NA</MudRadio>
+                                </MudRadioGroup>
+                            }
                         }
                         
                     </MudTd>
                  
-                    <MudTd>
+                     @if(estadoRegistro != 0)
+                    {
+                        <MudTd>
+                            <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
+                            <MudButton HtmlTag="label" style="width: 5%;"
+                                Variant="Variant.Filled"
+                                Color="MudBlazor.Color.Success"
+                                StartIcon="@Icons.Filled.CloudUpload"
+                                for="fileInput"
+                                OnClick="@(()=> EditarRegistro(registroRow,1))">
+                            </MudButton>
+                            <MudButton HtmlTag="label" style="width: 5%;"
+                                Variant="Variant.Filled"
+                                Color="MudBlazor.Color.Error"
+                                StartIcon="@Icons.Filled.CameraAlt"
+                                for="fileInput"
+                                OnClick="@(()=> EditarRegistro(registroRow,0))">
+                            </MudButton>
+                        </MudTd>
+                    }
                        
-                        <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
-                        <MudButton HtmlTag="label" style="width: 5%;"
-                                   Variant="Variant.Filled"
-                                   Color="MudBlazor.Color.Success"
-                                   StartIcon="@Icons.Filled.CloudUpload"
-                                   for="fileInput"
-                                   OnClick="@(()=> EditarRegistro(registroRow,1))">
-                        </MudButton>
-                        <MudButton HtmlTag="label" style="width: 5%;"
-                            Variant="Variant.Filled"
-                            Color="MudBlazor.Color.Error"
-                            StartIcon="@Icons.Filled.CameraAlt"
-                            for="fileInput"
-                            OnClick="@(()=> EditarRegistro(registroRow,0))">
-                        </MudButton>
-                    </MudTd>
-
-                    
                     @if (estadoRegistro == 2)
                     {
-                            if (registroRow.Foto2 != null)
+                        if (registroRow.Foto2 != null)
+                        {
+                            @if (registroRow.Foto2.Length > 0)
                             {
-                                @if (registroRow.Foto2.Length > 0)
-                                {
-                                    var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto2);
-                                    <MudTd DataLabel="Image">
-                                        <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
+                                var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto2);
+                                <MudTd DataLabel="Image">
+                                    <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
+                                        @if(estadoRegistro != 0)
+                                    {
                                         <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
-                                    </MudTd>
-                                }
+                                    }
+                                </MudTd>
                             }
+                        }
                     }
                     else
                     {
@@ -208,14 +239,44 @@
                                 var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto1);
                                 <MudTd DataLabel="Image">
                                     <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
-                                    <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
-                                </MudTd>
+                                    @if(estadoRegistro != 0)
+                                    {
+                                        <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
+                                    }
+                                    </MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd DataLabel="Image">
+                                        &nbsp;
+                                    </MudTd>
+                                }
                             }
+                        else
+                        {
+                            <MudTd DataLabel="Image">
+                                &nbsp;
+                            </MudTd>
                         }
                     }
+                    
+                        
                  
-                    <MudTd DataLabel="Observaciones">
-                        @registroRow.Obs1
+                    <MudTd DataLabel="Observacion">
+                         @if(estadoRegistro == 0)
+                            {
+                               @registroRow.Obs1
+                            }
+                        else
+                        {
+                            <MudButton HtmlTag="label" style="width: 5%;"
+                                                               Variant="Variant.Filled"
+                                                               Color="MudBlazor.Color.Success"
+                                                               StartIcon="@Icons.Filled.DocumentScanner"
+                                                               OnClick="@(()=> AbrirObservacion(registroRow))">
+                                                        </MudButton>
+                        }
+                            
                     </MudTd>
                 </RowTemplate>
                  
@@ -286,6 +347,7 @@
         disableButtonCancel = false;
         StateHasChanged();
     }
+
     private async Task EncenderCamara()
     {
         await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
@@ -324,7 +386,7 @@
 
             frameUri = image.ToBase64String(JpegFormat.Instance);
         }
-       
+
     }
 
     private void AbrirImagen(InspeccionDetDTO model, string rutaImagen)
@@ -338,6 +400,40 @@
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
         _dialogService.Show<MsImagen>(model.SubCategoria, parameters, options);
+
+    }
+
+    private async Task AbrirObservacion(InspeccionDetDTO model)
+    {
+        var options = new MudBlazor.DialogOptions
+            {
+                CloseButton = true,
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+        var parameters = new DialogParameters<MdObservacion>();
+
+
+        parameters.Add(x => x.codigoMandado, model.IdInspDet);
+
+        if (estadoRegistro==1)
+            parameters.Add(x => x.observacionMandado, model.Obs1);
+        if (estadoRegistro==2)
+            parameters.Add(x => x.observacionMandado, model.Obs2);
+
+        var result = await this._DialogService.Show<MdObservacion>("Actualizar observaciones", parameters, options).Result;
+
+        //validamos el resultado para actualizar
+        if (result.Data != null)
+        {
+            var data1 = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == model.IdInspDet).FirstOrDefault();
+
+            if (estadoRegistro==1)
+                data1.Obs1 = result.Data.ToString();
+            if (estadoRegistro==2)
+                data1.Obs2 = result.Data.ToString();
+        }
     }
 
     private TableGroupDefinition<InspeccionDetDTO> _groupDefinition = new()
@@ -353,7 +449,7 @@
 
     private bool vDesactiva = false, vCargando = false, _loading = true;
 
-    int vEstado=1;
+    int vEstado=1, vAutorizado=0;
 
     public AreaDTO _area { get; set; } = new AreaDTO();
 
@@ -504,6 +600,9 @@
         if (codigoInspeccion>0)
         {
             ObtenerInspeccion();
+
+            if (estadoRegistro == 0)
+                vDisabledIngresos = true;
         }
 
         ObtenerTipoInspeccion();
@@ -544,10 +643,7 @@
                     data.OpcSelect2 = "1";
                 }
             }
-            
-              StateHasChanged();
-          
-
+            StateHasChanged();
         }
     }
 
@@ -575,10 +671,10 @@
                     OpcSelect1 = "1",
                     NroOrden = data.NroOrden,
                     Activo = 1,
-                    IdInspDet = 0
+                    IdInspDet = data.IdPlantillaDet
                 };
                 _inspeccion.InspeccionDets.Add(inspeccionDetalle);
-                
+
 
             }
             StateHasChanged();
@@ -626,7 +722,6 @@
     }
 
     //listar tipos de inspeccion
-
     List<TipoInspeccionDTO> listaTipoInspeccion = new List<TipoInspeccionDTO>();
     private TipoInspeccionDTO _tipoSeleccionado;
 
@@ -654,10 +749,8 @@
     }
 
     //listar trabajadores
-
     List<TrabajadorDTO> listaTrabajadores = new List<TrabajadorDTO>();
     private TrabajadorDTO _trabajadorSeleccionado;
-
 
     private async Task<IEnumerable<TrabajadorDTO>> BuscarTrabajador(string valor)
     {
@@ -680,10 +773,8 @@
     }
 
     //listar supervidores
-
     List<TrabajadorDTO> listaJefeArea = new List<TrabajadorDTO>();
     private TrabajadorDTO _jefeareaSeleccionado;
-
 
     private async Task<IEnumerable<TrabajadorDTO>> BuscarJefes(string valor)
     {
@@ -705,7 +796,6 @@
         }
     }
 
-
     //Volver al listado de plantilla
 
     private void LlamarCabecera()
@@ -713,85 +803,99 @@
         _navigationManager.NavigateTo("/page/RegistroInspeccion");
     }
 
-   
-
     //Guardar
     private async Task Guardar()
     {
         if (validarDatos())
         {
-            myImageClass = "d-block";
-            disableButton = true;
+           
+                myImageClass = "d-block";
+                disableButton = true;
 
-            string _mensaje = "";
-            bool _resultado;
+                string _mensaje = "";
+                bool _resultado;
 
 
-            
-            _inspeccion.IdTpoInsp =_tipoSeleccionado.IdTpoInsp;
-            _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
-            _inspeccion.NomJefeArea = _jefeareaSeleccionado.NombreApellido;
 
-            
-            _inspeccion.Fecha = vFecha;
+                _inspeccion.IdTpoInsp = _tipoSeleccionado.IdTpoInsp;
+                _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
+                _inspeccion.NomJefeArea = _jefeareaSeleccionado.NombreApellido;
+                _inspeccion.FirmaJefeArea = _jefeareaSeleccionado.Firma;
 
-            _inspeccion.IdEmp = 1;
 
-            if (_inspeccion.IdCreate != null)
-            {
-                if (estadoRegistro==1)
+                _inspeccion.Fecha = vFecha;
+
+                _inspeccion.IdEmp = 1;
+
+
+                //editar
+                if (_inspeccion.IdCreate != null)
                 {
+                    if (estadoRegistro == 1)
+                    {
+                        _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
+                        _inspeccion.NomSuper1 = _trabajadorSeleccionado.NombreApellido;
+                    }
+                    else
+                    {
+                        _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
+                        _inspeccion.NomSuper2 = _trabajadorSeleccionado.NombreApellido;
+                    }
+
+
+
+                    _creacion.Inspeccions!.Add(_inspeccion);
+
+                    _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
+                    _creacion.PcModi = Environment.MachineName;
+                    _creacion.UsuaModi = appData.usuarioLogin;
+
+                    _resultado = await _inspeccionServicio.Editar(_creacion);
+                    _mensaje = "Registro fue modificado";
+                }
+                else// nuevo
+                {
+                    // limpiamos el codigo correlativo temporal de la inspeccion detalles //
+                    LimpiarDetalles();
+
+                    _inspeccion.IdArea = vCodigoArea;
                     _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
-                    _inspeccion.NomSuper1 = _trabajadorSeleccionado.NombreApellido;
+                    _creacion.Inspeccions!.Add(_inspeccion);
+
+                    _creacion.Activo = 1;
+                    _creacion.PcCrea = Environment.MachineName;
+                    _creacion.UsuaCrea = appData.usuarioLogin;
+
+                    var response = await _inspeccionServicio.Crear(_creacion);
+                    _resultado = response.status;
+                    _mensaje = "Registro fue creado";
+                }
+
+
+                if (_resultado)
+                {
+                    _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
                 }
                 else
                 {
-                    _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
-                    _inspeccion.NomSuper2 = _trabajadorSeleccionado.NombreApellido;
+                    _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
+                    disableButton = false;
                 }
-                
-                
-
-                _creacion.Inspeccions!.Add(_inspeccion);
- 
-                _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
-                _creacion.PcModi = Environment.MachineName;
-                _creacion.UsuaModi = appData.usuarioLogin;
-
-                _resultado = await _inspeccionServicio.Editar(_creacion);
-                _mensaje = "Registro fue modificado";
+                myImageClass = "d-none";
             }
             else
             {
-                _inspeccion.IdArea = vCodigoArea;
-                _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
-                _creacion.Inspeccions!.Add(_inspeccion);
-
-                _creacion.Activo = 1;
-                _creacion.PcCrea = Environment.MachineName;
-                _creacion.UsuaCrea = appData.usuarioLogin;
-
-               // GrabarDetalle();
-                
-
-               
-
-                var response = await _inspeccionServicio.Crear(_creacion);
-                _resultado = response.status;
-                _mensaje = "Registro fue creado";
+                _snackBar.Add("Error al guardar cambios, autorizacion no validad...", Severity.Error, a => a.VisibleStateDuration = 500);                
             }
 
 
-            if (_resultado)
-            {
-                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
-            }
-            else
-            {
-                _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
-                disableButton = false;
-            }
-            myImageClass = "d-none";
+    }
+
+    private void LimpiarDetalles()
+    {
+        foreach(var data in _inspeccion.InspeccionDets)
+        {
+            data.IdInspDet = 0;
         }
     }
 

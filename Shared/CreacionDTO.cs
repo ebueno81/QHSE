@@ -29,6 +29,8 @@ public partial class CreacionDTO
 
     public virtual List<AreaDTO>? Areas { get; set; }
 
+    public virtual List<ActaDTO>? Acta { get; set; }
+
     public virtual List<TrabajadorDTO>? Trabajadors { get; set; }
 
     public virtual List<UsuarioDTO>? Usuarios { get; set; }

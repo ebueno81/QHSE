@@ -1,0 +1,32 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@observacionMandado" Class="mb-3" MaxLength="500"
+                      Label="Observaciones" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OK">Aceptar</MudButton>
+        &nbsp;
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Cancel">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public int codigoMandado { get; set; }
+    [Parameter]
+    public string observacionMandado { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void OK()
+    {
+        MudDialog.Close(DialogResult.Ok(observacionMandado));
+
+    }
+  //  void Submit() => MudDialog.Close(DialogResult.Ok(true));
+}
