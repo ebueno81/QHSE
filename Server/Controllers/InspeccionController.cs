@@ -203,11 +203,49 @@ namespace QHSE.Server.Controllers
 
             FastReport.Report report = new FastReport.Report();
 
-            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion3.frx");
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion.frx");
             report.RegisterData(_listaRegistros, "DataSet1");
             report.Load(path);
 
             //report.SetParameterValue("Titulo", "Reporte de Areas Hoy");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("imprimirDetalle")]
+        public async Task<IActionResult> imprimirDetalle(int codigoInspeccion)
+        {
+            List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
+
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion,1);
+            query = query.Include(c => c.IdInspNavigation)
+                    .Include(s => s.IdSubCtgNavigation)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
+                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
+                    .Include(t => t.IdInspNavigation.IdSuper1Navigation)
+                    .Include(t => t.IdInspNavigation.IdTpoInspNavigation)
+                    ;
+
+            _listaRegistros = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspDetalle.frx");
+            report.RegisterData(_listaRegistros, "DataSet1");
+            report.Load(path);
 
             report.Prepare();
 

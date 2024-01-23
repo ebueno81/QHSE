@@ -57,6 +57,9 @@ namespace QHSE.Server.Utilidades
                    destino.Trabajador,
                    opt => opt.MapFrom(origen => origen.IdInspNavigation.IdSuper1Navigation.NomTraba + " " + origen.IdInspNavigation.IdSuper1Navigation.ApeTraba))
                  .ForMember(destino =>
+                   destino.NomSuper2,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdSuper1Navigation.NomTraba + " " + origen.IdInspNavigation.IdSuper1Navigation.ApeTraba))
+                 .ForMember(destino =>
                    destino.Area,
                    opt => opt.MapFrom(origen => origen.IdInspNavigation.IdAreaNavigation.DescArea))
                  .ForMember(destino =>

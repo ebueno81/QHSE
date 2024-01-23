@@ -52,6 +52,8 @@ namespace QHSE.Shared
 
         public string? Trabajador { get; set; }
 
+        public string? NomSuper2 { get; set; }
+
         public string? Area { get; set; }
 
         public string? Empresa { get; set; }

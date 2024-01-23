@@ -4,6 +4,8 @@
 @inject IAreaService _areaServicio
 @inject ITrabajadorService _trabajadorServicio
 @inject ITrabajadorService _jefeareaServicio
+@inject IActaService _actaServicio
+@inject IJSRuntime _jsServicio;
 @inject IDialogService _dialogService
 
 @inject IPlantillaService _plantillaServicio
@@ -35,7 +37,21 @@
 
         <MudGrid>
 
-            <MudItem xs="12" sm="3">
+
+            <MudItem xs="12" sm="2">
+                <MudSelect Label="Fecha Acta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                           @bind-Value="_actaSeleccionado" Disabled="vDisabledIngresos">
+                    @if (listaActas.Any())
+                    {
+                        foreach (var data in listaActas)
+                        {
+                            <MudSelectItem Value="@data">@data.FechaProg</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" sm="2">
                 <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                            @bind-Value="_tipoSeleccionado" Disabled="vDisabledIngresos">
                     @if (listaTipoInspeccion.Any())
@@ -48,7 +64,7 @@
                 </MudSelect>
             </MudItem>
 
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" sm="2">
                 @if (codigoInspeccion>0)
                 {
                     <MudTextField @bind-Value="@_inspeccion.Area" Class="mb-1" Disabled
@@ -103,7 +119,7 @@
         <center>
             <h1>Usar la Camara</h1>
             <video id="videoFeed" width="400" height="600"/>
-            <canvas class="d-none" id="currentFrame" width="400" height="600" />
+            <canvas class="d-none" id="currentFrame" width="400" height="600"/>
             <br />
             <button class="btn btn-primary mb-3" disabled="@vCargando" @onclick="CaptureFrame">Tomar Foto</button>
             <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
@@ -116,7 +132,7 @@
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
         <MudItem xs="12">
-            <MudTable Items="@_inspeccion.InspeccionDets"
+            <MudTable Items="@_inspeccion.InspeccionDets" RowsPerPage="appData.nFilas"
                       Striped="true" Bordered="true" Dense="true"
                       Filter="new Func<InspeccionDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
                       Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
@@ -168,7 +184,6 @@
                             {
                                  <MudTd DataLabel="Realizado">NA</MudTd>
                             }
-
                         }
                         else
                         {
@@ -207,8 +222,7 @@
                                 Variant="Variant.Filled"
                                 Color="MudBlazor.Color.Error"
                                 StartIcon="@Icons.Filled.CameraAlt"
-                                for="fileInput"
-                                OnClick="@(()=> EditarRegistro(registroRow,0))">
+                                   OnClick="@(() => AbrirCamara(registroRow))">
                             </MudButton>
                         </MudTd>
                     }
@@ -289,22 +303,30 @@
         </MudItem>
         
     </MudPaper>
+    
     }
     <br />
-    <MudProgressLinear Color="MudBlazor.Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
+    
     @if(estadoRegistro>0)
     {
         <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
     }
     &nbsp;&nbsp;
+    @if(codigoInspeccion>0)
+    {
+        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="@(() => ImprimirPDF(codigoInspeccion))">Imprimir</MudButton>
+    }
+    &nbsp;&nbsp;
     <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Disabled="@disableButtonCancel" OnClick="LlamarCabecera">Cancelar</MudButton>
+  @*  &nbsp;
+    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="@(() => AbrirCamara(_inspeccion.InspeccionDets.First()))">Camara</MudButton>*@
 </MudContainer>
 
 @code {
     [Parameter] public int codigoInspeccion { get; set; }
     [Parameter] public int estadoRegistro { get; set; }
 
-
+    
     // variables that work only with photo taking
     bool encenderCamara = false;
     //private string captionText;
@@ -397,7 +419,7 @@
         parameters.Add(x => x.codigoMandado, "");
         parameters.Add(x => x.articuloMandado, model.SubCategoria);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
 
         _dialogService.Show<MsImagen>(model.SubCategoria, parameters, options);
 
@@ -433,6 +455,32 @@
                 data1.Obs1 = result.Data.ToString();
             if (estadoRegistro==2)
                 data1.Obs2 = result.Data.ToString();
+        }
+    }
+
+    private async Task AbrirCamara(InspeccionDetDTO model)
+    {
+        var options = new MudBlazor.DialogOptions
+            {
+                CloseButton = true,
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = false
+            };
+        var parameters = new DialogParameters<MdCamara>();
+
+
+        parameters.Add(x => x.model, model);
+        parameters.Add(x => x.estadoRegistro, estadoRegistro);
+        
+     //   parameters.Add(x => x.codigoMandado, 0);
+
+        var result = await this._DialogService.Show<MdCamara>("Tomar Foto", parameters, options).Result;
+
+        ////validamos el resultado para actualizar
+        if (result.Data != null)
+        {
+          
         }
     }
 
@@ -481,6 +529,7 @@
 
     int vEdit = 0;
     string myImageClass { get; set; } = "d-none";
+
     DateTime? vFecha = DateTime.Now;
     bool disableButton = false, disableButtonCancel = false, desabilitaUser = false, vDisabledIngresos = false;
 
@@ -593,7 +642,6 @@
     //cargar listas
     protected override async Task OnInitializedAsync()
     {
-        _loading = false;
 
         ObtenerAreas();
 
@@ -604,9 +652,14 @@
             if (estadoRegistro == 0)
                 vDisabledIngresos = true;
         }
+        else
+        {
+            _loading = false;
+        }
+        ObtenerActa();
 
         ObtenerTipoInspeccion();
-
+        
     }
 
     private async Task ObtenerInspeccion()
@@ -626,8 +679,11 @@
                 _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
 
             _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
-
+            
+            
             StateHasChanged();
+
+            
         }
 
         var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion, estadoRegistro);
@@ -643,6 +699,9 @@
                     data.OpcSelect2 = "1";
                 }
             }
+
+            myImageClass = "d-none";
+            _loading = false;
             StateHasChanged();
         }
     }
@@ -748,6 +807,33 @@
         }
     }
 
+    //listar actas
+    List<ActaDTO> listaActas = new List<ActaDTO>();
+    private ActaDTO _actaSeleccionado;
+
+
+    private async Task ObtenerActa()
+    {
+        var response = await _actaServicio.Lista();
+
+        if (response.status)
+        {
+
+            listaActas = response.value!;
+            if (_inspeccion.IdActa != 0)
+            {
+                _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
+                StateHasChanged();
+
+            }
+            else
+            {
+                _actaSeleccionado = listaActas.First();
+            }
+            StateHasChanged();
+        }
+    }
+
     //listar trabajadores
     List<TrabajadorDTO> listaTrabajadores = new List<TrabajadorDTO>();
     private TrabajadorDTO _trabajadorSeleccionado;
@@ -808,85 +894,86 @@
     {
         if (validarDatos())
         {
-           
-                myImageClass = "d-block";
-                disableButton = true;
 
-                string _mensaje = "";
-                bool _resultado;
+            myImageClass = "d-block";
+            disableButton = true;
 
-
-
-                _inspeccion.IdTpoInsp = _tipoSeleccionado.IdTpoInsp;
-                _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
-                _inspeccion.NomJefeArea = _jefeareaSeleccionado.NombreApellido;
-                _inspeccion.FirmaJefeArea = _jefeareaSeleccionado.Firma;
+            string _mensaje = "";
+            bool _resultado;
 
 
-                _inspeccion.Fecha = vFecha;
 
-                _inspeccion.IdEmp = 1;
+            _inspeccion.IdTpoInsp = _tipoSeleccionado.IdTpoInsp;
+            _inspeccion.IdJefeArea = _jefeareaSeleccionado.IdTraba;
+            _inspeccion.NomJefeArea = _jefeareaSeleccionado.NombreApellido;
+            _inspeccion.FirmaJefeArea = _jefeareaSeleccionado.Firma;
+            _inspeccion.IdActa = _actaSeleccionado.IdActa;
 
 
-                //editar
-                if (_inspeccion.IdCreate != null)
+            _inspeccion.Fecha = vFecha;
+
+            _inspeccion.IdEmp = 1;
+
+
+            //editar
+            if (_inspeccion.IdCreate != null)
+            {
+                if (estadoRegistro == 1)
                 {
-                    if (estadoRegistro == 1)
-                    {
-                        _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
-                        _inspeccion.NomSuper1 = _trabajadorSeleccionado.NombreApellido;
-                    }
-                    else
-                    {
-                        _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
-                        _inspeccion.NomSuper2 = _trabajadorSeleccionado.NombreApellido;
-                    }
-
-
-
-                    _creacion.Inspeccions!.Add(_inspeccion);
-
-                    _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
-                    _creacion.PcModi = Environment.MachineName;
-                    _creacion.UsuaModi = appData.usuarioLogin;
-
-                    _resultado = await _inspeccionServicio.Editar(_creacion);
-                    _mensaje = "Registro fue modificado";
-                }
-                else// nuevo
-                {
-                    // limpiamos el codigo correlativo temporal de la inspeccion detalles //
-                    LimpiarDetalles();
-
-                    _inspeccion.IdArea = vCodigoArea;
                     _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
-                    _creacion.Inspeccions!.Add(_inspeccion);
-
-                    _creacion.Activo = 1;
-                    _creacion.PcCrea = Environment.MachineName;
-                    _creacion.UsuaCrea = appData.usuarioLogin;
-
-                    var response = await _inspeccionServicio.Crear(_creacion);
-                    _resultado = response.status;
-                    _mensaje = "Registro fue creado";
-                }
-
-
-                if (_resultado)
-                {
-                    _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+                    _inspeccion.NomSuper1 = _trabajadorSeleccionado.NombreApellido;
                 }
                 else
                 {
-                    _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
-                    disableButton = false;
+                    _inspeccion.IdSuper2 = _trabajadorSeleccionado.IdTraba;
+                    _inspeccion.NomSuper2 = _trabajadorSeleccionado.NombreApellido;
                 }
-                myImageClass = "d-none";
+
+
+
+                _creacion.Inspeccions!.Add(_inspeccion);
+
+                _creacion.IdCreate = _inspeccion.IdCreate ?? default(int);
+                _creacion.PcModi = Environment.MachineName;
+                _creacion.UsuaModi = appData.usuarioLogin;
+
+                _resultado = await _inspeccionServicio.Editar(_creacion);
+                _mensaje = "Registro fue modificado";
+            }
+            else// nuevo
+            {
+                // limpiamos el codigo correlativo temporal de la inspeccion detalles //
+                LimpiarDetalles();
+
+                _inspeccion.IdArea = vCodigoArea;
+                _inspeccion.IdSuper1 = _trabajadorSeleccionado.IdTraba;
+                _creacion.Inspeccions!.Add(_inspeccion);
+
+                _creacion.Activo = 1;
+                _creacion.PcCrea = Environment.MachineName;
+                _creacion.UsuaCrea = appData.usuarioLogin;
+
+                var response = await _inspeccionServicio.Crear(_creacion);
+                _resultado = response.status;
+                _mensaje = "Registro fue creado";
+            }
+
+
+            if (_resultado)
+            {
+                _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
             }
             else
             {
-                _snackBar.Add("Error al guardar cambios, autorizacion no validad...", Severity.Error, a => a.VisibleStateDuration = 500);                
+                _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
+                disableButton = false;
             }
+            myImageClass = "d-none";
+        }
+        else
+        {
+            _snackBar.Add("Error al guardar cambios, autorizacion no validad...", Severity.Error, a => a.VisibleStateDuration = 500);                
+        }
 
 
     }
@@ -914,51 +1001,64 @@
 
     private bool validarDatos()
     {
-        if (_trabajadorSeleccionado !=null)
+        if (_actaSeleccionado !=null)
         {
-            if (listaAreas != null)
+            if (_actaSeleccionado.IdActa>0)
             {
-                //if (listaAreas > 0)
-                //{
-                if (_tipoSeleccionado != null)
+                if (_trabajadorSeleccionado !=null)
                 {
-                    if (_tipoSeleccionado.IdTpoInsp>0)
+                    if (listaAreas != null)
                     {
-                        return true;
+                        if (_tipoSeleccionado != null)
+                        {
+                            if (_tipoSeleccionado.IdTpoInsp>0)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                Mensaje("1. Ingrese tipo de inspeccion...");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Mensaje("2. Ingrese tipo de inspeccion...");
+                            return false;
+                        }
                     }
                     else
                     {
-                        Mensaje("1. Ingrese tipo de inspeccion...");
+                        Mensaje("3. Falta seleccionar el area...");
                         return false;
                     }
                 }
                 else
                 {
-                    Mensaje("2. Ingrese tipo de inspeccion...");
+                    Mensaje("5. Falta seleccionar el supervisor...");
                     return false;
                 }
             }
             else
             {
-                Mensaje("3. Falta seleccionar el area...");
+                Mensaje("6. Falta la fecha del Acta...");
                 return false;
             }
-            
-            //}
-            //else
-            //{
-            //    Mensaje("4. Falta seleccionar el area...");
-            //    return false;
-            //}
         }
         else
         {
-            Mensaje("5. Falta seleccionar el supervisor...");
+            Mensaje("7. Falta la fecha del Acta...");
             return false;
         }
         
+        
     }
 
+    private async Task ImprimirPDF(int codigoInspeccion)
+    {
+        string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirDetalle?codigoInspeccion={codigoInspeccion}";
+        _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+    }
 
     int _idPlantillaDet = 0;
     //Editar Registro

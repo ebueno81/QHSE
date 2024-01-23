@@ -1,0 +1,118 @@
+﻿@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@using SixLabors.ImageSharp
+@using SixLabors.ImageSharp.Drawing
+@using SixLabors.ImageSharp.Drawing.Processing
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.Formats.Jpeg
+@using SixLabors.Fonts
+@using System.Net.Http
+@using System.IO
+<MudDialog>
+    <DialogContent>
+        <center>
+                <button class="btn btn-primary mb-3" disabled="@vCargando" @onclick="CaptureFrame">Tomar Foto</button>
+                <button class="btn btn-danger mb-3" @onclick="Cancel">Cancelar</button>
+                <div>
+                    <video id="videoFeed" width="400" height="600" />
+                    <canvas class="d-none" id="currentFrame" width="400" height="600" />
+                </div>
+          
+            
+            
+        </center>
+        
+    </DialogContent>
+    <DialogActions>
+       
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public InspeccionDetDTO model { get; set; }
+    [Parameter]
+    public int estadoRegistro { get; set; }
+
+    //private string captionText;
+    private string frameUri;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void OK()
+    {
+        MudDialog.Close(DialogResult.Ok(model));
+
+    }
+
+    bool vCargando = false, disableButtonCancel = false, disableButton = false, encenderCamara;
+    string myImageClass = "d-none";
+   // public byte[]? Foto;
+
+    private async Task CaptureFrame()
+    {
+        myImageClass = "d-block";
+        vCargando = true;
+        disableButtonCancel = true;
+        //StateHasChanged();
+        await JSRuntime.InvokeAsync<String>("getFrame", "videoFeed", "currentFrame", DotNetObjectReference.Create(this));
+        myImageClass = "d-none";
+        vCargando = false;
+        disableButton = false;
+        disableButtonCancel = false;
+        OK();
+       // StateHasChanged();
+    }
+
+    private async Task ActivarCamara(int cancelarCamara)
+    {
+        if (cancelarCamara == 1)
+        {
+            encenderCamara = false;
+            disableButton = false;
+            disableButtonCancel = false;
+        }
+        else
+        {
+            disableButton = true;
+            disableButtonCancel = true;
+            encenderCamara = true;
+            await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
+        }
+    }
+
+    [JSInvokable]
+    public void ProcessImage(string imageString)
+    {
+        SaveFileDTO saveFileDTO = new SaveFileDTO();
+        var fileData = new FileDataDTO();
+
+        byte[] imageData = Convert.FromBase64String(imageString.Split(',')[1]);
+
+        if (estadoRegistro==2)
+            model.Foto2 = imageData;
+        else
+            model.Foto1 = imageData;
+
+        using (var image = Image.Load(imageData))
+        {
+            image.Mutate(x => x
+                .Flip(FlipMode.Horizontal) //To match mirrored webcam image
+                .Fill(SixLabors.ImageSharp.Color.ParseHex("0008"), new RectangularPolygon(0, 0, 600, 400)) //Set footer bar for caption
+            );
+
+            frameUri = image.ToBase64String(JpegFormat.Instance);
+        }
+      //  OK();
+    }
+        
+    protected override async Task OnInitializedAsync()
+    {
+        ActivarCamara(0);
+    }
+}

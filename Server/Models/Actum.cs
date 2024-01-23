@@ -13,7 +13,11 @@ public partial class Actum
 
     public string? Obs { get; set; }
 
+    public int? Estado { get; set; }
+
     public int? IdCreate { get; set; }
 
     public virtual Creacion? IdCreateNavigation { get; set; }
+
+    public virtual ICollection<Inspeccion> Inspeccions { get; set; } = new List<Inspeccion>();
 }

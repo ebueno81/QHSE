@@ -10,6 +10,8 @@ namespace QHSE.Shared
     {
         public int IdInsp { get; set; }
 
+        public int? IdActa { get; set; }
+
         public int? IdTpoInsp { get; set; }
 
         public int? IdArea { get; set; }

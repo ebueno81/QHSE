@@ -10,6 +10,8 @@ public partial class Inspeccion
     /// </summary>
     public int IdInsp { get; set; }
 
+    public int? IdActa { get; set; }
+
     /// <summary>
     /// Id Tipo Inspección
     /// </summary>
@@ -55,6 +57,8 @@ public partial class Inspeccion
     /// Id Creación
     /// </summary>
     public int? IdCreate { get; set; }
+
+    public virtual Actum? IdActaNavigation { get; set; }
 
     public virtual Area? IdAreaNavigation { get; set; }
 

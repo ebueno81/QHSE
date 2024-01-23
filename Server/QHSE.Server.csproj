@@ -41,10 +41,10 @@
     <None Update="Reportes\RptActa.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Reportes\RptInspeccion.frx">
+    <None Update="Reportes\RptInspDetalle.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Reportes\RptInspeccion3.frx">
+    <None Update="Reportes\RptInspeccion.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Reportes\RptPlantilla.frx">

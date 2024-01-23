@@ -35,7 +35,7 @@
                             <MudButton HtmlTag="label"
                                    Variant="Variant.Filled"
                                    Color="MudBlazor.Color.Info"
-                                   StartIcon="@Icons.Filled.CameraAlt"
+                                   StartIcon="@Icons.Filled.CloudUpload"
                                    for="fileInput">
                             </MudButton>
                         </MudTd>
@@ -203,7 +203,7 @@
         parameters.Add(x => x.ButtonText, "Cerrar");
         parameters.Add(x => x.Color, Color.Error);
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
 
         DialogService.Show<MsMensaje>("Delete", parameters, options);
     }
