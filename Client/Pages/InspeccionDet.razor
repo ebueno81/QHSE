@@ -644,6 +644,8 @@
     {
 
         ObtenerAreas();
+        ObtenerActa();
+        ObtenerTipoInspeccion();
 
         if (codigoInspeccion>0)
         {
@@ -656,9 +658,7 @@
         {
             _loading = false;
         }
-        ObtenerActa();
-
-        ObtenerTipoInspeccion();
+        
         
     }
 
@@ -680,8 +680,10 @@
 
             _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
             
-            
-            StateHasChanged();
+            _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
+            _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
+             _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
+        //    StateHasChanged();
 
             
         }
@@ -766,17 +768,18 @@
         {
 
             listaAreas = response.value!;
-            if (_inspeccion.IdArea != 0)
-            {
-                _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
-                StateHasChanged();
+            _areaSeleccionado = listaAreas.First();
+            //if (_inspeccion.IdArea != 0)
+            //{
+            //    _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
+            //    StateHasChanged();
 
-            }
-            else
-            {
-                _areaSeleccionado = listaAreas.First();
-            }
-            StateHasChanged();
+            //}
+            //else
+            //{
+            //    _areaSeleccionado = listaAreas.First();
+            //}
+          //  StateHasChanged();
         }
     }
 
@@ -793,17 +796,18 @@
         {
 
             listaTipoInspeccion = response.value!;
-            if (_inspeccion.IdTpoInsp != 0)
-            {
-                _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
-                StateHasChanged();
+            _tipoSeleccionado = listaTipoInspeccion.First();
+            //if (_inspeccion.IdTpoInsp != 0)
+            //{
+            //    _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
+            //    StateHasChanged();
 
-            }
-            else
-            {
-                _tipoSeleccionado = listaTipoInspeccion.First();
-            }
-            StateHasChanged();
+            //}
+            //else
+            //{
+            //    _tipoSeleccionado = listaTipoInspeccion.First();
+            //}
+            //StateHasChanged();
         }
     }
 
@@ -820,17 +824,18 @@
         {
 
             listaActas = response.value!;
-            if (_inspeccion.IdActa != 0)
-            {
-                _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
-                StateHasChanged();
+            _actaSeleccionado = listaActas.First();
+            //if (_inspeccion.IdActa != 0)
+            //{
+            //    _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
+            //   // StateHasChanged();
 
-            }
-            else
-            {
-                _actaSeleccionado = listaActas.First();
-            }
-            StateHasChanged();
+            //}
+            //else
+            //{
+            //    _actaSeleccionado = listaActas.First();
+            //}
+         //   StateHasChanged();
         }
     }
 
