@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\Mensaje\MsOptions2.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
     <PackageReference Include="ClosedXML" Version="0.102.1" />
     <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.5.0" />
@@ -47,6 +51,19 @@
     <Content Update="wwwroot\Img\logo3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Mensaje\MsOptions.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Mensaje\MsOptions.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\MsOptions2.razor" />
+    <None Include="Pages\Mensaje\MsOptions.razor" />
   </ItemGroup>
 
 </Project>

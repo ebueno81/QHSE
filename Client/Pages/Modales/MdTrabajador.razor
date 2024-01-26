@@ -38,10 +38,21 @@
                                    StartIcon="@Icons.Filled.CloudUpload"
                                    for="fileInput">
                             </MudButton>
-                        </MudTd>
-                       
+                    </MudTd>
                     }
-                    
+                    else
+                    {
+                         <MudTd DataLabel="Image">
+                            <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg())" aria-label="delete"></MudIconButton>
+                            <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="MudBlazor.Color.Info"
+                                   StartIcon="@Icons.Filled.CloudUpload"
+                                   for="fileInput">
+                            </MudButton>
+                    </MudTd>
+                    }
+
                   
                 </MudPaper>
             </EditForm>

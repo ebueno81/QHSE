@@ -91,7 +91,7 @@
               <TableCell Name="Cell21" Text="[Table.SI]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
               <TableCell Name="Cell22" Border.Lines="All" Text="[Table.NO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
               <TableCell Name="Cell23" Border.Lines="All" Text="[Table.NA]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-              <TableCell Name="Cell24" Text="[Table.Obs1]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt"/>
+              <TableCell Name="Cell24" Text="[Table.Obs1]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt" TextFill.Color="Red"/>
               <TableCell Name="Cell25" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold">
                 <PictureObject Name="Picture1" Left="3.45" Top="3.45" Width="90.95" Height="33.8" DataColumn="Table.Foto1" SizeMode="StretchImage"/>
               </TableCell>

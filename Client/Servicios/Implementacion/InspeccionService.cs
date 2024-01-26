@@ -55,5 +55,12 @@ namespace QHSE.Client.Servicios.Implementacion
             var result = await _http.GetFromJsonAsync<ResponseDTO<List<InspeccionDTO>>>($"api/inspeccion/Lista?codigoInspeccion={codigoInspeccion}");
             return result!;
         }
+
+        public async Task<ResponseDTO<List<InspeccionDTO>>> ListaFechas(string? fechaInicio, string? fechaFinal)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseDTO<List<InspeccionDTO>>>($"api/inspeccion/ListaFechas?fechaInicio={fechaInicio}&fechaFinal={fechaFinal}");
+            return result!;
+        }
+        
     }
 }

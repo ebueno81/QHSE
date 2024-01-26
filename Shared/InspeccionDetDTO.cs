@@ -78,6 +78,12 @@ namespace QHSE.Shared
 
         public byte[]? Firma { get; set; }
 
+        public string? Por1 { get; set; }
+        
+        public string? Por2 { get; set; }
+        
+        public string? Barra { get; set; }
+
 
     }
 }

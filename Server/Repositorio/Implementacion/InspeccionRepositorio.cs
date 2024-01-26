@@ -12,6 +12,7 @@ namespace QHSE.Server.Repositorio.Implementacion
         public InspeccionRepositorio(DbQhseContext dbContext)
         {
             _dbContext = dbContext;
+            _dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(30));
         }
 
         public async Task<IQueryable<Inspeccion>> Consultar(Expression<Func<Inspeccion, bool>> filtro = null)

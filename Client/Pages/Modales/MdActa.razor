@@ -24,10 +24,17 @@
                         <MudTextField  @bind-Value="@_acta.Obs" MaxLength="50"
                                       Label="Observacion" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
                      </MudItem>
-                    
+                    <MudItem xs="12" sm="11">
+                        <MudRadioGroup @bind-SelectedOption="@estado">
+                            <MudRadio Option="@("0")" Color="MudBlazor.Color.Primary">Acta Abierta</MudRadio>
+                            <MudRadio Option="@("1")" Color="MudBlazor.Color.Secondary">Acta Cerrada</MudRadio>
+                        </MudRadioGroup>
+                       
+                    </MudItem>
                  </MudGrid>
-              
+                  
             </EditForm>
+              
         </MudContainer>
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="@(myImageClass + " my-7")" />
     </DialogContent>
@@ -54,13 +61,22 @@
 
 
     string myImageClass { get; set; } = "d-none";
+    string estado="";
     bool disableButton = false, desabilitaUser = false;
+
+
     DateTime? vFecha = DateTime.Now;
 
 
 
     protected override async Task OnInitializedAsync()
     {
+        if (_acta != null)
+            if (_acta.Estado == 1)
+                estado = "1";
+            else
+                estado = "0";
+        //StateHasChanged();
 
     }
 
@@ -80,8 +96,11 @@
 
             string _mensaje = "";
             bool _resultado;
-            _acta.FechaProg = vFecha;
+            int _vEstado = 0;
 
+
+            _acta.FechaProg = vFecha;
+            _acta.Estado = Convert.ToInt16(estado);
             _creacion.Acta!.Add(_acta);
 
 

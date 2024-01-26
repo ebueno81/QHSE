@@ -1,0 +1,30 @@
+﻿@using MudBlazor;
+<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+            <MudButton Variant="Variant.Filled" OnClick="@(() => OpcionSeleccionada(1))" Color="Color.Info">@titulo1</MudButton>
+           <br />
+            <MudButton Variant="Variant.Filled" OnClick="@(() => OpcionSeleccionada(2))" Color="Color.Tertiary">@titulo2</MudButton>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Close">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] 
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public string titulo1 { get; set; }
+    [Parameter]
+    public string titulo2 { get; set; }
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+
+    void OpcionSeleccionada(int opcion)
+    {
+        MudDialog.Close(DialogResult.Ok(opcion));
+        Close();
+    }
+}

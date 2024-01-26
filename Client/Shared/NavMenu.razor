@@ -1,6 +1,6 @@
 ﻿<MudNavMenu>
 
-    <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">DashBoard</MudNavLink>
+    <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Insights">DashBoard</MudNavLink>
 
     <MudNavGroup Title="Mantenimiento" Expanded="false" Icon="@Icons.Material.Filled.ImagesearchRoller">
         <MudNavLink Href="/page/trabajador" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Trabajadores</MudNavLink>
@@ -15,10 +15,10 @@
         <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DynamicFeed">Plantillas</MudNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Plagiarism">
+   @* <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Plagiarism">
         <MudNavLink Href="/page/ReporteGeneral" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MenuOpen">Reporte General </MudNavLink>
         <MudNavLink Href="/page/ReporteDetallado" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PostAdd">Reporte Detallado</MudNavLink>
-    </MudNavGroup>
+    </MudNavGroup>*@
 
     <AuthorizeView Roles="Administrador,Supervisor">
         <Authorized>

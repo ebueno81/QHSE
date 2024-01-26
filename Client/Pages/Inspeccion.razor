@@ -6,6 +6,7 @@
 @inject SweetAlertService Swal;
 @inject IJSRuntime _jsServicio;
 @using ClosedXML.Excel;
+@inject IDialogService _dialogService
 
 <AuthorizeView Roles="Administrador,Supervisor">
     <NotAuthorized>
@@ -21,19 +22,75 @@
     <MudText Typo="Typo.h5" GutterBottom="true">Listado de Inspecciones</MudText>
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
-        <MudGrid>
+          @if(appData.isMobile)
+            {
+                <MudItem xs="12">
+                    <MudDatePicker Label="Fecha Inicio" Margin="Margin.Dense" Variant="Variant.Outlined" Class="@(noneFecha)" @bind-Date="fechaInicio" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                </MudItem>
+                <br />
+                <MudItem xs="12">
+                    <MudDatePicker Label="Fecha Fin" Margin="Margin.Dense" Variant="Variant.Outlined" Class="@(noneFecha)" @bind-Date="fechaFin" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudButton Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           Color="Color.Info"
+                           Size="Size.Medium"
+                           Class="mt-1"
+                           OnClick="Buscar">Buscar</MudButton>
+                </MudItem>
             <AuthorizeView Roles="Administrador,Supervisor">
                 <Authorized>
                     <MudItem xs="12">
+
                         <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Add"
-                                   Color="Color.Primary"
-                                   OnClick="LlamarDetalle">
+                               StartIcon="@Icons.Material.Filled.Add"
+                               Color="Color.Primary"
+                               OnClick="LlamarDetalle">
                             Nueva Inspección
                         </MudButton>
                     </MudItem>
                 </Authorized>
             </AuthorizeView>
+            }
+            else
+            {
+                <div class="d-flex flex-grow-1 gap-4">
+                    <MudItem xs="@appData.xs4">
+                        <MudDatePicker Label="Fecha Inicio" Margin="Margin.Dense" Variant="Variant.Outlined" Class="@(noneFecha)" @bind-Date="fechaInicio" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+
+                    </MudItem>
+
+                    <MudItem xs="@appData.xs4">
+                        <MudDatePicker Label="Fecha Fin" Margin="Margin.Dense" Variant="Variant.Outlined" Class="@(noneFecha)" @bind-Date="fechaFin" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
+                    </MudItem>
+
+                    <MudItem xs="@appData.xs4">
+                        <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               Color="Color.Info"
+                               Size="Size.Medium"
+                               Class="mt-1"
+                               OnClick="Buscar">Buscar</MudButton>
+                    </MudItem>
+                    <MudItem xs="@appData.xs4">
+                    <AuthorizeView Roles="Administrador,Supervisor">
+                        <Authorized>
+                                <MudButton Variant="Variant.Filled"
+                                       StartIcon="@Icons.Material.Filled.Add"
+                                       Color="Color.Primary"
+                                       OnClick="LlamarDetalle">
+                                    Nueva Inspección
+                                </MudButton>
+                        </Authorized>
+                    </AuthorizeView>
+                     </MudItem>
+                </div>
+            }
+            
+        <MudGrid>
+           
 
             <MudItem xs="12">
 
@@ -70,20 +127,11 @@
                                     OnClick="@(() => AbrirEditar(registroRow.IdInsp,0))" />
                             <AuthorizeView Roles="Administrador,Supervisor">
                                 <Authorized>
-                                    <MudFab Color="Color.Secondary"
+                                    <MudFab Color="Color.Warning"
                                             StartIcon="@Icons.Material.Filled.Edit"
                                             Size="Size.Small"
                                             IconSize="Size.Small"
-                                            OnClick="@(() => AbrirEditar(registroRow.IdInsp,1))" />
-                                </Authorized>
-                            </AuthorizeView>
-                            <AuthorizeView Roles="Administrador,Supervisor">
-                                <Authorized>
-                                    <MudFab Color="Color.Primary"
-                                            StartIcon="@Icons.Material.Filled.Edit"
-                                            Size="Size.Small"
-                                            IconSize="Size.Small"
-                                            OnClick="@(() => AbrirEditar(registroRow.IdInsp,2))" />
+                                            OnClick="@(() => EditarInspeccionV2(registroRow))" />
                                 </Authorized>
                             </AuthorizeView>
                             <AuthorizeView Roles="Administrador">
@@ -100,13 +148,7 @@
                                     StartIcon="@Icons.Material.Filled.PictureAsPdf"
                                     Size="Size.Small"
                                     IconSize="Size.Small"
-                                    OnClick="@(() => ImprimirPDF(registroRow.IdInsp,1))" />
-                            <MudFab Color="Color.Warning"
-                                    StartIcon="@Icons.Material.Filled.FileDownload"
-                                    Size="Size.Small"
-                                    IconSize="Size.Small"
-                                    OnClick="@(() => ExportarExcel(registroRow.IdInsp))" />
-
+                                    OnClick="@(() => SeleccionarImpresion(registroRow.IdInsp,1,1))" />
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
@@ -127,21 +169,32 @@
     private string searchString1 = "";
     private InspeccionDTO selectedItem1 = null;
     private bool _loading = true;
-
-    private async Task ObtenerInspeccion()
-    {
-        var result = await _inspeccionServicio.Lista(0);
-
-        if (result.status)
-        {
-            listaInspeccion = (List<InspeccionDTO>)result.value!;
-        }
-    }
-
+    string noneFecha = "d-block";
+    DateTime? fechaInicio = Convert.ToDateTime("01/" + (DateTime.Today.Month + 100).ToString().Substring(1,2) + "/" + DateTime.Today.Year.ToString());
+    DateTime? fechaFin = DateTime.Today;
 
     protected override async Task OnInitializedAsync()
     {
-        await ObtenerInspeccion();
+        await Buscar();
+        _loading = false;
+
+    }
+
+    private async Task Buscar()
+    {
+        _loading = true;
+        string _fechaInicio, _fechaFin;
+        _fechaInicio = fechaInicio.Value.ToString("dd/MM/yyyy");
+        _fechaFin = fechaFin.Value.ToString("dd/MM/yyyy");
+
+        var resultado = await _inspeccionServicio.ListaFechas(_fechaInicio, _fechaFin);
+        if (resultado.status)
+        {
+            listaInspeccion = (List<InspeccionDTO>)resultado.value!;
+
+        }
+
+
         _loading = false;
 
     }
@@ -188,10 +241,42 @@
             if (resultado)
             {
                 _snackBar.Add("La inspección fue eliminado", Severity.Success, a => a.VisibleStateDuration = 500);
-                await ObtenerInspeccion();
+                await Buscar();
             }
             else
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
+        }
+    }
+
+    private async Task EditarInspeccionV2(InspeccionDTO model)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Editar Inspección",
+                Text = $"Seleccionar 1ra o 2da Inspección: Nro.: ({model.IdInsp})",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ShowDenyButton = true,
+                ConfirmButtonText = "1ra inspeccion",
+                DenyButtonText = "2da inspeccion",
+                CancelButtonText = "No, volver"
+            });
+
+        if (result.IsConfirmed)
+        {
+            //_snackBar.Add("1ra Inspeccion", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + model.IdInsp + "/" + 1);
+        }
+        else
+        {
+            if(result.IsDenied)
+            {
+                _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + model.IdInsp + "/" + 2);
+            }
+            else
+            {
+                //_snackBar.Add("Cancelado", Severity.Error, a => a.VisibleStateDuration = 500);
+            }
         }
     }
 
@@ -202,9 +287,55 @@
 
     private async Task ImprimirPDF(int codigoInspeccion, int numVerificacion)
     {
+
         string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirReporte?codigoInspeccion={codigoInspeccion}&numVerificacion={numVerificacion}";
         _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
     }
+
+
+    private async Task SeleccionarImpresion(int codigoInspeccion, int numVerificacion, int tipoReporte)
+    {
+        var options = new MudBlazor.DialogOptions
+            {
+                CloseButton = true,
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+        var parameters = new DialogParameters<MsOptions>();
+        parameters.Add(x => x.codigoMandado, tipoReporte);
+
+        var result = await this._dialogService.Show<MsOptions>("Seleccionar Opciones", parameters, options).Result;
+
+        //validamos el resultado para actualizar
+        if (result.Data != null)
+        {
+            var valorRecibido = result.Data.ToString();
+
+            if (valorRecibido == "1")
+            {
+                string rutaUrl= $"{appData.urlReporte}api/inspeccion/imprimirReporte?codigoInspeccion={codigoInspeccion}&numVerificacion={numVerificacion}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+            if (valorRecibido == "2")
+            {
+                string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirDetalle?codigoInspeccion={codigoInspeccion}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+            if (valorRecibido == "3")
+            {
+                string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirReporteNO?codigoInspeccion={codigoInspeccion}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+
+            if (valorRecibido == "4")
+            {
+                ExportarExcel(codigoInspeccion);
+            }
+
+        }
+    }
+
 
     private async Task ExportarExcel(int codigoPlantilla)
     {
@@ -280,4 +411,5 @@
         public string? SubCategoria { get; set; }
 
     }
+
 }

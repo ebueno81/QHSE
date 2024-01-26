@@ -7,6 +7,7 @@ using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
 using QHSE.Server.Repositorio.Implementacion;
 using QHSE.Shared;
+using System.Globalization;
 
 namespace QHSE.Server.Controllers
 {
@@ -22,7 +23,8 @@ namespace QHSE.Server.Controllers
         {
             _mapper = mapper;
             _InspeccionRepositorio = InspeccionRepositorio;
-            _hostingEnvironment = hostingEnvironment;   
+            _hostingEnvironment = hostingEnvironment;
+            
         }
 
         [Authorize]
@@ -38,6 +40,45 @@ namespace QHSE.Server.Controllers
 
 
                 IQueryable<Inspeccion> query = await _InspeccionRepositorio.Consultar(codigoInspeccion > 0 ? x => x.IdInsp == codigoInspeccion : null);
+
+
+                query = query.Include(c => c.IdCreateNavigation)
+                        .Where(c => c.IdCreateNavigation.Activo == 1)
+                        .Include(a => a.IdAreaNavigation)
+                        .Include(t => t.IdTpoInspNavigation)
+                        .Include(p => p.IdSuper1Navigation);
+
+                _listaInspeccions = _mapper.Map<List<InspeccionDTO>>(query.ToList());
+
+
+                _response = new ResponseDTO<List<InspeccionDTO>>() { status = true, msg = "ok", value = _listaInspeccions };
+
+                return StatusCode(StatusCodes.Status200OK, _response);
+            }
+            catch (Exception ex)
+            {
+
+                _response = new ResponseDTO<List<InspeccionDTO>>() { status = false, msg = ex.Message, value = null };
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("ListaFechas")]
+        public async Task<IActionResult> ListaFechas(string? fechaInicio, string? fechaFinal)
+        {
+            ResponseDTO<List<InspeccionDTO>> _response = new ResponseDTO<List<InspeccionDTO>>();
+
+            try
+            {
+                List<InspeccionDTO> _listaInspeccions = new List<InspeccionDTO>();
+
+                DateTime fech_Inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", new CultureInfo("es-PE"));
+                DateTime fech_Fin = DateTime.ParseExact(fechaFinal, "dd/MM/yyyy", new CultureInfo("es-PE"));
+
+                IQueryable<Inspeccion> query = await _InspeccionRepositorio.Consultar(x => x.Fecha >= fech_Inicio && x.Fecha<= fech_Fin);
 
 
                 query = query.Include(c => c.IdCreateNavigation)
@@ -197,6 +238,49 @@ namespace QHSE.Server.Controllers
                     .Include(e => e.IdInspNavigation.IdEmpNavigation)
                     .Include(t => t.IdInspNavigation.IdSuper1Navigation)
                     .Include(t => t.IdInspNavigation.IdTpoInspNavigation)
+                    ;
+
+            _listaRegistros = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
+
+            FastReport.Report report = new FastReport.Report();
+
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptInspeccion.frx");
+            report.RegisterData(_listaRegistros, "DataSet1");
+            report.Load(path);
+
+            //report.SetParameterValue("Titulo", "Reporte de Areas Hoy");
+
+            report.Prepare();
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                PDFSimpleExport pdfExport = new PDFSimpleExport();
+                pdfExport.Export(report, ms);
+                ms.Flush();
+                return File(ms.ToArray(), "application/pdf");
+            }
+
+
+        }
+
+
+        // NO REALIZADOS O NO CUMPLEN
+        [HttpGet]
+        [Route("imprimirReporteNO")]
+        public async Task<IActionResult> imprimirReporteNO(int codigoInspeccion)
+        {
+            List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
+
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, 1);
+            query = query.Include(c => c.IdInspNavigation)
+                    .Include(s => s.IdSubCtgNavigation)
+                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
+                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
+                    .Include(t => t.IdInspNavigation.IdSuper1Navigation)
+                    .Include(t => t.IdInspNavigation.IdTpoInspNavigation)
+                    .Where(X=>X.OpcSelect1=="0")
                     ;
 
             _listaRegistros = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());

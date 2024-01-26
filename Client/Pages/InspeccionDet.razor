@@ -31,6 +31,19 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
+    @if(estadoRegistro>0)
+    {
+        @if(estadoRegistro==1)
+        {
+            <MudText Typo="Typo.h5" GutterBottom="true">Inspección Nro.1</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h5" GutterBottom="true">Inspección Nro.2</MudText>
+        }
+    }
+    
+
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
         <MudText Typo="Typo.h5" GutterBottom="true"> </MudText>
@@ -114,21 +127,7 @@
     </MudPaper>
 
     <br />
-    @if (encenderCamara)
-    {
-        <center>
-            <h1>Usar la Camara</h1>
-            <video id="videoFeed" width="400" height="600"/>
-            <canvas class="d-none" id="currentFrame" width="400" height="600"/>
-            <br />
-            <button class="btn btn-primary mb-3" disabled="@vCargando" @onclick="CaptureFrame">Tomar Foto</button>
-            <button class="btn btn-danger mb-3" @onclick="(()=> ActivarCamara(1))">Cancelar</button>
-        </center>
-        <br />
-       
-    }
-    else
-    {
+
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
         <MudItem xs="12">
@@ -304,7 +303,7 @@
         
     </MudPaper>
     
-    }
+
     <br />
     
     @if(estadoRegistro>0)
@@ -312,14 +311,8 @@
         <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
     }
     &nbsp;&nbsp;
-    @if(codigoInspeccion>0)
-    {
-        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="@(() => ImprimirPDF(codigoInspeccion))">Imprimir</MudButton>
-    }
-    &nbsp;&nbsp;
     <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Disabled="@disableButtonCancel" OnClick="LlamarCabecera">Cancelar</MudButton>
-  @*  &nbsp;
-    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="@(() => AbrirCamara(_inspeccion.InspeccionDets.First()))">Camara</MudButton>*@
+  
 </MudContainer>
 
 @code {
@@ -696,7 +689,7 @@
             _inspeccion.InspeccionDets = result.value;
             if (estadoRegistro==2)
             {
-                foreach (var data in _inspeccion.InspeccionDets)
+                foreach (var data in _inspeccion.InspeccionDets.Where(x=>x.OpcSelect1=="0"))
                 {
                     data.OpcSelect2 = "1";
                 }

@@ -40,6 +40,22 @@ namespace QHSE.Server.Utilidades
             #endregion Inspeccion
 
             #region InspeccionDetalle
+            CreateMap<InspeccionDet, ResumenDTO>()
+                .ForMember(destino =>
+                   destino.Area,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdAreaNavigation.DescArea))
+                 .ForMember(destino =>
+                   destino.Empresa,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.IdEmpNavigation.RazEmp))
+                 .ForMember(destino =>
+                   destino.Fecha,
+                   opt => opt.MapFrom(origen => origen.IdInspNavigation.Fecha))
+                 .ForMember(destino =>
+                   destino.OpcSelect1,
+                   opt => opt.MapFrom(origen => origen.OpcSelect1))
+                 .ForMember(destino =>
+                   destino.OpcSelect2,
+                   opt => opt.MapFrom(origen => origen.OpcSelect2));
             CreateMap<InspeccionDet, InspeccionDetDTO>()
                 .ForMember(destino =>
                    destino.IdCtg,
@@ -100,6 +116,8 @@ namespace QHSE.Server.Utilidades
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
 
+          
+
             #region Plantilla
             CreateMap<Plantilla, PlantillaDTO>()
                  .ForMember(destino =>
@@ -137,7 +155,10 @@ namespace QHSE.Server.Utilidades
             #endregion Area
 
             #region Acta
-            CreateMap<Actum, ActaDTO>();
+            CreateMap<Actum, ActaDTO>()
+                .ForMember(destino =>
+                   destino.Activo,
+                   opt => opt.MapFrom(origen => origen.Estado==1?"Activo":"Cerrado"));
             CreateMap<ActaDTO, Actum>();
             #endregion Area
 

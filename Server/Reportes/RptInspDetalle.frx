@@ -117,7 +117,7 @@
                 <TextObject Name="Text4" Left="75.6" Width="28.35" Height="18.9" Text="NO" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
                 <TextObject Name="Text9" Left="9.45" Top="18.9" Width="85.05" Height="18.9" Text="Observación:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
                 <TextObject Name="Text8" Left="141.75" Width="37.8" Height="18.9" Text="N/A" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-                <TextObject Name="Text14" Left="9.45" Top="30.8" Width="217.35" Height="28.35" Text="[Table.Obs1]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt"/>
+                <TextObject Name="Text14" Left="9.45" Top="30.8" Width="217.35" Height="28.35" Text="[Table.Obs1]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt" TextFill.Color="Red"/>
                 <TextObject Name="Text19" Left="28.35" Width="28.35" Height="18.9" Text="[Table.SI]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="Red"/>
                 <TextObject Name="Text20" Left="103.95" Width="28.35" Height="18.9" Text="[Table.NO]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="Red"/>
                 <TextObject Name="Text21" Left="179.55" Width="28.35" Height="18.9" Text="[Table.NA]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="Red"/>
@@ -131,7 +131,7 @@
                 <TextObject Name="Text6" Width="28.35" Height="18.9" Text="SI" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
                 <TextObject Name="Text7" Left="75.6" Width="28.35" Height="18.9" Text="NO" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
                 <TextObject Name="Text10" Top="18.9" Width="103.95" Height="18.9" Text="Observación:" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-                <TextObject Name="Text15" Top="31.8" Width="217.35" Height="28.35" Text="[Table.Obs2]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt"/>
+                <TextObject Name="Text15" Top="31.8" Width="217.35" Height="28.35" Text="[Table.Obs2]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt" TextFill.Color="Red"/>
                 <TextObject Name="Text22" Left="28.35" Width="28.35" Height="18.9" Text="[Table.SI2]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="Red"/>
                 <TextObject Name="Text23" Left="103.95" Width="28.35" Height="18.9" Text="[Table.NO2]" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="Red"/>
                 <TextObject Name="Text24" Left="179.55" Width="28.35" Height="18.9" HorzAlign="Justify" VertAlign="Center" Font="Arial, 8pt"/>

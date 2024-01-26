@@ -29,6 +29,7 @@ builder.Services.AddScoped<IPlantillaService, PlantillaService>();
 builder.Services.AddScoped<IPlantillaDetService, PlantillaDetService>();
 builder.Services.AddScoped<IInspeccionService, InspeccionService>();
 builder.Services.AddScoped<ITipoInspeccionService, TipoInspeccionService>();
+builder.Services.AddScoped<IDashBoardService, DashBoardService>();
 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();

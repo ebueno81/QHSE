@@ -16,6 +16,10 @@ namespace QHSE.Shared
 
         public string? Obs { get; set; }
 
+        public int? Estado { get; set; }
+
+        public string? Activo { get; set; }
+
         public int? IdCreate { get; set; }
     }
 }

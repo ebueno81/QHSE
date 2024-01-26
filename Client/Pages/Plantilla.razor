@@ -5,6 +5,7 @@
 @inject ISnackbar _snackBar
 @inject SweetAlertService Swal;
 @inject IJSRuntime _jsServicio;
+@inject IDialogService _dialogService
 @using ClosedXML.Excel;
 
 <AuthorizeView Roles="Administrador,Supervisor">
@@ -86,13 +87,8 @@
                                     StartIcon="@Icons.Material.Filled.PictureAsPdf"
                                     Size="Size.Small"
                                     IconSize="Size.Small"
-                                    OnClick="@(() => ImprimirPDF(registroRow.IdPlantilla))" />
-                            <MudFab Color="Color.Warning"
-                                    StartIcon="@Icons.Material.Filled.FileDownload"
-                                    Size="Size.Small"
-                                    IconSize="Size.Small"
-                                    OnClick="@(() => ExportarExcel(registroRow.IdPlantilla))" />
-
+                                    OnClick="@(() => SeleccionarImpresion(registroRow.IdPlantilla))" />
+                           
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
@@ -199,6 +195,40 @@
         _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
 
     }
+
+    private async Task SeleccionarImpresion(int codigoPlantilla)
+    {
+        var options = new MudBlazor.DialogOptions
+            {
+                CloseButton = true,
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+        var parameters = new DialogParameters<MsOptions2>();
+        parameters.Add(x => x.titulo1, "Imprimir Plantilla");
+        parameters.Add(x => x.titulo2, "Exportar a Excel");
+
+        var result = await this._dialogService.Show<MsOptions2>("Seleccionar Opcion", parameters, options).Result;
+
+        //validamos el resultado para actualizar
+        if (result.Data != null)
+        {
+            var valorRecibido = result.Data.ToString();
+
+            if (valorRecibido == "1")
+            {
+                string rutaUrl = $"{appData.urlReporte}api/plantilla/imprimirReporte?codigoPlantilla={codigoPlantilla}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+            if (valorRecibido == "2")
+            {
+                ExportarExcel(codigoPlantilla);
+            }
+            
+        }
+    }
+
     private async Task ExportarExcel(int codigoPlantilla)
     {
         var result = await _plantillaServicio.ListaDetalles(codigoPlantilla);

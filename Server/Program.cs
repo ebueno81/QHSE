@@ -64,6 +64,7 @@ builder.Services.AddScoped<IPlantillaRepositorio, PlantillaRepositorio>();
 builder.Services.AddScoped<IPlantillaDetRepositorio, PlantillaDetRepositorio>();
 
 builder.Services.AddScoped<IInspeccionRepositorio, InspeccionRepositorio>();
+builder.Services.AddScoped<IDashBoardRepositorio, DashBoardRepositorio>();
 
 builder.Services.AddScoped<ICreacionRepositorio, CreacionRepositorio>();
 builder.Services.AddScoped<IEmpresaRepositorio, EmpresaRepositorio>();

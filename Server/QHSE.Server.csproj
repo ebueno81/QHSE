@@ -56,6 +56,9 @@
     <None Update="Reportes\RptAreas.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Reportes\RptResumen.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Reportes\RptSubCategorias.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

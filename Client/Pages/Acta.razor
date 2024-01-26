@@ -5,6 +5,7 @@
 @inject ISnackbar _snackBar
 @inject SweetAlertService Swal;
 @inject IJSRuntime _jsServicio;
+@inject IDialogService _dialogService
 
 <AuthorizeView Roles="Administrador,Supervisor">
     <NotAuthorized>
@@ -34,7 +35,7 @@
                     </MudItem>
                 </Authorized>
             </AuthorizeView>
-
+           
             <MudItem xs="12">
 
                 <MudTable Items="@listaActas"
@@ -49,6 +50,7 @@
                         <MudTh>Codigo</MudTh>
                         <MudTh>Nro.Acta</MudTh>
                         <MudTh>Fecha</MudTh>
+                        <MudTh>Estado</MudTh>
                         <MudTh>Observacion</MudTh>
 
                     </HeaderContent>
@@ -56,6 +58,8 @@
                         <MudTd DataLabel="Codigo">@registroRow.IdActa</MudTd>
                         <MudTd DataLabel="Nro.Acta">@registroRow.NroActa</MudTd>
                         <MudTd DataLabel="Fecha">@registroRow.FechaProg</MudTd>
+                        <MudTd DataLabel="Estado">@registroRow.Activo</MudTd>
+
                         <MudTd DataLabel="Observación">@registroRow.Obs</MudTd>
 
                         <MudTd DataLabel="">
@@ -81,7 +85,8 @@
                                     StartIcon="@Icons.Material.Filled.PictureAsPdf"
                                     Size="Size.Small"
                                     IconSize="Size.Small"
-                                    OnClick="@(() => ImprimirPDF(registroRow.IdActa))" />
+                                    OnClick="@(() => SeleccionarImpresion(registroRow.IdActa))" />
+                          
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
@@ -196,9 +201,40 @@
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
         }
     }
-    private async Task ImprimirPDF(int codigoActa)
+    
+
+    private async Task SeleccionarImpresion(int codigo)
     {
-        string rutaUrl = $"{appData.urlReporte}api/acta/imprimirReporte?codigo={codigoActa}";
-        _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+        var options = new MudBlazor.DialogOptions
+            {
+                CloseButton = true,
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+        var parameters = new DialogParameters<MsOptions2>();
+        parameters.Add(x => x.titulo1, "Imprimir Acta");
+        parameters.Add(x => x.titulo2, "Imprimir Resultado");
+
+        var result = await this._dialogService.Show<MsOptions2>("Seleccionar Opcion", parameters, options).Result;
+
+        //validamos el resultado para actualizar
+        if (result.Data != null)
+        {
+            var valorRecibido = result.Data.ToString();
+
+            if (valorRecibido == "1")
+            {
+                string rutaUrl = $"{appData.urlReporte}api/acta/imprimirReporte?codigo={codigo}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+            if (valorRecibido == "2")
+            {
+                string rutaUrl = $"{appData.urlReporte}api/dashboard/imprimirConsolidado?codigo={codigo}";
+                _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+            }
+
+        }
     }
+
 }
