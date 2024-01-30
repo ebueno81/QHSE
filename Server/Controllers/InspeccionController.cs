@@ -38,9 +38,7 @@ namespace QHSE.Server.Controllers
             {
                 List<InspeccionDTO> _listaInspeccions = new List<InspeccionDTO>();
 
-
                 IQueryable<Inspeccion> query = await _InspeccionRepositorio.Consultar(codigoInspeccion > 0 ? x => x.IdInsp == codigoInspeccion : null);
-
 
                 query = query.Include(c => c.IdCreateNavigation)
                         .Where(c => c.IdCreateNavigation.Activo == 1)
@@ -106,7 +104,7 @@ namespace QHSE.Server.Controllers
         [Authorize]
         [HttpGet]
         [Route("ListaDetalles")]
-        public async Task<IActionResult> ListaDetalles(int codigoInspeccion, int numVerificacion)
+        public async Task<IActionResult> ListaDetalles(int codigoInspeccion, int codigoArea, int numVerificacion)
         {
             ResponseDTO<List<InspeccionDetDTO>> _response = new ResponseDTO<List<InspeccionDetDTO>>();
 
@@ -114,17 +112,24 @@ namespace QHSE.Server.Controllers
             {
                 List<InspeccionDetDTO> _listaInspeccion = new List<InspeccionDetDTO>();
 
-                IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, numVerificacion);
-                query = query.Include(ca => ca.IdSubCtgNavigation)
-                    .Where(r => r.Activo == 1)
-                    .Include(s => s.IdSubCtgNavigation)
-                    .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
-                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
-                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
-                    .Include(tr => tr.IdInspNavigation.IdSuper1Navigation)
-                    .Include(t => t.IdInspNavigation.IdTpoInspNavigation);
+                IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion,codigoArea, numVerificacion);
 
-                _listaInspeccion = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
+                if (query.Any())
+                {
+                    query = query.Include(ca => ca.IdSubCtgNavigation)
+                   .Where(r => r.Activo == 1)
+                   .Include(s => s.IdSubCtgNavigation)
+                   .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
+                   .Include(a => a.IdInspNavigation.IdAreaNavigation)
+                   .Include(e => e.IdInspNavigation.IdEmpNavigation)
+                   .Include(tr => tr.IdInspNavigation.IdSuper1Navigation)
+                   .Include(t => t.IdInspNavigation.IdTpoInspNavigation);
+
+                    _listaInspeccion = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
+                }
+               
+
+                
 
                 if (_listaInspeccion.Count > 0)
                     _response = new ResponseDTO<List<InspeccionDetDTO>>() { status = true, msg = "ok", value = _listaInspeccion.ToList() };
@@ -230,7 +235,7 @@ namespace QHSE.Server.Controllers
         {
             List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
 
-            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, numVerificacion);
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, 0,numVerificacion);
             query = query.Include(c => c.IdInspNavigation)
                     .Include(s => s.IdSubCtgNavigation)
                     .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
@@ -272,7 +277,7 @@ namespace QHSE.Server.Controllers
         {
             List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
 
-            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion, 1);
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion,0, 1);
             query = query.Include(c => c.IdInspNavigation)
                     .Include(s => s.IdSubCtgNavigation)
                     .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
@@ -313,7 +318,7 @@ namespace QHSE.Server.Controllers
         {
             List<InspeccionDetDTO> _listaRegistros = new List<InspeccionDetDTO>();
 
-            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion,1);
+            IQueryable<InspeccionDet> query = await _InspeccionRepositorio.ConsultarDetalle(codigoInspeccion,0,1);
             query = query.Include(c => c.IdInspNavigation)
                     .Include(s => s.IdSubCtgNavigation)
                     .Include(ca => ca.IdSubCtgNavigation.IdCtgNavigation)
@@ -342,8 +347,8 @@ namespace QHSE.Server.Controllers
                 return File(ms.ToArray(), "application/pdf");
             }
 
-
         }
 
+        
     }
 }

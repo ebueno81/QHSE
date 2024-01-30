@@ -11,6 +11,16 @@
 @inject NavigationManager _navigationManager
 @inject ISnackbar _snackBar
 
+<AuthorizeView Roles="Administrador,Supervisor,Usuario">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">

@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.EMMA;
 using FastReport.Export.PdfSimple;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using QHSE.Server.Models;
 using QHSE.Server.Repositorio.Contrato;
-using QHSE.Server.Repositorio.Implementacion;
 using QHSE.Shared;
 
 namespace QHSE.Server.Controllers
@@ -26,6 +23,7 @@ namespace QHSE.Server.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("Resumen")]
         public async Task<IActionResult> Resumen()
         {

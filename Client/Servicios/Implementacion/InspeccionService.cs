@@ -22,9 +22,9 @@ namespace QHSE.Client.Servicios.Implementacion
             return result!;
         }
 
-        public async Task<ResponseDTO<List<InspeccionDetDTO>>> ListaDetalles(int codigoInspeccion, int numVerificacion)
+        public async Task<ResponseDTO<List<InspeccionDetDTO>>> ListaDetalles(int codigoInspeccion, int codigoArea, int numVerificacion)
         {
-            var result = await _http.GetFromJsonAsync<ResponseDTO<List<InspeccionDetDTO>>>($"api/inspeccion/ListaDetalles?codigoInspeccion={codigoInspeccion}&numVerificacion={numVerificacion}");
+            var result = await _http.GetFromJsonAsync<ResponseDTO<List<InspeccionDetDTO>>>($"api/inspeccion/ListaDetalles?codigoInspeccion={codigoInspeccion}&codigoArea={codigoArea}&numVerificacion={numVerificacion}");
             return result!;
         }
 

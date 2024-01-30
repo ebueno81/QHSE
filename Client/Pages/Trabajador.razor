@@ -5,7 +5,7 @@
 @inject ISnackbar _snackBar
 @inject SweetAlertService Swal;
 
-<AuthorizeView Roles="Administrador,Supervisor">
+<AuthorizeView Roles="Administrador,Supervisor,Usuario">
     <NotAuthorized>
         @{
             _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);

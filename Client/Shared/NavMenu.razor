@@ -1,4 +1,5 @@
-﻿<MudNavMenu>
+﻿@inject IJSRuntime _jsServicio;
+<MudNavMenu>
 
     <MudNavLink Href="/page/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Insights">DashBoard</MudNavLink>
 
@@ -10,9 +11,18 @@
     </MudNavGroup>
   
     <MudNavGroup Title="Procesos" Expanded="false" Icon="@Icons.Material.Filled.GridView">
-        <MudNavLink Href="/page/Acta" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FiberNew">Registro de Actas</MudNavLink>
+        <AuthorizeView Roles="Administrador,Supervisor,Usuario">
+            <Authorized>
+                <MudNavLink Href="/page/Acta" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FiberNew">Registro de Actas</MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+        
         <MudNavLink Href="/page/RegistroInspeccion" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Registro Inspección</MudNavLink>
-        <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DynamicFeed">Plantillas</MudNavLink>
+        <AuthorizeView Roles="Administrador,Supervisor">
+            <Authorized>
+                <MudNavLink Href="/page/plantilla" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DynamicFeed">Plantillas</MudNavLink>
+            </Authorized>
+        </AuthorizeView>
     </MudNavGroup>
 
    @* <MudNavGroup Title="Reportes" Expanded="false" Icon="@Icons.Material.Filled.Plagiarism">
@@ -28,7 +38,17 @@
         </Authorized>
     </AuthorizeView>
 
-    <MudNavLink Href="/page/ayuda" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Report">Ayuda</MudNavLink>
+    <MudNavLink OnClick="Ayuda" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Report">Ayuda</MudNavLink>
 
 
 </MudNavMenu>
+
+@code
+{
+
+    private void Ayuda()
+    {
+        string rutaUrl = $"{appData.urlReporte}ManualAyuda.pdf";
+        _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
+    }
+}

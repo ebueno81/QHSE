@@ -72,10 +72,14 @@
     protected override async Task OnInitializedAsync()
     {
         if (_acta != null)
+        {
+            vFecha = _acta.FechaProg;
             if (_acta.Estado == 1)
-                estado = "1";
+                estado = "1";//cerrado
             else
-                estado = "0";
+                estado = "0";//abierto
+        }
+       
         //StateHasChanged();
 
     }

@@ -58,6 +58,12 @@ namespace QHSE.Server.Utilidades
                    opt => opt.MapFrom(origen => origen.OpcSelect2));
             CreateMap<InspeccionDet, InspeccionDetDTO>()
                 .ForMember(destino =>
+                   destino.Foto1,
+                   opt => opt.MapFrom(origen => origen.Foto1))
+                .ForMember(destino =>
+                   destino.Foto2,
+                   opt => opt.MapFrom(origen => origen.Foto2))
+                .ForMember(destino =>
                    destino.IdCtg,
                    opt => opt.MapFrom(origen => origen.IdSubCtgNavigation.IdCtgNavigation.IdCtg))
                 .ForMember(destino =>
@@ -158,7 +164,7 @@ namespace QHSE.Server.Utilidades
             CreateMap<Actum, ActaDTO>()
                 .ForMember(destino =>
                    destino.Activo,
-                   opt => opt.MapFrom(origen => origen.Estado==1?"Activo":"Cerrado"));
+                   opt => opt.MapFrom(origen => origen.Estado==1?"Cerrado":"Activo"));
             CreateMap<ActaDTO, Actum>();
             #endregion Area
 

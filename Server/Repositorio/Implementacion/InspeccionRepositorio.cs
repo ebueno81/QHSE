@@ -74,7 +74,7 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
         }
 
-        public async Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion, int numVerificacion)
+        public async Task<IQueryable<InspeccionDet>> ConsultarDetalle(int idInspeccion, int idArea, int numVerificacion)
         {
             // segunda verificacion
             if (numVerificacion== 2)
@@ -84,8 +84,17 @@ namespace QHSE.Server.Repositorio.Implementacion
             }
             else// primera verificacion
             {
-                IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion);
-                return queryEntidad;
+                if (numVerificacion == 3)// verificacion anterior 
+                {
+                    IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInspNavigation.IdActa < idInspeccion && d.IdInspNavigation.IdArea==idArea);
+                    return queryEntidad;
+                }
+                else
+                {
+                    IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInsp == idInspeccion);
+                    return queryEntidad;
+                }
+                    
             }
             
         }

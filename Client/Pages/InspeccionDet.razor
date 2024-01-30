@@ -29,6 +29,16 @@
 
 @inject MudBlazor.IDialogService _DialogService
 
+<AuthorizeView Roles="Administrador,Supervisor,Usuario">
+    <NotAuthorized>
+        @{
+            _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
+            _navigationManager.NavigateTo("/");
+
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-5">
 
     @if(estadoRegistro>0)
@@ -52,16 +62,26 @@
 
 
             <MudItem xs="12" sm="2">
-                <MudSelect Label="Fecha Acta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
+                @if(codigoInspeccion>0 && _actaSeleccionado != null)
+                {
+
+                    <MudTextField @bind-Value="@_actaSeleccionado.FechaProg" Class="mb-1" Disabled
+                              Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                }
+                else
+                {
+                    <MudSelect Label="Fecha Acta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
                            @bind-Value="_actaSeleccionado" Disabled="vDisabledIngresos">
-                    @if (listaActas.Any())
-                    {
-                        foreach (var data in listaActas)
+                        @if (listaActas.Any())
                         {
-                            <MudSelectItem Value="@data">@data.FechaProg</MudSelectItem>
+                            foreach (var data in listaActas)
+                            {
+                                <MudSelectItem Value="@data">@data.FechaProg</MudSelectItem>
+                            }
                         }
-                    }
-                </MudSelect>
+                    </MudSelect>
+                }
+                
             </MudItem>
 
             <MudItem xs="12" sm="2">
@@ -308,7 +328,7 @@
     
     @if(estadoRegistro>0)
     {
-        <MudButton Variant="Variant.Filled" Disabled="@disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
+        <MudButton Variant="Variant.Filled" Disabled="disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
     }
     &nbsp;&nbsp;
     <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Disabled="@disableButtonCancel" OnClick="LlamarCabecera">Cancelar</MudButton>
@@ -319,7 +339,7 @@
     [Parameter] public int codigoInspeccion { get; set; }
     [Parameter] public int estadoRegistro { get; set; }
 
-    
+
     // variables that work only with photo taking
     bool encenderCamara = false;
     //private string captionText;
@@ -329,80 +349,6 @@
     FontFamily sansFamily;
     Font captionFont;
 
-    // Cancel o activate of the camera
-    private async Task ActivarCamara(int cancelarCamara)
-    {
-        if (cancelarCamara == 1)
-        {
-            encenderCamara = false;
-            disableButton = false;
-            disableButtonCancel = false;
-        }
-        else
-        {
-            disableButton = true;
-            disableButtonCancel = true;
-            encenderCamara = true;
-            await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
-        }
-
-
-    }
-    // method that work with the camera
-    private async Task CaptureFrame()
-    {
-        myImageClass = "d-block";
-        vCargando = true;
-        disableButtonCancel = true;
-        //StateHasChanged();
-        await JSRuntime.InvokeAsync<String>("getFrame", "videoFeed", "currentFrame", DotNetObjectReference.Create(this));
-        myImageClass = "d-none";
-        vCargando = false;
-        disableButton = false;
-        disableButtonCancel = false;
-        StateHasChanged();
-    }
-
-    private async Task EncenderCamara()
-    {
-        await JSRuntime.InvokeVoidAsync("startVideo", "videoFeed");
-
-        //Font stored in wwwroot. Fetch it as byte array, and use it
-        var fontBytes = await Http.GetByteArrayAsync("OpenSans-Regular.ttf");
-        collection.Add(new MemoryStream(fontBytes));
-        collection.TryGet("Open Sans", out sansFamily);
-        captionFont = sansFamily.CreateFont(16, FontStyle.Regular);
-    }
-
-    [JSInvokable]
-    public void ProcessImage(string imageString)
-    {
-        SaveFileDTO saveFileDTO = new SaveFileDTO();
-        var fileData = new FileDataDTO();
-
-        byte[] imageData = Convert.FromBase64String(imageString.Split(',')[1]);
-
-        //Do image processing here
-        var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == _idPlantillaDet).First();
-        modeloPlantilla.Imagen = imageData;
-        if (estadoRegistro<2)
-            modeloPlantilla.Foto1 = imageData;
-        if (estadoRegistro == 2)
-            modeloPlantilla.Foto2 = imageData;
-
-
-        ActivarCamara(1);
-        using (var image = Image.Load(imageData))
-        {
-            image.Mutate(x => x
-                .Flip(FlipMode.Horizontal) //To match mirrored webcam image
-                .Fill(SixLabors.ImageSharp.Color.ParseHex("0008"), new RectangularPolygon(0, 0, 600, 400)) //Set footer bar for caption
-            );
-
-            frameUri = image.ToBase64String(JpegFormat.Instance);
-        }
-
-    }
 
     private void AbrirImagen(InspeccionDetDTO model, string rutaImagen)
     {
@@ -465,15 +411,15 @@
 
         parameters.Add(x => x.model, model);
         parameters.Add(x => x.estadoRegistro, estadoRegistro);
-        
-     //   parameters.Add(x => x.codigoMandado, 0);
+
+        //   parameters.Add(x => x.codigoMandado, 0);
 
         var result = await this._DialogService.Show<MdCamara>("Tomar Foto", parameters, options).Result;
 
         ////validamos el resultado para actualizar
         if (result.Data != null)
         {
-          
+
         }
     }
 
@@ -651,8 +597,8 @@
         {
             _loading = false;
         }
-        
-        
+
+
     }
 
     private async Task ObtenerInspeccion()
@@ -661,6 +607,7 @@
 
         if (resultC.status)
         {
+
             _inspeccion = resultC.value.First();
             vFecha = _inspeccion.Fecha ?? default(DateTime);
             vCodigoArea = _inspeccion.IdArea ?? default(int);
@@ -672,16 +619,16 @@
                 _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
 
             _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
-            
+
             _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
             _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
-             _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
-        //    StateHasChanged();
+            _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
+            //    StateHasChanged();
 
-            
+
         }
 
-        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion, estadoRegistro);
+        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion,0, estadoRegistro);
 
         if (result.status)
         {
@@ -696,6 +643,7 @@
             }
 
             myImageClass = "d-none";
+
             _loading = false;
             StateHasChanged();
         }
@@ -704,9 +652,10 @@
     private async Task ObtenerPlantilla(string codigoArea)
     {
         var result = await _plantillaServicio.Lista(int.Parse(codigoArea),1);
-
         if (result.status)
         {
+            _loading = true;
+            StateHasChanged();
             _plantilla = result.value.FirstOrDefault()!;
             vCodigoArea = int.Parse(codigoArea);
             _inspeccion.InspeccionDets.Clear();
@@ -718,22 +667,75 @@
             {
 
                 var inspeccionDetalle = new InspeccionDetDTO()
-                {
-                    SubCategoria = data.SubCategoria,
-                    Categoria = data.Categoria,
-                    IdSubCtg = data.IdSubCtg,
-                    OpcSelect1 = "1",
-                    NroOrden = data.NroOrden,
-                    Activo = 1,
-                    IdInspDet = data.IdPlantillaDet
-                };
+                        {
+                            SubCategoria = data.SubCategoria,
+                            Categoria = data.Categoria,
+                            IdSubCtg = data.IdSubCtg,
+                            OpcSelect1 = "1",
+                            NroOrden = data.NroOrden,
+                            Activo = 1,
+                            IdInspDet = data.IdPlantillaDet
+                        };
                 _inspeccion.InspeccionDets.Add(inspeccionDetalle);
 
 
             }
+
+            //  UltimaInspeccion(_actaSeleccionado.IdActa, _areaSeleccionado.IdArea);
+            List<InspeccionDetDTO> InspeccionDetsAnt = new List<InspeccionDetDTO>();
+
+            var result3 = await _inspeccionServicio.ListaDetalles(_actaSeleccionado.IdActa, vCodigoArea, 3);
+
+            if (result3.status)
+            {
+
+                InspeccionDetsAnt = result3.value!;
+
+                foreach (var data in InspeccionDetsAnt)
+                {
+                    foreach (var data2 in _inspeccion.InspeccionDets)
+                    {
+                        if (data2 != null)
+                        {
+                            if (data2.IdSubCtg == data.IdSubCtg)
+                            {
+                                if (data.OpcSelect1 == "0")
+                                {
+                                    data2.Foto1 = data.Foto1;
+                                    data2.OpcSelect1 = data.OpcSelect1;
+                                    data2.Obs1 = data.Obs1;
+                                }
+                                else
+                                {
+                                    if (data.OpcSelect2 == "0")
+                                    {
+                                        data2.Foto1 = data.Foto2;
+                                        data2.OpcSelect1 = data.OpcSelect2;
+                                        data2.Obs1 = data.Obs2;
+                                    }
+                                    else
+                                    {
+                                        data2.Foto1 = data.Foto1;
+                                        data2.OpcSelect1 = data.OpcSelect1;
+                                        data2.Obs1 = data.Obs1;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            _loading = false;
             StateHasChanged();
         }
+
+
     }
+
+
 
     private bool FilterFunc1(InspeccionDetDTO element) => FilterFunc(element, searchString1);
 
@@ -762,17 +764,7 @@
 
             listaAreas = response.value!;
             _areaSeleccionado = listaAreas.First();
-            //if (_inspeccion.IdArea != 0)
-            //{
-            //    _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
-            //    StateHasChanged();
 
-            //}
-            //else
-            //{
-            //    _areaSeleccionado = listaAreas.First();
-            //}
-          //  StateHasChanged();
         }
     }
 
@@ -790,17 +782,7 @@
 
             listaTipoInspeccion = response.value!;
             _tipoSeleccionado = listaTipoInspeccion.First();
-            //if (_inspeccion.IdTpoInsp != 0)
-            //{
-            //    _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
-            //    StateHasChanged();
 
-            //}
-            //else
-            //{
-            //    _tipoSeleccionado = listaTipoInspeccion.First();
-            //}
-            //StateHasChanged();
         }
     }
 
@@ -816,19 +798,10 @@
         if (response.status)
         {
 
-            listaActas = response.value!;
-            _actaSeleccionado = listaActas.First();
-            //if (_inspeccion.IdActa != 0)
-            //{
-            //    _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
-            //   // StateHasChanged();
+            listaActas = response.value!.Where(x=>x.Estado==0).ToList();
 
-            //}
-            //else
-            //{
-            //    _actaSeleccionado = listaActas.First();
-            //}
-         //   StateHasChanged();
+            _actaSeleccionado = listaActas.First();
+
         }
     }
 
@@ -928,6 +901,7 @@
                 }
 
 
+                _creacion.Inspeccions.Clear();
 
                 _creacion.Inspeccions!.Add(_inspeccion);
 
@@ -952,6 +926,16 @@
                 _creacion.UsuaCrea = appData.usuarioLogin;
 
                 var response = await _inspeccionServicio.Crear(_creacion);
+
+
+
+                // resultado
+                _creacion = response.value;
+                _inspeccion.IdCreate = _creacion.IdCreate;
+                _inspeccion.IdInsp = _creacion.Inspeccions.First().IdInsp;
+                estadoRegistro=1;
+                codigoInspeccion = _creacion.Inspeccions.First().IdInsp;
+                ObtenerIdDetalle(codigoInspeccion);
                 _resultado = response.status;
                 _mensaje = "Registro fue creado";
             }
@@ -960,12 +944,14 @@
             if (_resultado)
             {
                 _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
+
             }
             else
             {
                 _snackBar.Add("Error al guardar cambios, al parecer hubo unos problemas al momento de grabar...", Severity.Error, a => a.VisibleStateDuration = 500);
-                disableButton = false;
+               
             }
+             disableButton = false;
             myImageClass = "d-none";
         }
         else
@@ -974,6 +960,49 @@
         }
 
 
+    }
+
+    private async Task ObtenerIdDetalle(int codigoInspeccion)
+    {
+
+        List<InspeccionDetDTO> InspeccionDetsAnt = new List<InspeccionDetDTO>();
+
+        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion,0, 1);
+
+        if (result.status)
+        {
+
+
+            InspeccionDetsAnt = result.value!;
+
+            var result3 = await _inspeccionServicio.ListaDetalles(codigoInspeccion, 0, 1);
+
+            if (result3.status)
+            {
+
+                InspeccionDetsAnt = result3.value!;
+
+                foreach (var data in InspeccionDetsAnt)
+                {
+                    foreach (var data2 in _inspeccion.InspeccionDets)
+                    {
+                        if (data2 != null)
+                        {
+                            if (data2.IdSubCtg == data.IdSubCtg)
+                            {
+                                 data2.IdInspDet = data.IdInspDet;
+                                 data2.IdInsp = data.IdInsp;
+
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+            StateHasChanged();
+        }
     }
 
     private void LimpiarDetalles()
@@ -1063,7 +1092,7 @@
     private void EditarRegistro(InspeccionDetDTO model, int activamosCamara)
     {
         _idPlantillaDet = model.IdInspDet;
-        ActivarCamara(activamosCamara);
+     //   ActivarCamara(activamosCamara);
 
     }
 

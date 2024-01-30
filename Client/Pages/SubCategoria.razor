@@ -7,7 +7,7 @@
 @inject SweetAlertService Swal;
 @inject IJSRuntime _jsServicio;
 
-<AuthorizeView Roles="Administrador,Supervisor">
+<AuthorizeView Roles="Administrador,Supervisor,Usuario">
     <NotAuthorized>
         @{
             _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);

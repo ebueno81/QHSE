@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Remove="Pages\Mensaje\MsOptions2.razor" />
+    <Content Remove="wwwroot\ManualAyuda.pdf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +65,9 @@
   <ItemGroup>
     <None Include="Pages\MsOptions2.razor" />
     <None Include="Pages\Mensaje\MsOptions.razor" />
+    <None Include="wwwroot\ManualAyuda.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

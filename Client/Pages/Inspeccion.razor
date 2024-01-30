@@ -8,7 +8,7 @@
 @using ClosedXML.Excel;
 @inject IDialogService _dialogService
 
-<AuthorizeView Roles="Administrador,Supervisor">
+<AuthorizeView Roles="Administrador,Supervisor,Usuario">
     <NotAuthorized>
         @{
             _snackBar.Add("Acceso no autorizado...", Severity.Error, a => a.VisibleStateDuration = 500);
@@ -31,16 +31,15 @@
                 <MudItem xs="12">
                     <MudDatePicker Label="Fecha Fin" Margin="Margin.Dense" Variant="Variant.Outlined" Class="@(noneFecha)" @bind-Date="fechaFin" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" />
                 </MudItem>
-
+                <br />
                 <MudItem xs="12">
                     <MudButton Variant="Variant.Filled"
                            StartIcon="@Icons.Material.Filled.Search"
                            Color="Color.Info"
-                           Size="Size.Medium"
-                           Class="mt-1"
-                           OnClick="Buscar">Buscar</MudButton>
+                           OnClick="Buscar">Buscar Registro &nbsp;</MudButton>
                 </MudItem>
-            <AuthorizeView Roles="Administrador,Supervisor">
+                <br />
+            <AuthorizeView Roles="Administrador,Supervisor,Usuario">
                 <Authorized>
                     <MudItem xs="12">
 
@@ -75,7 +74,7 @@
                                OnClick="Buscar">Buscar</MudButton>
                     </MudItem>
                     <MudItem xs="@appData.xs4">
-                    <AuthorizeView Roles="Administrador,Supervisor">
+                    <AuthorizeView Roles="Administrador,Supervisor,Usuario">
                         <Authorized>
                                 <MudButton Variant="Variant.Filled"
                                        StartIcon="@Icons.Material.Filled.Add"
@@ -125,7 +124,7 @@
                                     Size="Size.Small"
                                     IconSize="Size.Small"
                                     OnClick="@(() => AbrirEditar(registroRow.IdInsp,0))" />
-                            <AuthorizeView Roles="Administrador,Supervisor">
+                            <AuthorizeView Roles="Administrador,Supervisor,Usuario">
                                 <Authorized>
                                     <MudFab Color="Color.Warning"
                                             StartIcon="@Icons.Material.Filled.Edit"
@@ -339,7 +338,7 @@
 
     private async Task ExportarExcel(int codigoPlantilla)
     {
-        var result = await _inspeccionServicio.ListaDetalles(codigoPlantilla,1);
+        var result = await _inspeccionServicio.ListaDetalles(codigoPlantilla,0,1);
 
         if (result.status)
         {
