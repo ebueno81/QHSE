@@ -46,7 +46,7 @@
     <Content Update="wwwroot\Img\logo2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Img\logo4.png">
+    <Content Update="wwwroot\logo4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\Img\logo3.png">
