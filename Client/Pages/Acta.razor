@@ -200,17 +200,7 @@
                 _snackBar.Add("No se pudo eliminar", Severity.Error, a => a.VisibleStateDuration = 500);
         }
     }
-    //private async Task ImprimirPDF(int codigoActa)
-    //{
-    //    string rutaUrl = $"{appData.urlReporte}api/acta/imprimirReporte?codigo={codigoActa}";
-    //    _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
-    //}
-    //private async Task ImprimirResumenPDF(int codigoActa)
-    //{
-    //    string rutaUrl = $"{appData.urlReporte}api/dashboard/imprimirConsolidado?codigo={codigoActa}";
-    //    _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
-    //}
-
+    
     private async Task SeleccionarImpresion(int codigo)
     {
         var options = new MudBlazor.DialogOptions

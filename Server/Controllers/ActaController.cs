@@ -49,7 +49,7 @@ namespace QHSE.Server.Controllers
 
                 _listaActas = _mapper.Map<List<ActaDTO>>(query.ToList());
 
-                _response = new ResponseDTO<List<ActaDTO>>() { status = true, msg = "ok", value = _listaActas };
+                _response = new ResponseDTO<List<ActaDTO>>() { status = true, msg = "ok", value = _listaActas.OrderByDescending(x=>x.NroActa).ToList() };
 
                 return StatusCode(StatusCodes.Status200OK, _response);
             }
