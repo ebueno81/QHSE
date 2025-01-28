@@ -184,7 +184,7 @@ namespace QHSE.Server.Controllers
                 
                 IQueryable<Usuario> query = await _usuarioRepositorio.Consultar();
                 query = query.Include(c => c.IdCreateNavigation)
-                        .Where(c => c.IdCreateNavigation.Activo == 1 && c.NomUsua ==request.NomUsua && c.ClaveUsua==request.ClaveUsua)
+                        .Where(c => c.IdCreateNavigation.Activo == 1 && c.NomUsua == request.NomUsua && c.ClaveUsua==request.ClaveUsua)
                         .Include(p => p.IdTrabaNavigation)
                         .Include(t => t.IdTpoUsuaNavigation);
 
