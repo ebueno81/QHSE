@@ -73,5 +73,23 @@ namespace QHSE.Server.Repositorio.Implementacion
                 throw;
             }
         }
+
+        public async Task<int?> ObtenerPenultimoIdActa()
+        {
+            try
+            {
+                return await _dbContext.Acta
+                    .Where(a => a.IdCreateNavigation.Activo == 1)
+                    .OrderByDescending(a => a.NroActa)
+                    .Skip(1)
+                    .Select(a => (int?)a.IdActa)
+                    .FirstOrDefaultAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
     }
 }

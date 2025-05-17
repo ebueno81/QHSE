@@ -10,5 +10,7 @@ namespace QHSE.Server.Repositorio.Contrato
         Task<Creacion> Crear(Creacion entidad);
         Task<bool> Editar(Creacion entidad);
         Task<IQueryable<Actum>> Consultar(Expression<Func<Actum, bool>> filtro = null);
+        Task<int?> ObtenerPenultimoIdActa();
+
     }
 }

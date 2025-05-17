@@ -8,10 +8,12 @@ namespace QHSE.Server.Repositorio.Implementacion
     public class InspeccionRepositorio:IInspeccionRepositorio
     {
         private readonly DbQhseContext _dbContext;
+        private readonly IActaRepositorio _actaRepositorio;
 
-        public InspeccionRepositorio(DbQhseContext dbContext)
+        public InspeccionRepositorio(DbQhseContext dbContext, IActaRepositorio actaRepositorio)
         {
             _dbContext = dbContext;
+            _actaRepositorio = actaRepositorio;
             _dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(30));
         }
 
@@ -86,7 +88,12 @@ namespace QHSE.Server.Repositorio.Implementacion
             {
                 if (numVerificacion == 3)// verificacion anterior 
                 {
-                    IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInspNavigation.IdActa < idInspeccion && d.IdInspNavigation.IdArea==idArea);
+                    int? penultimoIdActa = await _actaRepositorio.ObtenerPenultimoIdActa();
+
+                    if (penultimoIdActa == null)
+                        return Enumerable.Empty<InspeccionDet>().AsQueryable();
+
+                    IQueryable<InspeccionDet> queryEntidad = _dbContext.InspeccionDets.Where(d => d.IdInspNavigation.IdActa == penultimoIdActa && d.IdInspNavigation.IdArea==idArea);
                     return queryEntidad;
                 }
                 else

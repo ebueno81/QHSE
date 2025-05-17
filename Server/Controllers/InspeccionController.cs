@@ -128,9 +128,6 @@ namespace QHSE.Server.Controllers
                     _listaInspeccion = _mapper.Map<List<InspeccionDetDTO>>(query.ToList());
                 }
                
-
-                
-
                 if (_listaInspeccion.Count > 0)
                     _response = new ResponseDTO<List<InspeccionDetDTO>>() { status = true, msg = "ok", value = _listaInspeccion.ToList() };
                 else
@@ -140,7 +137,6 @@ namespace QHSE.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 _response = new ResponseDTO<List<InspeccionDetDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }

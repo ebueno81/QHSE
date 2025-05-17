@@ -52,7 +52,7 @@
             <MudText Typo="Typo.h5" GutterBottom="true">Inspección Nro.2</MudText>
         }
     }
-    
+
 
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
 
@@ -62,16 +62,17 @@
 
 
             <MudItem xs="12" sm="2">
+                <!--Modo Editar-->
                 @if(codigoInspeccion>0 && _actaSeleccionado != null)
                 {
 
                     <MudTextField @bind-Value="@_actaSeleccionado.FechaProg" Class="mb-1" Disabled
-                              Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
                 }
                 else
                 {
                     <MudSelect Label="Fecha Acta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                           @bind-Value="_actaSeleccionado" Disabled="vDisabledIngresos">
+                    @bind-Value="_actaSeleccionado" Disabled="vDisabledIngresos">
                         @if (listaActas.Any())
                         {
                             foreach (var data in listaActas)
@@ -81,12 +82,12 @@
                         }
                     </MudSelect>
                 }
-                
+
             </MudItem>
 
             <MudItem xs="12" sm="2">
                 <MudSelect Label="Tipo Inspeccion" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                           @bind-Value="_tipoSeleccionado" Disabled="vDisabledIngresos">
+                @bind-Value="_tipoSeleccionado" Disabled="vDisabledIngresos">
                     @if (listaTipoInspeccion.Any())
                     {
                         foreach (var tipo in listaTipoInspeccion)
@@ -98,15 +99,16 @@
             </MudItem>
 
             <MudItem xs="12" sm="2">
+                <!--Modo Editar-->
                 @if (codigoInspeccion>0)
                 {
                     <MudTextField @bind-Value="@_inspeccion.Area" Class="mb-1" Disabled
-                              Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    Label="Area" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Badge" />
                 }
                 else
                 {
                     <MudSelect T="string" Label="Area" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Class="mb-1"
-                           ValueChanged="ObtenerPlantilla">
+                    ValueChanged="ObtenerPlantilla">
                         @if (listaAreas.Any())
                         {
                             foreach (var area in listaAreas)
@@ -120,25 +122,25 @@
 
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Supervisor" @bind-Value="_trabajadorSeleccionado" SearchFunc="@BuscarTrabajador"
-                                 ResetValueOnEmptyText="true"
-                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
-                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                 Disabled="vDisabledIngresos"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
+                ResetValueOnEmptyText="true"
+                AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
+                Variant="Variant.Outlined" Margin="Margin.Dense"
+                Disabled="vDisabledIngresos"
+                ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="TrabajadorDTO" Label="Buscar Jefe de area" @bind-Value="_jefeareaSeleccionado" SearchFunc="@BuscarJefes"
-                                 ResetValueOnEmptyText="true"
-                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
-                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                 Disabled="vDisabledIngresos"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
+                ResetValueOnEmptyText="true"
+                AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Primary"
+                Variant="Variant.Outlined" Margin="Margin.Dense"
+                Disabled="vDisabledIngresos"
+                ToStringFunc="@(e => e == null ? null : $"{e.NombreApellido}")" />
             </MudItem>
 
             <MudItem xs="12" sm="3">
                 <MudDatePicker Label="Fecha" Margin="Margin.Dense" Variant="Variant.Outlined" Class="d-block" @bind-Date="vFecha" Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy"
-                               Disabled="vDisabledIngresos" />
+                Disabled="vDisabledIngresos" />
             </MudItem>
 
 
@@ -152,10 +154,10 @@
 
         <MudItem xs="12">
             <MudTable Items="@_inspeccion.InspeccionDets" RowsPerPage="appData.nFilas"
-                      Striped="true" Bordered="true" Dense="true"
-                      Filter="new Func<InspeccionDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
-                      Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
-                      GroupBy="@_groupDefinition">
+            Striped="true" Bordered="true" Dense="true"
+            Filter="new Func<InspeccionDetDTO,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem2"
+            Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info"
+            GroupBy="@_groupDefinition">
                 <ColGroup>
                     <col/>
                     <col/>
@@ -174,15 +176,15 @@
                     <MudTh>Pregunta</MudTh>
                     <MudTh>Realizado</MudTh>
                     <MudTh>Imagen</MudTh>
-                     @if(estadoRegistro != 0)
-                     {
-                         <MudTh></MudTh>
-                     }
+                    @if(estadoRegistro != 0)
+                    {
+                        <MudTh></MudTh>
+                    }
                     <MudTh>Observacion</MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
                     <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.Key}")</MudTh>
-                    </GroupHeaderTemplate>
+                </GroupHeaderTemplate>
                 <RowTemplate Context="registroRow">
 
                     <MudTd DataLabel="Nro">@registroRow.NroOrden</MudTd>
@@ -193,15 +195,15 @@
                         {
                             if(registroRow.OpcSelect1=="0")
                             {
-                                 <MudTd DataLabel="Realizado">No</MudTd>
+                                <MudTd DataLabel="Realizado">No</MudTd>
                             }
                             if(registroRow.OpcSelect1=="1")
                             {
-                                 <MudTd DataLabel="Realizado">Si</MudTd>
+                                <MudTd DataLabel="Realizado">Si</MudTd>
                             }
                             if(registroRow.OpcSelect1=="2")
                             {
-                                 <MudTd DataLabel="Realizado">NA</MudTd>
+                                <MudTd DataLabel="Realizado">NA</MudTd>
                             }
                         }
                         else
@@ -223,29 +225,29 @@
                                 </MudRadioGroup>
                             }
                         }
-                        
+
                     </MudTd>
-                 
-                     @if(estadoRegistro != 0)
+
+                    @if(estadoRegistro != 0)
                     {
                         <MudTd>
                             <InputFile accept="image/png, image/gif, image/jpeg , image/jpg;capture=camera" id="fileInput" OnChange="UploadFilesDTO" hidden multiple />
                             <MudButton HtmlTag="label" style="width: 5%;"
-                                Variant="Variant.Filled"
-                                Color="MudBlazor.Color.Success"
-                                StartIcon="@Icons.Filled.CloudUpload"
-                                for="fileInput"
-                                OnClick="@(()=> EditarRegistro(registroRow,1))">
+                            Variant="Variant.Filled"
+                            Color="MudBlazor.Color.Success"
+                            StartIcon="@Icons.Filled.CloudUpload"
+                            for="fileInput"
+                            OnClick="@(()=> EditarRegistro(registroRow,1))">
                             </MudButton>
                             <MudButton HtmlTag="label" style="width: 5%;"
-                                Variant="Variant.Filled"
-                                Color="MudBlazor.Color.Error"
-                                StartIcon="@Icons.Filled.CameraAlt"
-                                   OnClick="@(() => AbrirCamara(registroRow))">
+                            Variant="Variant.Filled"
+                            Color="MudBlazor.Color.Error"
+                            StartIcon="@Icons.Filled.CameraAlt"
+                            OnClick="@(() => AbrirCamara(registroRow))">
                             </MudButton>
                         </MudTd>
                     }
-                       
+                    <!--Validamos estado-->
                     @if (estadoRegistro == 2)
                     {
                         if (registroRow.Foto2 != null)
@@ -255,7 +257,7 @@
                                 var imgSrc2 = "data:image/jpg;base64," + Convert.ToBase64String(registroRow.Foto2);
                                 <MudTd DataLabel="Image">
                                     <img width="35" height="40" src="@imgSrc2" @onclick="(()=>AbrirImagen(registroRow,imgSrc2))" />
-                                        @if(estadoRegistro != 0)
+                                    @if(estadoRegistro != 0)
                                     {
                                         <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
                                     }
@@ -276,15 +278,15 @@
                                     {
                                         <MudIconButton Color="MudBlazor.Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(_ => RemoveImg(registroRow.IdInspDet))" aria-label="delete"></MudIconButton>
                                     }
-                                    </MudTd>
-                                }
-                                else
-                                {
-                                    <MudTd DataLabel="Image">
-                                        &nbsp;
-                                    </MudTd>
-                                }
+                                </MudTd>
                             }
+                            else
+                            {
+                                <MudTd DataLabel="Image">
+                                    &nbsp;
+                                </MudTd>
+                            }
+                        }
                         else
                         {
                             <MudTd DataLabel="Image">
@@ -292,27 +294,27 @@
                             </MudTd>
                         }
                     }
-                    
-                        
-                 
+
+
+
                     <MudTd DataLabel="Observacion">
-                         @if(estadoRegistro == 0)
-                            {
-                               @registroRow.Obs1
-                            }
+                        @if(estadoRegistro == 0)
+                        {
+                            @registroRow.Obs1
+                        }
                         else
                         {
                             <MudButton HtmlTag="label" style="width: 5%;"
-                                                               Variant="Variant.Filled"
-                                                               Color="MudBlazor.Color.Success"
-                                                               StartIcon="@Icons.Filled.DocumentScanner"
-                                                               OnClick="@(()=> AbrirObservacion(registroRow))">
-                                                        </MudButton>
+                            Variant="Variant.Filled"
+                            Color="MudBlazor.Color.Success"
+                            StartIcon="@Icons.Filled.DocumentScanner"
+                            OnClick="@(()=> AbrirObservacion(registroRow))">
+                            </MudButton>
                         }
-                            
+
                     </MudTd>
                 </RowTemplate>
-                 
+
                 <PagerContent>
                     <MudTablePager />
                 </PagerContent>
@@ -320,19 +322,19 @@
             </MudTable>
 
         </MudItem>
-        
+
     </MudPaper>
-    
+
 
     <br />
-    
+
     @if(estadoRegistro>0)
     {
         <MudButton Variant="Variant.Filled" Disabled="disableButton" Color="MudBlazor.Color.Primary" OnClick="Guardar">Grabar</MudButton>
     }
     &nbsp;&nbsp;
     <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Disabled="@disableButtonCancel" OnClick="LlamarCabecera">Cancelar</MudButton>
-  
+
 </MudContainer>
 
 @code {
@@ -681,7 +683,6 @@
 
             }
 
-            //  UltimaInspeccion(_actaSeleccionado.IdActa, _areaSeleccionado.IdArea);
             List<InspeccionDetDTO> InspeccionDetsAnt = new List<InspeccionDetDTO>();
 
             var result3 = await _inspeccionServicio.ListaDetalles(_actaSeleccionado.IdActa, vCodigoArea, 3);
@@ -735,7 +736,10 @@
 
     }
 
+    int lastIdActaPrevious(){
 
+        return 1;
+    }
 
     private bool FilterFunc1(InspeccionDetDTO element) => FilterFunc(element, searchString1);
 

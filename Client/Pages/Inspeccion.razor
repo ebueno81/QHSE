@@ -118,12 +118,14 @@
                         <MudTd DataLabel="Supervisor">@registroRow.Fecha</MudTd>
 
                         <MudTd DataLabel="">
-                            
+                            <!--Modo mostrar-->
                             <MudFab Color="Color.Tertiary"
                                     StartIcon="@Icons.Material.Filled.RemoveRedEye"
                                     Size="Size.Small"
                                     IconSize="Size.Small"
                                     OnClick="@(() => AbrirEditar(registroRow.IdInsp,0))" />
+
+                            <!--Modo Editar primera o segunda inspeccion-->
                             <AuthorizeView Roles="Administrador,Supervisor,Usuario">
                                 <Authorized>
                                     <MudFab Color="Color.Warning"
@@ -133,6 +135,8 @@
                                             OnClick="@(() => EditarInspeccionV2(registroRow))" />
                                 </Authorized>
                             </AuthorizeView>
+
+                            <!--Modo Eliminar-->
                             <AuthorizeView Roles="Administrador">
                                 <Authorized>
                                     <MudFab Color="Color.Error"
@@ -143,6 +147,7 @@
                                 </Authorized>
                             </AuthorizeView>
 
+                            <!--PDF-->
                             <MudFab Color="Color.Info"
                                     StartIcon="@Icons.Material.Filled.PictureAsPdf"
                                     Size="Size.Small"
@@ -213,6 +218,7 @@
 
     private async Task AbrirEditar(int codigoInspeccion, int estadoRegistro)
     {
+        // lo envia con estado = 0 solo muestra
         _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + codigoInspeccion+ "/" + estadoRegistro);
     }
 
@@ -262,20 +268,11 @@
             });
 
         if (result.IsConfirmed)
-        {
-            //_snackBar.Add("1ra Inspeccion", Severity.Error, a => a.VisibleStateDuration = 500);
             _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + model.IdInsp + "/" + 1);
-        }
         else
         {
             if(result.IsDenied)
-            {
                 _navigationManager.NavigateTo("/page/RegistroInspeccionDet/" + model.IdInsp + "/" + 2);
-            }
-            else
-            {
-                //_snackBar.Add("Cancelado", Severity.Error, a => a.VisibleStateDuration = 500);
-            }
         }
     }
 
@@ -328,10 +325,8 @@
             }
 
             if (valorRecibido == "4")
-            {
-                ExportarExcel(codigoInspeccion);
-            }
-
+                await ExportarExcel(codigoInspeccion);
+           
         }
     }
 
@@ -393,11 +388,6 @@
             }
 
         }
-
-
-
-
-
     }
 
     class listaRegistros
@@ -408,7 +398,6 @@
         public string? Categoria { get; set; }
         public int? IdSubCategoria { get; set; }
         public string? SubCategoria { get; set; }
-
     }
 
 }
