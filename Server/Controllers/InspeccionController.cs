@@ -55,7 +55,6 @@ namespace QHSE.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 _response = new ResponseDTO<List<InspeccionDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }
@@ -86,15 +85,12 @@ namespace QHSE.Server.Controllers
                         .Include(p => p.IdSuper1Navigation);
 
                 _listaInspeccions = _mapper.Map<List<InspeccionDTO>>(query.ToList());
-
-
                 _response = new ResponseDTO<List<InspeccionDTO>>() { status = true, msg = "ok", value = _listaInspeccions };
 
                 return StatusCode(StatusCodes.Status200OK, _response);
             }
             catch (Exception ex)
             {
-
                 _response = new ResponseDTO<List<InspeccionDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }

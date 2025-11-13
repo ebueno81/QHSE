@@ -345,12 +345,10 @@
     // variables that work only with photo taking
     bool encenderCamara = false;
     //private string captionText;
-    private string frameUri;
-
+    string frameUri;
     FontCollection collection = new FontCollection();
     FontFamily sansFamily;
     Font captionFont;
-
 
     private void AbrirImagen(InspeccionDetDTO model, string rutaImagen)
     {
@@ -376,7 +374,6 @@
                 FullWidth = true
             };
         var parameters = new DialogParameters<MdObservacion>();
-
 
         parameters.Add(x => x.codigoMandado, model.IdInspDet);
 
@@ -409,20 +406,11 @@
                 FullWidth = false
             };
         var parameters = new DialogParameters<MdCamara>();
-
-
         parameters.Add(x => x.model, model);
         parameters.Add(x => x.estadoRegistro, estadoRegistro);
 
-        //   parameters.Add(x => x.codigoMandado, 0);
-
         var result = await this._DialogService.Show<MdCamara>("Tomar Foto", parameters, options).Result;
 
-        ////validamos el resultado para actualizar
-        if (result.Data != null)
-        {
-
-        }
     }
 
     private TableGroupDefinition<InspeccionDetDTO> _groupDefinition = new()
@@ -502,7 +490,7 @@
         }
     }
 
-    private async Task UploadFilesDTO(InputFileChangeEventArgs e)
+    async Task UploadFilesDTO(InputFileChangeEventArgs e)
     {
         int conta = 0;
 
@@ -540,7 +528,7 @@
 
     }
 
-    private void RemoveImg(int codigoInspeccionDet)
+    void RemoveImg(int codigoInspeccionDet)
     {
         //save.Files.Remove(file);
         var modeloPlantilla = _inspeccion.InspeccionDets.Where(x => x.IdInspDet == codigoInspeccionDet).First();
@@ -555,7 +543,8 @@
     }
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
-    private void UploadFiles(IBrowserFile file)
+
+    void UploadFiles(IBrowserFile file)
     {
 
         files.Add(file);
@@ -565,13 +554,13 @@
         //TODO upload the files to the server
     }
 
-    private void UploadFiles2(IBrowserFile file)
+    void UploadFiles2(IBrowserFile file)
     {
         files.Add(file);
         //TODO upload the files to the server
     }
 
-    private void Validar()
+    void Validar()
     {
         string prueba = "";
         foreach (var data in _inspeccion.InspeccionDets)
@@ -583,7 +572,6 @@
     //cargar listas
     protected override async Task OnInitializedAsync()
     {
-
         ObtenerAreas();
         ObtenerActa();
         ObtenerTipoInspeccion();
@@ -596,62 +584,86 @@
                 vDisabledIngresos = true;
         }
         else
-        {
             _loading = false;
-        }
-
 
     }
 
-    private async Task ObtenerInspeccion()
+    async Task ObtenerInspeccion()
     {
-        var resultC = await _inspeccionServicio.Lista(codigoInspeccion);
-
-        if (resultC.status)
+        try
         {
+            // Iniciar loading
+            _loading = true;
+            myImageClass = "d-block";
+            StateHasChanged();
 
-            _inspeccion = resultC.value.First();
-            vFecha = _inspeccion.Fecha ?? default(DateTime);
-            vCodigoArea = _inspeccion.IdArea ?? default(int);
+            var resultC = await _inspeccionServicio.Lista(codigoInspeccion);
 
-            var response = await _trabajadorServicio.Lista();
-            if (estadoRegistro==2)
-                _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper2);            
-            else
-                _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);            
-
-            _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
-
-            _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
-            _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
-            _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
-            //    StateHasChanged();
-
-
-        }
-
-        var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion,0, estadoRegistro);
-
-        if (result.status)
-        {
-
-            _inspeccion.InspeccionDets = result.value;
-            if (estadoRegistro==2)
+            if (resultC.status)
             {
-                foreach (var data in _inspeccion.InspeccionDets.Where(x=>x.OpcSelect1=="0"))
-                {
-                    data.OpcSelect2 = "1";
-                }
+                _inspeccion = resultC.value.First();
+                vFecha = _inspeccion.Fecha ?? default(DateTime);
+                vCodigoArea = _inspeccion.IdArea ?? default(int);
+
+                var response = await _trabajadorServicio.Lista();
+
+                if (estadoRegistro == 2)
+                    _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper2);
+                else
+                    _trabajadorSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdSuper1);
+
+                _jefeareaSeleccionado = response.value.FirstOrDefault(x => x.IdTraba == _inspeccion.IdJefeArea);
+                _areaSeleccionado = listaAreas.FirstOrDefault(x => x.IdArea == _inspeccion.IdArea);
+                _tipoSeleccionado = listaTipoInspeccion.FirstOrDefault(x => x.IdTpoInsp == _inspeccion.IdTpoInsp);
+                _actaSeleccionado = listaActas.FirstOrDefault(x => x.IdActa == _inspeccion.IdActa);
+            }
+            else
+            {
+                // ⚠️ Cortar el spinner y mostrar error
+                _loading = false;
+                myImageClass = "d-none";
+                StateHasChanged();
+                return;
             }
 
-            myImageClass = "d-none";
+            var result = await _inspeccionServicio.ListaDetalles(codigoInspeccion, 0, estadoRegistro);
 
+            if (result.status)
+            {
+                _inspeccion.InspeccionDets = result.value;
+
+                if (estadoRegistro == 2)
+                {
+                    foreach (var data in _inspeccion.InspeccionDets.Where(x => x.OpcSelect1 == "0"))
+                    {
+                        data.OpcSelect2 = "1";
+                    }
+                }
+            }
+            else
+            {
+                // ⚠️ Cortar spinner si el detalle viene con error
+                _loading = false;
+                myImageClass = "d-none";
+                StateHasChanged();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Opcional: mostrar error
+            Console.WriteLine("Error: " + ex.Message);
+        }
+        finally
+        {
+            // Asegura apagar siempre el spinner
             _loading = false;
+            myImageClass = "d-none";
             StateHasChanged();
         }
     }
 
-    private async Task ObtenerPlantilla(string codigoArea)
+    async Task ObtenerPlantilla(string codigoArea)
     {
         var result = await _plantillaServicio.Lista(int.Parse(codigoArea),1);
         if (result.status)
@@ -741,9 +753,9 @@
         return 1;
     }
 
-    private bool FilterFunc1(InspeccionDetDTO element) => FilterFunc(element, searchString1);
+    bool FilterFunc1(InspeccionDetDTO element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(InspeccionDetDTO element, string searchString)
+    bool FilterFunc(InspeccionDetDTO element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -759,7 +771,7 @@
     List<AreaDTO> listaAreas = new List<AreaDTO>();
     private AreaDTO _areaSeleccionado;
 
-    private async Task ObtenerAreas()
+    async Task ObtenerAreas()
     {
         var response = await _areaServicio.Lista();
 
@@ -774,10 +786,10 @@
 
     //listar tipos de inspeccion
     List<TipoInspeccionDTO> listaTipoInspeccion = new List<TipoInspeccionDTO>();
-    private TipoInspeccionDTO _tipoSeleccionado;
+    TipoInspeccionDTO _tipoSeleccionado;
 
 
-    private async Task ObtenerTipoInspeccion()
+    async Task ObtenerTipoInspeccion()
     {
         var response = await _tipoinspeccionServicio.Lista();
 
@@ -790,12 +802,10 @@
         }
     }
 
-    //listar actas
     List<ActaDTO> listaActas = new List<ActaDTO>();
-    private ActaDTO _actaSeleccionado;
+    ActaDTO _actaSeleccionado;
 
-
-    private async Task ObtenerActa()
+    async Task ObtenerActa()
     {
         var response = await _actaServicio.Lista();
 
@@ -809,11 +819,10 @@
         }
     }
 
-    //listar trabajadores
     List<TrabajadorDTO> listaTrabajadores = new List<TrabajadorDTO>();
-    private TrabajadorDTO _trabajadorSeleccionado;
+    TrabajadorDTO _trabajadorSeleccionado;
 
-    private async Task<IEnumerable<TrabajadorDTO>> BuscarTrabajador(string valor)
+    async Task<IEnumerable<TrabajadorDTO>> BuscarTrabajador(string valor)
     {
         var response = await _trabajadorServicio.Lista();
 

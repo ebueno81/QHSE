@@ -276,12 +276,12 @@
         }
     }
 
-    private void LlamarDetalle()
+    void LlamarDetalle()
     {
         _navigationManager.NavigateTo("/page/RegistroInspeccionDet/0/1");
     }
 
-    private async Task ImprimirPDF(int codigoInspeccion, int numVerificacion)
+    async Task ImprimirPDF(int codigoInspeccion, int numVerificacion)
     {
 
         string rutaUrl = $"{appData.urlReporte}api/inspeccion/imprimirReporte?codigoInspeccion={codigoInspeccion}&numVerificacion={numVerificacion}";
@@ -289,7 +289,7 @@
     }
 
 
-    private async Task SeleccionarImpresion(int codigoInspeccion, int numVerificacion, int tipoReporte)
+    async Task SeleccionarImpresion(int codigoInspeccion, int numVerificacion, int tipoReporte)
     {
         var options = new MudBlazor.DialogOptions
             {
