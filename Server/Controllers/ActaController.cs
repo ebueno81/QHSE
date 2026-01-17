@@ -16,10 +16,10 @@ namespace QHSE.Server.Controllers
     [ApiController]
     public class ActaController : ControllerBase
     {
-        private readonly IMapper _mapper;
-        private readonly IActaRepositorio _areaRepositorio;
-        private IWebHostEnvironment _hostingEnvironment;
-        private readonly IConfiguration _configuration;
+        readonly IMapper _mapper;
+        readonly IActaRepositorio _areaRepositorio;
+        IWebHostEnvironment _hostingEnvironment;
+        readonly IConfiguration _configuration;
 
         public ActaController(IActaRepositorio articuloRepositorio, IMapper mapper, IConfiguration configuration, 
             IWebHostEnvironment hostingEnvironment)
@@ -28,7 +28,6 @@ namespace QHSE.Server.Controllers
             _areaRepositorio = articuloRepositorio;
             _hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
-
         }
 
         [HttpGet]
@@ -59,7 +58,6 @@ namespace QHSE.Server.Controllers
                 _response = new ResponseDTO<List<ActaDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }
-
         }
 
         [HttpPost]
@@ -67,7 +65,6 @@ namespace QHSE.Server.Controllers
         [Route("Guardar")]
         public async Task<IActionResult> Guardar([FromBody] CreacionDTO request)
         {
-
             ResponseDTO<CreacionDTO> _ResponseDTO = new ResponseDTO<CreacionDTO>();
 
             try
@@ -76,7 +73,6 @@ namespace QHSE.Server.Controllers
                 _Acta.FechaCrea = DateTime.Now;
 
                 Creacion _ActaCreado = await _areaRepositorio.Crear(_Acta);
-
 
                 if (_ActaCreado.IdCreate != 0)
                     _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = true, msg = "ok", value = _mapper.Map<CreacionDTO>(_ActaCreado) };
@@ -88,12 +84,9 @@ namespace QHSE.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 _ResponseDTO = new ResponseDTO<CreacionDTO>() { status = false, msg = ex.Message };
                 return StatusCode(StatusCodes.Status500InternalServerError, _ResponseDTO);
             }
-
-
         }
 
         [HttpPut]
@@ -101,7 +94,6 @@ namespace QHSE.Server.Controllers
         [Route("Editar")]
         public async Task<IActionResult> Editar([FromBody] CreacionDTO request)
         {
-
             ResponseDTO<bool> _ResponseDTO = new ResponseDTO<bool>();
 
             try
@@ -111,7 +103,6 @@ namespace QHSE.Server.Controllers
 
                 if (_ActaEditar.IdCreate != null)
                 {
-                   
                     _ActaEditar.FechaModi = DateTime.Now;
                     _ActaEditar.UsuaModi = _Acta.UsuaModi;
                     _ActaEditar.PcModi = _Acta.PcModi;
@@ -130,19 +121,13 @@ namespace QHSE.Server.Controllers
                 }
 
                 return StatusCode(StatusCodes.Status200OK, _ResponseDTO);
-
             }
             catch (Exception ex)
             {
-
                 _ResponseDTO = new ResponseDTO<bool>() { status = false, msg = ex.Message };
                 return StatusCode(StatusCodes.Status500InternalServerError, _ResponseDTO);
             }
-
-
         }
-
-
 
         [HttpGet]
         [Route("imprimirReporte")]
@@ -155,12 +140,8 @@ namespace QHSE.Server.Controllers
             var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Reportes", "RptActa.frx");
             report.RegisterData(listaActas, "DataSet1");
             report.Load(path);
-            
-
-         //   report.SetParameterValue("Titulo","Reporte de Actas");
 
             report.Prepare();
-
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -169,12 +150,6 @@ namespace QHSE.Server.Controllers
                 ms.Flush();
                 return File(ms.ToArray(), "application/pdf");
             }
-
-
         }
-
-
     }
-
-
 }

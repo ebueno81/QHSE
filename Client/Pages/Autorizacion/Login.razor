@@ -34,7 +34,6 @@
         {
             <center><MudInputLabel style="cursor:pointer" onclick="@CancelarClave">Cancelar Recuperacion de clave</MudInputLabel></center>
         }
-
     </EditForm>
 }
 else
@@ -45,7 +44,6 @@ else
         <DataAnnotationsValidator></DataAnnotationsValidator>
 
         <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">Bienvenido</MudText>
-
 
         <MudTextField T="string"
                   @bind-Value="@usuarioLogin.Usuario1"
@@ -78,9 +76,7 @@ else
     {
         <center><MudInputLabel style="cursor:pointer" onclick="@RecuperarClave">¿Desea recupera tu contraseña?</MudInputLabel></center>
     }
-
 }
-
 
 @code {
     [Parameter]
@@ -99,22 +95,12 @@ else
     bool _recuperarClave = false, _recuperacion = false;
     string _usuarioRecuperarClave;
 
-
-    private config[] _config;
-
-    //private async Task leerJson()
-    //{
-
-    //    _config = await _http.GetFromJsonAsync<config[]>("config2.json");
-
-    //}
-
+    config[] _config;
 
     public class config
     {
         public string rutaReporte { get; set; }
     }
-
 
     void TogglePasswordVisibility()
     {
@@ -131,22 +117,15 @@ else
             PasswordInput = InputType.Text;
         }
     }
-    protected override async Task OnInitializedAsync()
-    {
 
-
-    }
-
-
-
-    private async Task CancelarClave()
+    async Task CancelarClave()
     {
         _recuperarClave = false;
         myImageClass = "d-none";
         disableButton = false;
     }
 
-    private async Task RecuperarClave()
+    async Task RecuperarClave()
     {
         if (_recuperarClave)
         {
@@ -171,7 +150,6 @@ else
             disableButton = false;
             _recuperarClave = false;
             _recuperacion = false;
-
         }
         else
         {
@@ -184,9 +162,7 @@ else
         }
     }
 
-
-
-    private async Task OnValidSubmit()
+    async Task OnValidSubmit()
     {
         List<UsuarioDTO> listaUsuarios = new List<UsuarioDTO>();
         List<TrabajadorDTO> listaTrabjadores = new List<TrabajadorDTO>();
@@ -200,7 +176,6 @@ else
 
         if (result.status)
         {
-
             appData.idPedido = 0;
 
             string currentUrl = _navigationManager.Uri;
@@ -218,8 +193,6 @@ else
                 }
             }
 
-
-
             listaUsuarios = (List<UsuarioDTO>)result.value!;
             usuarioDTO = listaUsuarios.FirstOrDefault();
 
@@ -228,24 +201,14 @@ else
             appData.idUsuario = usuarioDTO.IdUsua;
             appData.usuarioRol = usuarioDTO.TipoUsuario;
             appData.idTraba = usuarioDTO.IdTraba;
-            //appData.idVendedor = usuarioDTO.IdVendedor;
             appData.empresa = "FastDye S.A.C.";
 
             var mobile = await _jsServicio.InvokeAsync<bool>("isDevice");
             string isDevice = mobile ? "Mobile" : "Desktop";
-            //appData.xs6 = 6;
-            //appData.xs5 = 5;
-            //appData.xs4 = 4;
-            //appData.xs3 = 3;
-            //appData.xs2 = 2;
-            //appData.xs1 = 1;
-            //appData.xs46 = 4;
-
 
             // enviammos la ruta del reporte //
             _config = await _http.GetFromJsonAsync<config[]>("configSomee.json");
             appData.urlReporte = _config.First().rutaReporte;
-
 
             if (mobile)
             {

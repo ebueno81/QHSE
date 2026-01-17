@@ -104,20 +104,17 @@
     List<ActaDTO> listaActas = new List<ActaDTO>();
 
 
-    private string searchString1 = "";
-    private ActaDTO selectedItem1 = null;
-    private bool _loading = true;
+    string searchString1 = "";
+    ActaDTO selectedItem1 = null;
+    bool _loading = true;
 
-    private async Task ObtenerActas()
+    async Task ObtenerActas()
     {
         var result = await _actaServicio.Lista();
 
         if (result.status)
-        {
             listaActas = (List<ActaDTO>)result.value!;
-        }
     }
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,14 +125,13 @@
         }
         catch (Exception)
         {
-
             _snackBar.Add("Acceso indebido...", Severity.Error, a => a.VisibleStateDuration = 500);
         }
     }
 
-    private bool FilterFunc1(ActaDTO element) => FilterFunc(element, searchString1);
+    bool FilterFunc1(ActaDTO element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(ActaDTO element, string searchString)
+    bool FilterFunc(ActaDTO element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -151,12 +147,10 @@
         var resultado = await dialogo.Result;
 
         if (!resultado.Canceled)
-        {
             await ObtenerActas();
-        }
     }
 
-    private async Task AbrirEditar(ActaDTO model)
+    async Task AbrirEditar(ActaDTO model)
     {
         var parametros = new DialogParameters { ["_acta"] = model };
 
@@ -164,12 +158,10 @@
         var resultado = await dialogo.Result;
 
         if (!resultado.Canceled)
-        {
             await ObtenerActas();
-        }
     }
 
-    private async Task Eliminar(ActaDTO model)
+    async Task Eliminar(ActaDTO model)
     {
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
             {
@@ -188,7 +180,6 @@
             _creacion.UsuaAnula = appData.usuarioLogin;
             _creacion.PcAnula = Environment.MachineName;
 
-
             var resultado = await _creacionServicio.Anular(_creacion);
 
             if (resultado)
@@ -201,7 +192,7 @@
         }
     }
     
-    private async Task SeleccionarImpresion(int codigo)
+    async Task SeleccionarImpresion(int codigo)
     {
         var options = new MudBlazor.DialogOptions
             {
@@ -231,7 +222,6 @@
                 string rutaUrl = $"{appData.urlReporte}api/dashboard/imprimirConsolidado?codigo={codigo}";
                 _jsServicio.InvokeAsync<object>("open", rutaUrl, "_blank");
             }
-
         }
     }
 

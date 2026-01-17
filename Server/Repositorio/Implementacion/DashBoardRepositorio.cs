@@ -126,67 +126,61 @@ namespace QHSE.Server.Repositorio.Implementacion
 
         public async Task<List<ResumenDTO>> Consolidado(int idActa)
         {
-            
-            try
-            {
-                 List<ResumenDTO> resumen = new List<ResumenDTO>();
+            IQueryable<InspeccionDet> query = _dbContext.InspeccionDets
+                .Include(x => x.IdInspNavigation)
+                .Include(x => x.IdInspNavigation.IdAreaNavigation)
+                .Include(x => x.IdInspNavigation.IdEmpNavigation)
+                .Where(x => x.IdInspNavigation.IdActa == idActa);
 
-                IQueryable<InspeccionDet> query = _dbContext.InspeccionDets
-                    .Include(x => x.IdInspNavigation)
-                    .Include(a => a.IdInspNavigation.IdAreaNavigation)
-                    .Include(e => e.IdInspNavigation.IdEmpNavigation)
-                    .Where(ve => ve.IdInspNavigation.IdActa == idActa);
+            var resumen = query
+                .GroupBy(v => new
+                {
+                    v.IdInspNavigation.IdAreaNavigation.DescArea,
+                    v.IdInspNavigation.IdEmpNavigation.RazEmp,
+                    v.IdInspNavigation.IdActaNavigation.FechaProg
+                })
+                .Select(dv => new
+                {
+                    dv.Key,
+                    Total = dv.Count(),
+                    Ok1 = dv.Sum(x => x.OpcSelect1 == "1" ? 1 : 0),
+                    Ok2 = dv.Sum(x => x.OpcSelect2 == "1" ? 1 : 0)
+                })
+                .AsEnumerable() // ← evita problemas de traducción EF
+                .Select(x =>
+                {
+                    decimal porcentaje = x.Total == 0
+                        ? 0
+                        : (decimal)(x.Ok1 + x.Ok2) / x.Total;
 
-              
-                resumen = _mapper.Map<List<ResumenDTO>>(query.GroupBy(v => new { v.IdInspNavigation.IdAreaNavigation.DescArea, v.IdInspNavigation.IdEmpNavigation.RazEmp, v.IdInspNavigation.IdActaNavigation.FechaProg })
-                        .Select(dv => new ResumenDTO
-                        {
-                            Area = dv.Key.DescArea,
-                            Empresa = dv.Key.RazEmp,
-                            Fecha = dv.Key.FechaProg,
-                            Por1 = (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1 : 0) / Convert.ToDecimal(dv.Count())).ToString().Substring(2,2) + "%",
-                            Por2 = (dv.Sum(dv => dv.OpcSelect2 == "1" ? 1 : 0) / Convert.ToDecimal(dv.Sum(dv => dv.OpcSelect1 == "0" ? 1 : 0))).ToString().Substring(2,2) + "%",
-                            porcEfectivo = (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1 : 0) / Convert.ToDecimal(dv.Count())),
-                            Barra = (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1 : 0) / Convert.ToDecimal(dv.Count())) >= 0 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.1) ? "_"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.1 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.2) ? "__"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.2 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.3) ? "___"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.3 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.4) ? "____"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.4 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.5) ? "_____"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.5) &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.6) ? "______"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.6 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.7) ? "_______"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.7 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.8) ? "________"
-                                    :
-                                    (((dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) > 0.8 &&
-                                    (dv.Sum(dv => dv.OpcSelect1 == "1" ? 1.0 : 0.0) / dv.Count()) <= 0.9) ? "_________"
-                                    : "__________"))))))))
-                        }));
+                    return new ResumenDTO
+                    {
+                        Area = x.Key.DescArea,
+                        Empresa = x.Key.RazEmp,
+                        Fecha = x.Key.FechaProg,
 
-                
+                        Por1 = ((decimal)x.Ok1 / x.Total).ToString("P0"),
 
+                        Por2 = porcentaje.ToString("P0"),
 
-                return resumen;
+                        porcEfectivo = porcentaje,
 
-            }
-            catch
-            {
+                        Barra =
+                            porcentaje <= 0.1m ? "_" :
+                            porcentaje <= 0.2m ? "___" :
+                            porcentaje <= 0.3m ? "_____" :
+                            porcentaje <= 0.4m ? "______" :
+                            porcentaje <= 0.5m ? "_______" :
+                            porcentaje <= 0.6m ? "________" :
+                            porcentaje <= 0.7m ? "_________" :
+                            porcentaje <= 0.8m ? "__________" :
+                            porcentaje <= 0.9m ? "___________" :
+                                                 "_____________"
+                    };
+                })
+                .ToList();
 
-                throw;
-            }
+            return resumen;
         }
     }
 }
