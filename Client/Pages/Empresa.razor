@@ -16,9 +16,13 @@
     <MudPaper Elevation="3" Class="pa-4" Width="100%">
         <MudText Typo="Typo.h5" GutterBottom="true">Datos Empresa</MudText>
         <MudGrid>
-            <MudItem xs="12" sm="12">
+            <MudItem xs="12" sm="6">
                 <MudTextField @bind-Value="@_empresa.RazEmp" Class="mb-3"
                               Label="Empresa" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Fax" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="@_empresa.ActividadEmp" Class="mb-3"
+                              Label="Actividad" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Fax" />
             </MudItem>
         </MudGrid>
         <MudGrid>
@@ -55,7 +59,25 @@
                 <MudTextField @bind-Value="@_empresa.DptEmp" Class="mb-3"
                               Label="Departamento" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.AssistantPhoto" />
             </MudItem>
-          
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.CantTrabEmp" Class="mb-3"
+                              Label="Cantidad Trabajadores" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Person" />
+            </MudItem>
+        </MudGrid>
+
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.JefeSstr" Class="mb-3"
+                              Label="Jefe SSTR" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Person2" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.JefePlanta" Class="mb-3"
+                              Label="Jefe Planta" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Person3" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudTextField @bind-Value="@_empresa.JefeComite" Class="mb-3"
+                              Label="Jefe Comite" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Person4" />
+            </MudItem>
         </MudGrid>
     </MudPaper>
     <br /><br />
@@ -66,11 +88,8 @@
 </MudContainer>
 
 @code {
-
-
     List<EmpresaDTO> listaEmpresa = new List<EmpresaDTO>();
     public EmpresaDTO _empresa = new EmpresaDTO();
-
     string myImageClass { get; set; } = "d-none";
     bool disableButton = false;
 
@@ -86,73 +105,53 @@
                 if (listaEmpresa != null)
                 {
                     if (listaEmpresa.Count() > 0)
-                    {
                         _empresa = listaEmpresa.First();
-                    }
                 }
-
-
             }
         }
         catch (Exception)
         {
             _snackBar.Add("Bienvenido al sistema...", Severity.Warning, a => a.VisibleStateDuration = 500);
         }
-
-
-
-
     }
 
-    private void Cerrar()
+    void Cerrar()
     {
-
         _navigationManager.NavigateTo("/page/dashboard");
-
     }
-    private async Task GuardarEmpresa()
+
+    async Task GuardarEmpresa()
     {
         if (validarDatos())
         {
             myImageClass = "d-block";
             disableButton = true;
-
             string _mensaje = "";
             bool _resultado;
 
-
             if (_empresa.IdEmp != 0)
             {
-
                 _resultado = await _empresaServicio.Editar(_empresa);
                 _mensaje = "Empresa fue modificado";
-
             }
             else
             {
-
                 var response = await _empresaServicio.Crear(_empresa);
-
                 _resultado = response.status;
                 _mensaje = "Empresa fue creado";
             }
 
             if (_resultado)
-            {
                 _snackBar.Add(_mensaje, Severity.Success, a => a.VisibleStateDuration = 500);
-            }
             else
                 _snackBar.Add("Error al guardar cambios", Severity.Error, a => a.VisibleStateDuration = 500);
 
             myImageClass = "d-none";
             disableButton = false;
         }
-
-
     }
 
-
-    private bool validarDatos()
+    bool validarDatos()
     {
         if (_empresa != null)
         {
@@ -164,16 +163,12 @@
             {
                 _snackBar.Add("1. Error al guardar cambios debe ingresar el nombre de la empresa", Severity.Error, a => a.VisibleStateDuration = 500);
                 return false;
-
             }
         }
         else
         {
             _snackBar.Add("2. Error al guardar cambios", Severity.Error, a => a.VisibleStateDuration = 500);
             return false;
-
         }
-
     }
-
 }

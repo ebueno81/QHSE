@@ -11,6 +11,8 @@ public partial class Actum
 
     public DateTime? FechaProg { get; set; }
 
+    public DateTime? FechaLevanta { get; set; }
+
     public string? Obs { get; set; }
 
     public int? Estado { get; set; }

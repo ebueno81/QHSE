@@ -50,5 +50,15 @@ public partial class Empresa
     /// </summary>
     public string? DistEmp { get; set; }
 
+    public string? ActividadEmp { get; set; }
+
+    public int? CantTrabEmp { get; set; }
+
+    public string? JefeSstr { get; set; }
+
+    public string? JefePlanta { get; set; }
+
+    public string? JefeComite { get; set; }
+
     public virtual ICollection<Inspeccion> Inspeccions { get; set; } = new List<Inspeccion>();
 }

@@ -25,9 +25,13 @@ public partial class DbQhseContext : DbContext
 
     public virtual DbSet<Empresa> Empresas { get; set; }
 
+    public virtual DbSet<IncludeTableList> IncludeTableLists { get; set; }
+
     public virtual DbSet<Inspeccion> Inspeccions { get; set; }
 
     public virtual DbSet<InspeccionDet> InspeccionDets { get; set; }
+
+    public virtual DbSet<MnModulo> MnModulos { get; set; }
 
     public virtual DbSet<Plantilla> Plantillas { get; set; }
 
@@ -41,12 +45,12 @@ public partial class DbQhseContext : DbContext
 
     public virtual DbSet<Trabajador> Trabajadors { get; set; }
 
+    public virtual DbSet<UsuaPermiso> UsuaPermisos { get; set; }
+
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-       // => optionsBuilder.UseSqlServer("Data Source=192.168.173.200,1436; Trusted_Connection=false; TrustServerCertificate=True; Initial Catalog=DbQhse;user id=sa; pwd=ACEace11");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +58,7 @@ public partial class DbQhseContext : DbContext
         {
             entity.HasKey(e => e.IdActa);
 
+            entity.Property(e => e.FechaLevanta).HasColumnType("date");
             entity.Property(e => e.FechaProg).HasColumnType("date");
             entity.Property(e => e.NroActa).HasMaxLength(15);
             entity.Property(e => e.Obs).HasMaxLength(300);
@@ -139,6 +144,7 @@ public partial class DbQhseContext : DbContext
             entity.ToTable("Empresa");
 
             entity.Property(e => e.IdEmp).HasComment("Id Empresa");
+            entity.Property(e => e.ActividadEmp).HasMaxLength(150);
             entity.Property(e => e.CorreoEmp)
                 .HasMaxLength(100)
                 .HasComment("Correo Empresa");
@@ -151,6 +157,11 @@ public partial class DbQhseContext : DbContext
             entity.Property(e => e.DptEmp)
                 .HasMaxLength(30)
                 .HasComment("Departamento Emp");
+            entity.Property(e => e.JefeComite).HasMaxLength(250);
+            entity.Property(e => e.JefePlanta).HasMaxLength(250);
+            entity.Property(e => e.JefeSstr)
+                .HasMaxLength(250)
+                .HasColumnName("JefeSSTR");
             entity.Property(e => e.NroTelefono)
                 .HasMaxLength(20)
                 .HasComment("N° Telefono");
@@ -163,6 +174,17 @@ public partial class DbQhseContext : DbContext
             entity.Property(e => e.RucEmp)
                 .HasMaxLength(11)
                 .HasComment("Ruc Empresa");
+        });
+
+        modelBuilder.Entity<IncludeTableList>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("include_table_list");
+
+            entity.Property(e => e.TableName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Inspeccion>(entity =>
@@ -250,6 +272,24 @@ public partial class DbQhseContext : DbContext
             entity.HasOne(d => d.IdSubCtgNavigation).WithMany(p => p.InspeccionDets)
                 .HasForeignKey(d => d.IdSubCtg)
                 .HasConstraintName("FK_InspeccionDet_SubCategoria");
+        });
+
+        modelBuilder.Entity<MnModulo>(entity =>
+        {
+            entity.HasKey(e => e.Codigo);
+
+            entity.Property(e => e.Codigo)
+                .HasMaxLength(10)
+                .HasColumnName("codigo");
+            entity.Property(e => e.CAnulaReg).HasColumnName("c_anula_reg");
+            entity.Property(e => e.FechaCrea).HasColumnType("datetime");
+            entity.Property(e => e.FechaModi).HasColumnType("datetime");
+            entity.Property(e => e.NombreFormulario).HasMaxLength(50);
+            entity.Property(e => e.NombreMenu).HasMaxLength(50);
+            entity.Property(e => e.NombreModulo).HasMaxLength(50);
+            entity.Property(e => e.NombreTool).HasMaxLength(50);
+            entity.Property(e => e.UsuarioCrea).HasMaxLength(20);
+            entity.Property(e => e.UsuarioModi).HasMaxLength(20);
         });
 
         modelBuilder.Entity<Plantilla>(entity =>
@@ -368,6 +408,21 @@ public partial class DbQhseContext : DbContext
             entity.HasOne(d => d.IdCreateNavigation).WithMany(p => p.Trabajadors)
                 .HasForeignKey(d => d.IdCreate)
                 .HasConstraintName("FK_Trabajador_Creacion");
+        });
+
+        modelBuilder.Entity<UsuaPermiso>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("UsuaPermiso");
+
+            entity.Property(e => e.CAnulaReg).HasColumnName("c_anula_reg");
+            entity.Property(e => e.CodiModulo).HasMaxLength(5);
+            entity.Property(e => e.CodiUsuario).HasMaxLength(15);
+            entity.Property(e => e.FechaCrea).HasColumnType("datetime");
+            entity.Property(e => e.FechaModi).HasColumnType("datetime");
+            entity.Property(e => e.UsuarioModi).HasMaxLength(10);
+            entity.Property(e => e.Usuariocrea).HasMaxLength(10);
         });
 
         modelBuilder.Entity<Usuario>(entity =>

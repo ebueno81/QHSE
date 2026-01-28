@@ -35,6 +35,8 @@ public partial class Usuario
     /// </summary>
     public int? IdCreate { get; set; }
 
+    public bool? Activo { get; set; }
+
     public virtual Creacion? IdCreateNavigation { get; set; }
 
     public virtual TpoUsuario? IdTpoUsuaNavigation { get; set; }

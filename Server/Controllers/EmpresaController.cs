@@ -32,7 +32,6 @@ namespace QHSE.Server.Controllers
                 List<EmpresaDTO> _listaEmpresa = new List<EmpresaDTO>();
                 IQueryable<Empresa> query = await _empresaRepositorio.Consultar();
 
-
                 _listaEmpresa = _mapper.Map<List<EmpresaDTO>>(query.ToList());
 
                 if (_listaEmpresa.Count > 0)
@@ -44,26 +43,20 @@ namespace QHSE.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 _response = new ResponseDTO<List<EmpresaDTO>>() { status = false, msg = ex.Message, value = null };
                 return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }
-
         }
 
         [HttpPost]
         [Route("Guardar")]
         public async Task<IActionResult> Guardar([FromBody] EmpresaDTO request)
         {
-
             ResponseDTO<EmpresaDTO> _ResponseDTO = new ResponseDTO<EmpresaDTO>();
-
             try
             {
                 Empresa _empresa = _mapper.Map<Empresa>(request);
-
                 Empresa _empresaCreada = await _empresaRepositorio.Crear(_empresa);
-
 
                 if (_empresaCreada.IdEmp != 0)
                     _ResponseDTO = new ResponseDTO<EmpresaDTO>() { status = true, msg = "ok", value = _mapper.Map<EmpresaDTO>(_empresaCreada) };
@@ -71,25 +64,19 @@ namespace QHSE.Server.Controllers
                     _ResponseDTO = new ResponseDTO<EmpresaDTO>() { status = false, msg = "No se pudo crear la empresa" };
 
                 return StatusCode(StatusCodes.Status200OK, _ResponseDTO);
-
             }
             catch (Exception ex)
             {
-
                 _ResponseDTO = new ResponseDTO<EmpresaDTO>() { status = false, msg = ex.Message };
                 return StatusCode(StatusCodes.Status500InternalServerError, _ResponseDTO);
             }
-
-
         }
 
         [HttpPut]
         [Route("Editar")]
         public async Task<IActionResult> Editar([FromBody] EmpresaDTO request)
         {
-
             ResponseDTO<bool> _ResponseDTO = new ResponseDTO<bool>();
-
             try
             {
                 Empresa _empresa = _mapper.Map<Empresa>(request);
@@ -104,7 +91,12 @@ namespace QHSE.Server.Controllers
                     _empresaEditar.DistEmp = _empresa.DistEmp;
                     _empresaEditar.ProvEmp = _empresa.ProvEmp;
                     _empresaEditar.DptEmp = _empresa.DptEmp;
-                    
+                    _empresaEditar.ActividadEmp = _empresa.ActividadEmp;
+                    _empresaEditar.JefeSstr = _empresa.JefeSstr;
+                    _empresaEditar.JefeComite = _empresa.JefeComite;
+                    _empresaEditar.JefePlanta = _empresa.JefePlanta;
+                    _empresaEditar.CantTrabEmp = _empresa.CantTrabEmp;
+
                     _empresaEditar.CorreoEmp = _empresa.CorreoEmp;
 
                     bool respuesta = await _empresaRepositorio.Editar(_empresaEditar);

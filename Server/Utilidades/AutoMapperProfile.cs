@@ -122,8 +122,6 @@ namespace QHSE.Server.Utilidades
             CreateMap<InspeccionDetDTO, InspeccionDet>();
             #endregion InspeccionDetalle
 
-          
-
             #region Plantilla
             CreateMap<Plantilla, PlantillaDTO>()
                  .ForMember(destino =>
@@ -190,7 +188,6 @@ namespace QHSE.Server.Utilidades
             CreateMap<TpoInspeccion, TipoInspeccionDTO>();
             CreateMap<TipoInspeccionDTO, TpoInspeccion>();
             #endregion TipoInspeccion
-
 
             #region Usuario
             CreateMap<UsuarioDTO, Usuario>();
